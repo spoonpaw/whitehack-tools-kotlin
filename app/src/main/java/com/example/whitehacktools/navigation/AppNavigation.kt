@@ -39,6 +39,9 @@ fun AppNavigation(
                 },
                 onExportCharacter = {
                     // TODO: Handle export
+                },
+                onDeleteCharacter = { character ->
+                    characters = characters.filter { it.id != character.id }
                 }
             )
         }

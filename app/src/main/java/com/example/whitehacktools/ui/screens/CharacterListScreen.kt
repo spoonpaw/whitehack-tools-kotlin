@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,7 +18,8 @@ fun CharacterListScreen(
     characters: List<PlayerCharacter> = emptyList(),
     onAddCharacter: () -> Unit = {},
     onImportCharacter: () -> Unit = {},
-    onExportCharacter: () -> Unit = {}
+    onExportCharacter: () -> Unit = {},
+    onDeleteCharacter: (PlayerCharacter) -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -62,7 +64,10 @@ fun CharacterListScreen(
                 contentPadding = PaddingValues(16.dp)
             ) {
                 items(characters) { character ->
-                    CharacterListItem(character = character)
+                    CharacterListItem(
+                        character = character,
+                        onDelete = { onDeleteCharacter(character) }
+                    )
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
@@ -74,27 +79,60 @@ fun CharacterListScreen(
 @Composable
 private fun CharacterListItem(
     character: PlayerCharacter,
+    onDelete: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete Character") },
+            text = { Text("Are you sure you want to delete ${character.name}?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showDeleteDialog = false
+                        onDelete()
+                    }
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     Card(
         modifier = modifier.fillMaxWidth(),
         onClick = { /* TODO: Navigate to character detail */ }
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .padding(16.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = character.name,
-                style = MaterialTheme.typography.titleMedium
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "Level ${character.level} ${character.characterClass}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Column {
+                Text(
+                    text = character.name,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Level ${character.level} ${character.characterClass}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            IconButton(onClick = { showDeleteDialog = true }) {
+                Text("×", style = MaterialTheme.typography.titleLarge)
+            }
         }
     }
 }
