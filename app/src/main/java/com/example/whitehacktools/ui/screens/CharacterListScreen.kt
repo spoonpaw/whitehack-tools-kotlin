@@ -17,6 +17,7 @@ fun CharacterListScreen(
     modifier: Modifier = Modifier,
     characters: List<PlayerCharacter> = emptyList(),
     onAddCharacter: () -> Unit = {},
+    onSelectCharacter: (PlayerCharacter) -> Unit = {},
     onImportCharacter: () -> Unit = {},
     onExportCharacter: () -> Unit = {},
     onDeleteCharacter: (PlayerCharacter) -> Unit = {}
@@ -72,6 +73,7 @@ fun CharacterListScreen(
                 items(characters) { character ->
                     CharacterListItem(
                         character = character,
+                        onSelect = { onSelectCharacter(character) },
                         onDelete = { onDeleteCharacter(character) }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -85,6 +87,7 @@ fun CharacterListScreen(
 @Composable
 private fun CharacterListItem(
     character: PlayerCharacter,
+    onSelect: () -> Unit = {},
     onDelete: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -115,7 +118,7 @@ private fun CharacterListItem(
 
     Card(
         modifier = modifier.fillMaxWidth(),
-        onClick = { /* TODO: Navigate to character detail */ }
+        onClick = onSelect
     ) {
         Row(
             modifier = Modifier

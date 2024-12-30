@@ -9,16 +9,17 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharacterFormScreen(
+    initialName: String = "",
     modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit = {},
     onSave: (String) -> Unit = {}
 ) {
-    var name by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf(initialName) }
     
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("New Character") },
+                title = { Text(if (initialName.isEmpty()) "New Character" else "Edit Character") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Text("←", style = MaterialTheme.typography.titleLarge)
@@ -28,7 +29,6 @@ fun CharacterFormScreen(
                     FilledTonalButton(
                         onClick = { 
                             onSave(name)
-                            onNavigateBack()
                         },
                         enabled = name.isNotBlank()
                     ) {
