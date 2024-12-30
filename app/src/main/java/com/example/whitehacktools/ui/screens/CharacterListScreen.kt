@@ -27,11 +27,17 @@ fun CharacterListScreen(
                 title = { Text("Characters") },
                 actions = {
                     // Import button
-                    FilledTonalButton(onClick = onImportCharacter) {
+                    FilledTonalButton(
+                        onClick = onImportCharacter,
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
                         Text("Import")
                     }
                     // Export button
-                    FilledTonalButton(onClick = onExportCharacter) {
+                    FilledTonalButton(
+                        onClick = onExportCharacter,
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
                         Text("Export")
                     }
                     // Add button
