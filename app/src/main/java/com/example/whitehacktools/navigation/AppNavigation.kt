@@ -16,10 +16,9 @@ import java.util.UUID
 
 sealed class Screen(val route: String) {
     object CharacterList : Screen("characterList")
-    object CharacterForm : Screen("characterForm?characterId={characterId}") {
+    object CharacterForm : Screen("characterForm/{characterId}") {
         fun createRoute(characterId: String? = null) = 
-            if (characterId != null) "characterForm?characterId=$characterId"
-            else "characterForm?characterId"
+            "characterForm/${characterId ?: "new"}"
     }
     object CharacterDetail : Screen("characterDetail/{characterId}") {
         fun createRoute(characterId: String) = "characterDetail/$characterId"
@@ -47,12 +46,8 @@ fun AppNavigation(
                 onSelectCharacter = { character ->
                     navController.navigate(Screen.CharacterDetail.createRoute(character.id))
                 },
-                onImportCharacter = {
-                    // TODO: Handle import
-                },
-                onExportCharacter = {
-                    // TODO: Handle export
-                },
+                onImportCharacter = {},  // Keeping these for now
+                onExportCharacter = {},  // Keeping these for now
                 onDeleteCharacter = { character ->
                     characters = characters.filter { it.id != character.id }
                 }
@@ -70,18 +65,19 @@ fun AppNavigation(
             )
         ) { backStackEntry ->
             val characterId = backStackEntry.arguments?.getString("characterId")
-            val character = characterId?.let { id -> characters.find { it.id == id } }
+            val character = if (characterId != "new") characters.find { it.id == characterId } else null
             
             CharacterFormScreen(
                 initialName = character?.name ?: "",
+                initialLevel = character?.level ?: 1,
                 onNavigateBack = {
                     navController.popBackStack()
                 },
-                onSave = { name ->
+                onSave = { name, level ->
                     if (character != null) {
                         // Update existing character
                         characters = characters.map { 
-                            if (it.id == character.id) it.copy(name = name)
+                            if (it.id == character.id) it.copy(name = name, level = level)
                             else it
                         }
                     } else {
@@ -90,7 +86,7 @@ fun AppNavigation(
                             id = UUID.randomUUID().toString(),
                             name = name,
                             characterClass = "Fighter", // Default values for now
-                            level = 1
+                            level = level
                         )
                         characters = characters + newCharacter
                     }
@@ -102,7 +98,9 @@ fun AppNavigation(
         composable(
             route = Screen.CharacterDetail.route,
             arguments = listOf(
-                navArgument("characterId") { type = NavType.StringType }
+                navArgument("characterId") {
+                    type = NavType.StringType
+                }
             )
         ) { backStackEntry ->
             val characterId = backStackEntry.arguments?.getString("characterId")
