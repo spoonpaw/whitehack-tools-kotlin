@@ -3,12 +3,15 @@ package com.example.whitehacktools.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.whitehacktools.model.PlayerCharacter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,7 +46,11 @@ fun CharacterListScreen(
                     }
                     // Add button
                     IconButton(onClick = onAddCharacter) {
-                        Text("+", style = MaterialTheme.typography.titleLarge)
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = "Add Character",
+                            modifier = Modifier.size(32.dp)
+                        )
                     }
                 }
             )
@@ -71,11 +78,41 @@ fun CharacterListScreen(
                 contentPadding = PaddingValues(16.dp)
             ) {
                 items(characters) { character ->
-                    CharacterListItem(
-                        character = character,
-                        onSelect = { onSelectCharacter(character) },
-                        onDelete = { onDeleteCharacter(character) }
-                    )
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        onClick = { onSelectCharacter(character) }
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(
+                                    text = character.name,
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                                Text(
+                                    text = "Level ${character.level} ${character.characterClass}",
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                            IconButton(
+                                onClick = { onDeleteCharacter(character) },
+                                modifier = Modifier.size(48.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.Close,
+                                    contentDescription = "Delete Character",
+                                    modifier = Modifier.size(32.dp)
+                                )
+                            }
+                        }
+                    }
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }
