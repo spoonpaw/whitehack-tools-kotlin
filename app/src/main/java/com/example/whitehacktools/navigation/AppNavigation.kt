@@ -9,10 +9,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.whitehacktools.model.PlayerCharacter
-import com.example.whitehacktools.ui.screens.CharacterFormScreen
-import com.example.whitehacktools.ui.screens.CharacterListScreen
-import com.example.whitehacktools.ui.screens.CharacterDetailScreen
-import java.util.UUID
+import com.example.whitehacktools.ui.screens.*
+import java.util.*
 
 sealed class Screen(val route: String) {
     object CharacterList : Screen("characterList")
@@ -70,14 +68,15 @@ fun AppNavigation(
             CharacterFormScreen(
                 initialName = character?.name ?: "",
                 initialLevel = character?.level ?: 1,
+                initialCharacterClass = character?.characterClass ?: "Deft",
                 onNavigateBack = {
                     navController.popBackStack()
                 },
-                onSave = { name, level ->
+                onSave = { name, level, characterClass ->
                     if (character != null) {
                         // Update existing character
                         characters = characters.map { 
-                            if (it.id == character.id) it.copy(name = name, level = level)
+                            if (it.id == character.id) it.copy(name = name, level = level, characterClass = characterClass)
                             else it
                         }
                     } else {
@@ -85,7 +84,7 @@ fun AppNavigation(
                         val newCharacter = PlayerCharacter(
                             id = UUID.randomUUID().toString(),
                             name = name,
-                            characterClass = "Fighter", // Default values for now
+                            characterClass = characterClass,
                             level = level
                         )
                         characters = characters + newCharacter

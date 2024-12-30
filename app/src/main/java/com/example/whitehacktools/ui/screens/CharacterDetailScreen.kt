@@ -2,7 +2,8 @@ package com.example.whitehacktools.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.whitehacktools.model.PlayerCharacter
@@ -11,9 +12,8 @@ import com.example.whitehacktools.model.PlayerCharacter
 @Composable
 fun CharacterDetailScreen(
     character: PlayerCharacter,
-    onNavigateBack: () -> Unit,
-    onEditCharacter: () -> Unit,
-    modifier: Modifier = Modifier
+    onNavigateBack: () -> Unit = {},
+    onEditCharacter: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
@@ -21,70 +21,126 @@ fun CharacterDetailScreen(
                 title = { Text("Character Detail") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Text("←", style = MaterialTheme.typography.titleLarge)
+                        Text("←")
                     }
                 },
                 actions = {
-                    // Edit button
-                    FilledTonalButton(
-                        onClick = onEditCharacter,
-                        modifier = Modifier.padding(end = 8.dp)
-                    ) {
+                    TextButton(onClick = onEditCharacter) {
                         Text("Edit")
                     }
                 }
             )
-        },
-        modifier = modifier
-    ) { paddingValues ->
+        }
+    ) { padding ->
         Column(
             modifier = Modifier
-                .padding(paddingValues)
-                .padding(16.dp)
+                .fillMaxSize()
+                .padding(padding)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Basic Info Card
+            // Header Card
             Card(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(
                     modifier = Modifier
-                        .padding(16.dp)
                         .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text(
-                        text = "Name",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    // Character Name
                     Text(
                         text = character.name,
-                        style = MaterialTheme.typography.bodyLarge
+                        style = MaterialTheme.typography.headlineMedium
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
                     
-                    Text(
-                        text = "Class",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        text = character.characterClass,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    // Player Name
+                    if (character.playerName.isNotEmpty()) {
+                        Text(
+                            text = "Player: ${character.playerName}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                     
-                    Text(
-                        text = "Level",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    // Stats Grid
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        // Level
+                        StatCard(
+                            title = "Level",
+                            value = character.level.toString()
+                        )
+                        
+                        // Class
+                        StatCard(
+                            title = "Class",
+                            value = character.characterClass
+                        )
+                        
+                        // XP
+                        StatCard(
+                            title = "XP",
+                            value = character.experience.toString()
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    // Health Bar
+                    LinearProgressIndicator(
+                        progress = character.currentHP.toFloat() / character.maxHP.toFloat(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(8.dp),
+                        color = when {
+                            character.currentHP <= 0 -> MaterialTheme.colorScheme.error
+                            character.currentHP < character.maxHP / 2 -> MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
+                            character.currentHP < character.maxHP -> MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
+                            else -> MaterialTheme.colorScheme.primary
+                        }
                     )
                     Text(
-                        text = character.level.toString(),
-                        style = MaterialTheme.typography.bodyLarge
+                        text = "HP: ${character.currentHP}/${character.maxHP}",
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
-            // Add more sections for other character details here
+        }
+    }
+}
+
+@Composable
+private fun StatCard(
+    title: String,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Column(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleMedium
+            )
         }
     }
 }
