@@ -1,11 +1,16 @@
 package com.example.whitehacktools.ui.screens
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.whitehacktools.model.PlayerCharacter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -21,14 +26,23 @@ fun CharacterDetailScreen(
                 title = { Text("Character Detail") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Text("←")
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            modifier = Modifier.size(32.dp)
+                        )
                     }
                 },
                 actions = {
                     TextButton(onClick = onEditCharacter) {
-                        Text("Edit")
+                        Text(
+                            "Edit",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
-                }
+                },
+                modifier = Modifier.padding(vertical = 8.dp)
             )
         }
     ) { padding ->
