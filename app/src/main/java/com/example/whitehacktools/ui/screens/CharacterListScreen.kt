@@ -19,22 +19,22 @@ fun CharacterListScreen(
     onImportCharacter: () -> Unit = {},
     onExportCharacter: () -> Unit = {}
 ) {
-    androidx.compose.material3.Scaffold(
+    Scaffold(
         topBar = {
-            androidx.compose.material3.TopAppBar(
-                title = { androidx.compose.material3.Text("Characters") },
+            TopAppBar(
+                title = { Text("Characters") },
                 actions = {
                     // Import button
-                    androidx.compose.material3.TextButton(onClick = onImportCharacter) {
-                        androidx.compose.material3.Text("Import")
+                    FilledTonalButton(onClick = onImportCharacter) {
+                        Text("Import")
                     }
                     // Export button
-                    androidx.compose.material3.TextButton(onClick = onExportCharacter) {
-                        androidx.compose.material3.Text("Export")
+                    FilledTonalButton(onClick = onExportCharacter) {
+                        Text("Export")
                     }
                     // Add button
-                    androidx.compose.material3.IconButton(onClick = onAddCharacter) {
-                        androidx.compose.material3.Text("+", style = androidx.compose.material3.MaterialTheme.typography.titleLarge)
+                    IconButton(onClick = onAddCharacter) {
+                        Text("+", style = MaterialTheme.typography.titleLarge)
                     }
                 }
             )
@@ -48,10 +48,10 @@ fun CharacterListScreen(
                     .padding(paddingValues),
                 contentAlignment = Alignment.Center
             ) {
-                androidx.compose.material3.Text(
+                Text(
                     text = "No characters yet",
-                    style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
-                    color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         } else {
@@ -76,7 +76,7 @@ private fun CharacterListItem(
     character: PlayerCharacter,
     modifier: Modifier = Modifier
 ) {
-    androidx.compose.material3.Card(
+    Card(
         modifier = modifier.fillMaxWidth(),
         onClick = { /* TODO: Navigate to character detail */ }
     ) {
@@ -85,15 +85,15 @@ private fun CharacterListItem(
                 .padding(16.dp)
                 .fillMaxWidth()
         ) {
-            androidx.compose.material3.Text(
+            Text(
                 text = character.name,
-                style = androidx.compose.material3.MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.height(4.dp))
-            androidx.compose.material3.Text(
+            Text(
                 text = "Level ${character.level} ${character.characterClass}",
-                style = androidx.compose.material3.MaterialTheme.typography.bodyMedium,
-                color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
