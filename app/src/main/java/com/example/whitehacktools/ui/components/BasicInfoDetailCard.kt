@@ -16,7 +16,7 @@ fun BasicInfoDetailCard(
     modifier: Modifier = Modifier
 ) {
     SectionCard(
-        title = "Basic Information",
+        title = "Basic Info",
         modifier = modifier
     ) {
         Column(
