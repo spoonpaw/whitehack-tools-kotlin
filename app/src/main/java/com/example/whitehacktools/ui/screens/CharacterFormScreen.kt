@@ -6,9 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.whitehacktools.ui.components.BasicInfoFormCard
-import com.example.whitehacktools.ui.components.TopBarAction
-import com.example.whitehacktools.ui.components.WhitehackTopAppBar
+import com.example.whitehacktools.ui.components.*
 
 private val characterClasses = listOf(
     "Deft",
@@ -26,13 +24,15 @@ fun CharacterFormScreen(
     initialPlayerName: String = "",
     initialLevel: Int = 1,
     initialCharacterClass: String = "Deft",
+    initialTab: CharacterTab = CharacterTab.Info,
     onNavigateBack: () -> Unit = {},
-    onSave: (name: String, level: Int, characterClass: String) -> Unit = { _, _, _ -> }
+    onSave: (name: String, level: Int, characterClass: String, selectedTab: CharacterTab) -> Unit = { _, _, _, _ -> }
 ) {
     var name by remember { mutableStateOf(initialName) }
     var playerName by remember { mutableStateOf(initialPlayerName) }
     var level by remember { mutableStateOf(initialLevel.toString()) }
     var characterClass by remember { mutableStateOf(initialCharacterClass) }
+    var selectedTab by remember { mutableStateOf(initialTab) }
 
     Scaffold(
         topBar = {
@@ -44,7 +44,7 @@ fun CharacterFormScreen(
                         text = "Save",
                         onClick = {
                             val levelInt = level.toIntOrNull() ?: 1
-                            onSave(name, levelInt, characterClass)
+                            onSave(name, levelInt, characterClass, selectedTab)
                         },
                         enabled = name.isNotBlank() && level.toIntOrNull() in 1..10,
                         isPrimary = true
@@ -57,22 +57,74 @@ fun CharacterFormScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            BasicInfoFormCard(
-                name = name,
-                onNameChange = { name = it },
-                playerName = playerName,
-                onPlayerNameChange = { playerName = it },
-                level = level,
-                onLevelChange = { level = it },
-                characterClass = characterClass,
-                onCharacterClassChange = { characterClass = it },
-                characterClasses = characterClasses,
-                modifier = Modifier.fillMaxWidth()
+            CharacterTabBar(
+                selectedTab = selectedTab,
+                onTabSelected = { selectedTab = it }
             )
+            
+            when (selectedTab) {
+                CharacterTab.Info -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        BasicInfoFormCard(
+                            name = name,
+                            onNameChange = { name = it },
+                            playerName = playerName,
+                            onPlayerNameChange = { playerName = it },
+                            level = level,
+                            onLevelChange = { level = it },
+                            characterClass = characterClass,
+                            onCharacterClassChange = { characterClass = it },
+                            characterClasses = characterClasses,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
+                CharacterTab.Combat -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        SectionCard(
+                            title = "Combat Stats",
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "Combat stats form coming soon...",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+                CharacterTab.Equipment -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        SectionCard(
+                            title = "Equipment",
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "Equipment form coming soon...",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
