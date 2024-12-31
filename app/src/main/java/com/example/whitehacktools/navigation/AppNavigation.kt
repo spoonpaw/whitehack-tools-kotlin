@@ -117,18 +117,19 @@ fun AppNavigation(
             )
         ) { backStackEntry ->
             val characterId = backStackEntry.arguments?.getString("characterId")
-            val character = characters.find { it.id == characterId }
-            
-            if (character != null) {
-                CharacterDetailScreen(
-                    character = character,
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    },
-                    onEditCharacter = {
-                        navController.navigate(Screen.CharacterForm.createRoute(character.id))
-                    }
-                )
+            characterId?.let { id ->
+                val character = characters.find { it.id == id }
+                character?.let {
+                    CharacterDetailScreen(
+                        character = it,
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        },
+                        onEditCharacter = { character ->
+                            navController.navigate(Screen.CharacterForm.createRoute(character.id))
+                        }
+                    )
+                }
             }
         }
     }
