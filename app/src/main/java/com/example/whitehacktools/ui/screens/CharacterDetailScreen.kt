@@ -2,7 +2,6 @@ package com.example.whitehacktools.ui.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -10,6 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.whitehacktools.model.PlayerCharacter
 import com.example.whitehacktools.ui.components.BasicInfoDetailCard
+import com.example.whitehacktools.ui.components.TopBarAction
+import com.example.whitehacktools.ui.components.WhitehackTopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -20,18 +21,16 @@ fun CharacterDetailScreen(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(character.name) },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { onEditCharacter(character) }) {
-                        Icon(Icons.Default.Edit, contentDescription = "Edit Character")
-                    }
-                }
+            WhitehackTopAppBar(
+                title = character.name,
+                onNavigateBack = onNavigateBack,
+                actions = listOf(
+                    TopBarAction.IconAction(
+                        icon = Icons.Default.Edit,
+                        contentDescription = "Edit Character",
+                        onClick = { onEditCharacter(character) }
+                    )
+                )
             )
         }
     ) { padding ->

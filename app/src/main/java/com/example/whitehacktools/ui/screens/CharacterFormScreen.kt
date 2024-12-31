@@ -1,16 +1,14 @@
 package com.example.whitehacktools.ui.screens
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.whitehacktools.ui.components.BasicInfoFormCard
+import com.example.whitehacktools.ui.components.TopBarAction
+import com.example.whitehacktools.ui.components.WhitehackTopAppBar
 
 private val characterClasses = listOf(
     "Deft",
@@ -38,33 +36,20 @@ fun CharacterFormScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(if (initialName.isEmpty()) "New Character" else "Edit Character") },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            Icons.Default.ArrowBack,
-                            contentDescription = "Back",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
-                },
-                actions = {
-                    TextButton(
+            WhitehackTopAppBar(
+                title = if (initialName.isEmpty()) "New Character" else "Edit Character",
+                onNavigateBack = onNavigateBack,
+                actions = listOf(
+                    TopBarAction.TextAction(
+                        text = "Save",
                         onClick = {
                             val levelInt = level.toIntOrNull() ?: 1
                             onSave(name, levelInt, characterClass)
                         },
-                        enabled = name.isNotBlank() && level.toIntOrNull() in 1..10
-                    ) {
-                        Text(
-                            "Save",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                },
-                modifier = Modifier.padding(vertical = 8.dp)
+                        enabled = name.isNotBlank() && level.toIntOrNull() in 1..10,
+                        isPrimary = true
+                    )
+                )
             )
         }
     ) { padding ->

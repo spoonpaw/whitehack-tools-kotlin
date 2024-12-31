@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.whitehacktools.model.PlayerCharacter
+import com.example.whitehacktools.ui.components.TopBarAction
+import com.example.whitehacktools.ui.components.WhitehackTopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -27,32 +29,23 @@ fun CharacterListScreen(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Characters") },
-                actions = {
-                    // Import button
-                    FilledTonalButton(
-                        onClick = onImportCharacter,
-                        modifier = Modifier.padding(end = 8.dp)
-                    ) {
-                        Text("Import")
-                    }
-                    // Export button
-                    FilledTonalButton(
-                        onClick = onExportCharacter,
-                        modifier = Modifier.padding(end = 8.dp)
-                    ) {
-                        Text("Export")
-                    }
-                    // Add button
-                    IconButton(onClick = onAddCharacter) {
-                        Icon(
-                            Icons.Default.Add,
-                            contentDescription = "Add Character",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
-                }
+            WhitehackTopAppBar(
+                title = "Characters",
+                actions = listOf(
+                    TopBarAction.TonalButtonAction(
+                        text = "Import",
+                        onClick = onImportCharacter
+                    ),
+                    TopBarAction.TonalButtonAction(
+                        text = "Export",
+                        onClick = onExportCharacter
+                    ),
+                    TopBarAction.IconAction(
+                        icon = Icons.Default.Add,
+                        contentDescription = "Add Character",
+                        onClick = onAddCharacter
+                    )
+                )
             )
         },
         modifier = modifier

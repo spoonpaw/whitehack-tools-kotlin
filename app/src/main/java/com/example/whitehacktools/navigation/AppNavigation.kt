@@ -80,7 +80,17 @@ fun AppNavigation(
                 initialLevel = character?.level ?: 1,
                 initialCharacterClass = character?.characterClass ?: "Deft",
                 onNavigateBack = {
-                    navController.popBackStack()
+                    if (characterId == "new") {
+                        // From new character form, go back to list
+                        navController.navigate(Screen.CharacterList.route) {
+                            popUpTo(Screen.CharacterList.route) { inclusive = true }
+                        }
+                    } else {
+                        // From edit form, go back to detail
+                        navController.navigate(Screen.CharacterDetail.createRoute(characterId!!)) {
+                            popUpTo(Screen.CharacterForm.route) { inclusive = true }
+                        }
+                    }
                 },
                 onSave = { name, level, characterClass ->
                     scope.launch {
@@ -92,6 +102,10 @@ fun AppNavigation(
                                 } else it
                             }
                             characterStore.saveCharacters(updatedCharacters)
+                            // After editing, go back to detail view
+                            navController.navigate(Screen.CharacterDetail.createRoute(character.id)) {
+                                popUpTo(Screen.CharacterForm.route) { inclusive = true }
+                            }
                         } else {
                             // Create new character
                             val newCharacter = PlayerCharacter(
@@ -101,8 +115,11 @@ fun AppNavigation(
                                 level = level
                             )
                             characterStore.saveCharacters(characters + newCharacter)
+                            // After creating new, go back to list
+                            navController.navigate(Screen.CharacterList.route) {
+                                popUpTo(Screen.CharacterList.route) { inclusive = true }
+                            }
                         }
-                        navController.popBackStack()
                     }
                 }
             )
@@ -123,7 +140,10 @@ fun AppNavigation(
                     CharacterDetailScreen(
                         character = it,
                         onNavigateBack = {
-                            navController.popBackStack()
+                            // From detail, always go back to list
+                            navController.navigate(Screen.CharacterList.route) {
+                                popUpTo(Screen.CharacterList.route) { inclusive = true }
+                            }
                         },
                         onEditCharacter = { character ->
                             navController.navigate(Screen.CharacterForm.createRoute(character.id))
