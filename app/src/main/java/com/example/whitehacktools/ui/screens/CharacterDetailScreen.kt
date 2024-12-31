@@ -22,7 +22,7 @@ fun CharacterDetailScreen(
     Scaffold(
         topBar = {
             WhitehackTopAppBar(
-                title = character.name,
+                title = "Character Detail",
                 onNavigateBack = onNavigateBack,
                 actions = listOf(
                     TopBarAction.IconAction(
