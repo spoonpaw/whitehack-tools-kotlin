@@ -1,15 +1,19 @@
 package com.example.whitehacktools.navigation
 
+import android.content.Context
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.whitehacktools.data.CharacterStore
 import com.example.whitehacktools.model.PlayerCharacter
 import com.example.whitehacktools.ui.screens.*
+import kotlinx.coroutines.launch
 import java.util.*
 
 sealed class Screen(val route: String) {
@@ -28,7 +32,10 @@ fun AppNavigation(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController()
 ) {
-    var characters by remember { mutableStateOf(listOf<PlayerCharacter>()) }
+    val context = LocalContext.current
+    val characterStore = remember { CharacterStore(context) }
+    val characters by characterStore.characters.collectAsState(initial = emptyList())
+    val scope = rememberCoroutineScope()
     
     NavHost(
         navController = navController,
@@ -47,7 +54,9 @@ fun AppNavigation(
                 onImportCharacter = {},  // Keeping these for now
                 onExportCharacter = {},  // Keeping these for now
                 onDeleteCharacter = { character ->
-                    characters = characters.filter { it.id != character.id }
+                    scope.launch {
+                        characterStore.saveCharacters(characters.filter { it.id != character.id })
+                    }
                 }
             )
         }
@@ -67,33 +76,38 @@ fun AppNavigation(
             
             CharacterFormScreen(
                 initialName = character?.name ?: "",
+                initialPlayerName = character?.playerName ?: "",
                 initialLevel = character?.level ?: 1,
                 initialCharacterClass = character?.characterClass ?: "Deft",
                 onNavigateBack = {
                     navController.popBackStack()
                 },
                 onSave = { name, level, characterClass ->
-                    if (character != null) {
-                        // Update existing character
-                        characters = characters.map { 
-                            if (it.id == character.id) it.copy(name = name, level = level, characterClass = characterClass)
-                            else it
+                    scope.launch {
+                        if (character != null) {
+                            // Update existing character
+                            val updatedCharacters = characters.map { 
+                                if (it.id == character.id) {
+                                    it.copy(name = name, level = level, characterClass = characterClass)
+                                } else it
+                            }
+                            characterStore.saveCharacters(updatedCharacters)
+                        } else {
+                            // Create new character
+                            val newCharacter = PlayerCharacter(
+                                id = UUID.randomUUID().toString(),
+                                name = name,
+                                characterClass = characterClass,
+                                level = level
+                            )
+                            characterStore.saveCharacters(characters + newCharacter)
                         }
-                    } else {
-                        // Create new character
-                        val newCharacter = PlayerCharacter(
-                            id = UUID.randomUUID().toString(),
-                            name = name,
-                            characterClass = characterClass,
-                            level = level
-                        )
-                        characters = characters + newCharacter
+                        navController.popBackStack()
                     }
-                    navController.popBackStack()
                 }
             )
         }
-
+        
         composable(
             route = Screen.CharacterDetail.route,
             arguments = listOf(

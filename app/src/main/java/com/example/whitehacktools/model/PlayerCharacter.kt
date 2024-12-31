@@ -1,5 +1,8 @@
 package com.example.whitehacktools.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class PlayerCharacter(
     val id: String,
     val name: String,
