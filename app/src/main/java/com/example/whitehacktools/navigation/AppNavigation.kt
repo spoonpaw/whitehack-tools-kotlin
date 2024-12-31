@@ -87,6 +87,13 @@ fun AppNavigation(
                 initialPlayerName = character?.playerName ?: "",
                 initialLevel = character?.level ?: 1,
                 initialCharacterClass = character?.characterClass ?: "Deft",
+                initialCurrentHP = character?.currentHP ?: 10,
+                initialMaxHP = character?.maxHP ?: 10,
+                initialAttackValue = character?.attackValue ?: 0,
+                initialDefenseValue = character?.defenseValue ?: 0,
+                initialMovement = character?.movement ?: 30,
+                initialInitiativeBonus = character?.initiativeBonus ?: 0,
+                initialSaveColor = character?.saveColor ?: "",
                 initialTab = selectedTab,
                 onNavigateBack = {
                     if (characterId == "new") {
@@ -101,19 +108,30 @@ fun AppNavigation(
                         }
                     }
                 },
-                onSave = { name, level, characterClass, newTab ->
+                onSave = { name, level, characterClass, currentHP, maxHP, attackValue, defenseValue, movement, initiativeBonus, saveColor, selectedTab ->
                     scope.launch {
                         if (character != null) {
                             // Update existing character
                             val updatedCharacters = characters.map { existingChar -> 
                                 if (existingChar.id == character.id) {
-                                    existingChar.copy(name = name, level = level, characterClass = characterClass)
+                                    existingChar.copy(
+                                        name = name,
+                                        level = level,
+                                        characterClass = characterClass,
+                                        currentHP = currentHP,
+                                        maxHP = maxHP,
+                                        attackValue = attackValue,
+                                        defenseValue = defenseValue,
+                                        movement = movement,
+                                        initiativeBonus = initiativeBonus,
+                                        saveColor = saveColor
+                                    )
                                 } else {
                                     existingChar
                                 }
                             }
                             characterStore.saveCharacters(updatedCharacters)
-                            navController.navigate(Screen.CharacterDetail.createRoute(character.id, newTab)) {
+                            navController.navigate(Screen.CharacterDetail.createRoute(character.id, selectedTab)) {
                                 popUpTo(Screen.CharacterForm.route) { inclusive = true }
                             }
                         } else {
@@ -123,10 +141,17 @@ fun AppNavigation(
                                 name = name,
                                 playerName = "",
                                 level = level,
-                                characterClass = characterClass
+                                characterClass = characterClass,
+                                currentHP = currentHP,
+                                maxHP = maxHP,
+                                attackValue = attackValue,
+                                defenseValue = defenseValue,
+                                movement = movement,
+                                initiativeBonus = initiativeBonus,
+                                saveColor = saveColor
                             )
                             characterStore.saveCharacters(characters + newCharacter)
-                            navController.navigate(Screen.CharacterDetail.createRoute(newCharacter.id, newTab)) {
+                            navController.navigate(Screen.CharacterDetail.createRoute(newCharacter.id, selectedTab)) {
                                 popUpTo(Screen.CharacterForm.route) { inclusive = true }
                             }
                         }

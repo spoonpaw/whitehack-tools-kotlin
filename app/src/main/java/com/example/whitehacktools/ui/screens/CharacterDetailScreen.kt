@@ -66,16 +66,10 @@ fun CharacterDetailScreen(
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        SectionCard(
-                            title = "Combat Stats",
+                        CombatDetailCard(
+                            character = character,
                             modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = "Combat stats coming soon...",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
+                        )
                     }
                 }
                 com.example.whitehacktools.ui.components.CharacterTab.Equipment -> {
