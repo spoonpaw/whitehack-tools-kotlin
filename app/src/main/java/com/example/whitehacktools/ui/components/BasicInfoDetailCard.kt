@@ -3,10 +3,8 @@ package com.example.whitehacktools.ui.components
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.whitehacktools.model.PlayerCharacter
 
@@ -22,22 +20,21 @@ fun BasicInfoDetailCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             DetailItem(
-                label = "Character",
+                label = "Character Name",
                 value = character.name.ifEmpty { "Unnamed" }
             )
             
             DetailItem(
-                label = "Player",
+                label = "Player Name",
                 value = character.playerName.ifEmpty { "Unknown" }
             )
             
             DetailItem(
-                label = "Class",
+                label = "Character Class",
                 value = character.characterClass.ifEmpty { "Unspecified" }
             )
             
@@ -55,27 +52,33 @@ private fun DetailItem(
     value: String,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+        shape = MaterialTheme.shapes.medium
     ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.primary,
-            textAlign = TextAlign.Center
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Medium,
-            textAlign = TextAlign.Center,
-            color = if (value in listOf("Unnamed", "Unknown", "Unspecified")) {
-                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-            } else {
-                MaterialTheme.colorScheme.onSurface
-            }
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Medium
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Normal,
+                color = if (value in listOf("Unnamed", "Unknown", "Unspecified")) {
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                }
+            )
+        }
     }
 }

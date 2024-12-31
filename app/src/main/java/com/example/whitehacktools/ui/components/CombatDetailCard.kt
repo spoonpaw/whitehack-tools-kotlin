@@ -2,9 +2,9 @@ package com.example.whitehacktools.ui.components
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.whitehacktools.model.PlayerCharacter
 
@@ -18,123 +18,81 @@ fun CombatDetailCard(
         modifier = modifier
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // First row: HP
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                StatBox(
-                    title = "Current HP",
-                    value = character.currentHP.toString(),
-                    modifier = Modifier.weight(1f)
-                )
-                StatBox(
-                    title = "Max HP",
-                    value = character.maxHP.toString(),
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            // Second row: Attack and Defense
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                StatBox(
-                    title = "Attack",
-                    value = character.attackValue.toString(),
-                    modifier = Modifier.weight(1f)
-                )
-                StatBox(
-                    title = "Defense",
-                    value = character.defenseValue.toString(),
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            // Third row: Movement and Initiative
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                StatBox(
-                    title = "Movement",
-                    value = "${character.movement} ft",
-                    modifier = Modifier.weight(1f)
-                )
-                StatBox(
-                    title = "Initiative",
-                    value = if (character.initiativeBonus > 0) "+${character.initiativeBonus}" else "0",
-                    modifier = Modifier.weight(1f)
-                )
-            }
-
-            // Fourth row: Save Color
-            SaveColorBox(
-                title = "Save Color",
-                value = character.saveColor,
-                modifier = Modifier.fillMaxWidth()
+            DetailItem(
+                label = "Current HP",
+                value = character.currentHP.toString()
+            )
+            
+            DetailItem(
+                label = "Maximum HP",
+                value = character.maxHP.toString()
+            )
+            
+            DetailItem(
+                label = "Attack Value",
+                value = character.attackValue.toString()
+            )
+            
+            DetailItem(
+                label = "Defense Value",
+                value = character.defenseValue.toString()
+            )
+            
+            DetailItem(
+                label = "Movement",
+                value = "${character.movement} ft"
+            )
+            
+            DetailItem(
+                label = "Initiative Bonus",
+                value = if (character.initiativeBonus >= 0) "+${character.initiativeBonus}" else character.initiativeBonus.toString()
+            )
+            
+            DetailItem(
+                label = "Save Color",
+                value = character.saveColor.ifEmpty { "Unspecified" }
             )
         }
     }
 }
 
 @Composable
-private fun StatBox(
-    title: String,
+private fun DetailItem(
+    label: String,
     value: String,
     modifier: Modifier = Modifier
 ) {
     Surface(
-        modifier = modifier,
-        shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+        modifier = modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+        shape = MaterialTheme.shapes.medium
     ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            horizontalAlignment = Alignment.Start
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = title,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                text = label,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Medium
             )
-            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = value,
-                style = MaterialTheme.typography.titleLarge
-            )
-        }
-    }
-}
-
-@Composable
-private fun SaveColorBox(
-    title: String,
-    value: String,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier,
-        shape = MaterialTheme.shapes.medium,
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-    ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            horizontalAlignment = Alignment.Start
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = value,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Normal,
+                color = if (value == "Unspecified") {
+                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                } else {
+                    MaterialTheme.colorScheme.onSurface
+                }
             )
         }
     }
