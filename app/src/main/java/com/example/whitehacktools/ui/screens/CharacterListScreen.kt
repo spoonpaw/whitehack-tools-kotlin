@@ -27,6 +27,31 @@ fun CharacterListScreen(
     onExportCharacter: () -> Unit = {},
     onDeleteCharacter: (PlayerCharacter) -> Unit = {}
 ) {
+    var characterToDelete by remember { mutableStateOf<PlayerCharacter?>(null) }
+
+    characterToDelete?.let { character ->
+        AlertDialog(
+            onDismissRequest = { characterToDelete = null },
+            title = { Text("Delete Character") },
+            text = { Text("Are you sure you want to delete ${character.name}?") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onDeleteCharacter(character)
+                        characterToDelete = null
+                    }
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { characterToDelete = null }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             WhitehackTopAppBar(
@@ -68,45 +93,15 @@ fun CharacterListScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues),
-                contentPadding = PaddingValues(16.dp)
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(characters) { character ->
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        onClick = { onSelectCharacter(character) }
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column {
-                                Text(
-                                    text = character.name,
-                                    style = MaterialTheme.typography.titleMedium
-                                )
-                                Text(
-                                    text = "Level ${character.level} ${character.characterClass}",
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
-                            IconButton(
-                                onClick = { onDeleteCharacter(character) },
-                                modifier = Modifier.size(48.dp)
-                            ) {
-                                Icon(
-                                    Icons.Default.Close,
-                                    contentDescription = "Delete Character",
-                                    modifier = Modifier.size(32.dp)
-                                )
-                            }
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(8.dp))
+                    CharacterListItem(
+                        character = character,
+                        onSelect = { onSelectCharacter(character) },
+                        onDelete = { characterToDelete = character }
+                    )
                 }
             }
         }
@@ -121,31 +116,6 @@ private fun CharacterListItem(
     onDelete: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    var showDeleteDialog by remember { mutableStateOf(false) }
-
-    if (showDeleteDialog) {
-        AlertDialog(
-            onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete Character") },
-            text = { Text("Are you sure you want to delete ${character.name}?") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showDeleteDialog = false
-                        onDelete()
-                    }
-                ) {
-                    Text("Delete")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
-                }
-            }
-        )
-    }
-
     Card(
         modifier = modifier.fillMaxWidth(),
         onClick = onSelect
@@ -169,8 +139,12 @@ private fun CharacterListItem(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            IconButton(onClick = { showDeleteDialog = true }) {
-                Text("×", style = MaterialTheme.typography.titleLarge)
+            IconButton(onClick = onDelete) {
+                Icon(
+                    Icons.Default.Close,
+                    contentDescription = "Delete Character",
+                    modifier = Modifier.size(32.dp)
+                )
             }
         }
     }
