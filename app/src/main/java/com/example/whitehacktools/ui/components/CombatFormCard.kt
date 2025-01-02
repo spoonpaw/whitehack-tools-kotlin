@@ -86,56 +86,6 @@ fun CombatFormCard(
                 shape = RoundedCornerShape(12.dp)
             )
 
-            // Attack Value
-            OutlinedTextField(
-                value = attackValue,
-                onValueChange = { value ->
-                    val newValue = value.filter { it.isDigit() }
-                    onAttackValueChange(newValue)
-                },
-                label = { 
-                    Text(
-                        text = "Attack Value",
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                    focusedLabelColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                ),
-                shape = RoundedCornerShape(12.dp)
-            )
-
-            // Defense Value
-            OutlinedTextField(
-                value = defenseValue,
-                onValueChange = { value ->
-                    val newValue = value.filter { it.isDigit() }
-                    onDefenseValueChange(newValue)
-                },
-                label = { 
-                    Text(
-                        text = "Defense Value",
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                    focusedLabelColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                ),
-                shape = RoundedCornerShape(12.dp)
-            )
-
             // Movement
             OutlinedTextField(
                 value = movement,
@@ -146,31 +96,6 @@ fun CombatFormCard(
                 label = { 
                     Text(
                         text = "Movement",
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                    focusedLabelColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                ),
-                shape = RoundedCornerShape(12.dp)
-            )
-
-            // Initiative Bonus
-            OutlinedTextField(
-                value = initiativeBonus,
-                onValueChange = { value ->
-                    val newValue = value.filter { it.isDigit() || it == '+' || it == '-' }
-                    onInitiativeBonusChange(newValue)
-                },
-                label = { 
-                    Text(
-                        text = "Initiative Bonus",
                         style = MaterialTheme.typography.labelMedium
                     )
                 },
