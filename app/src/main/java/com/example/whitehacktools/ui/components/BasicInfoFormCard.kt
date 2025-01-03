@@ -23,129 +23,37 @@ fun BasicInfoFormCard(
     characterClasses: List<String>,
     modifier: Modifier = Modifier
 ) {
-    var expanded by remember { mutableStateOf(false) }
-
     SectionCard(
         title = "Basic Info",
         modifier = modifier
     ) {
-        // Character Name
-        OutlinedTextField(
+        FormField(
             value = name,
             onValueChange = onNameChange,
-            label = { 
-                Text(
-                    text = "Character Name",
-                    style = MaterialTheme.typography.labelMedium
-                )
-            },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                focusedLabelColor = MaterialTheme.colorScheme.primary,
-                unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-            ),
-            shape = RoundedCornerShape(12.dp)
+            label = "Character Name"
         )
         
-        // Player Name
-        OutlinedTextField(
+        FormField(
             value = playerName,
             onValueChange = onPlayerNameChange,
-            label = { 
-                Text(
-                    text = "Player Name",
-                    style = MaterialTheme.typography.labelMedium
-                )
-            },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                focusedLabelColor = MaterialTheme.colorScheme.primary,
-                unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-            ),
-            shape = RoundedCornerShape(12.dp)
+            label = "Player Name"
         )
-
-        // Level
-        OutlinedTextField(
+        
+        FormField(
             value = level,
-            onValueChange = { newValue ->
-                if (newValue.isEmpty() || newValue.toIntOrNull() in 1..10) {
-                    onLevelChange(newValue)
-                }
-            },
-            label = { 
-                Text(
-                    text = "Level (1-10)",
-                    style = MaterialTheme.typography.labelMedium
-                )
-            },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
+            onValueChange = onLevelChange,
+            label = "Level (1-10)",
+            keyboardType = KeyboardType.Number,
+            numberOnly = true,
             isError = level.toIntOrNull() !in 1..10,
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = MaterialTheme.colorScheme.primary,
-                unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                focusedLabelColor = MaterialTheme.colorScheme.primary,
-                unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-            ),
-            shape = RoundedCornerShape(12.dp)
+            validate = { it.isEmpty() || it.toIntOrNull() in 1..10 }
         )
-
-        // Character Class
-        Box(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = it }
-            ) {
-                OutlinedTextField(
-                    value = characterClass,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { 
-                        Text(
-                            text = "Character Class",
-                            style = MaterialTheme.typography.labelMedium
-                        )
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor(),
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                        focusedLabelColor = MaterialTheme.colorScheme.primary,
-                        unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                )
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    characterClasses.forEach { option ->
-                        DropdownMenuItem(
-                            text = { Text(option) },
-                            onClick = {
-                                onCharacterClassChange(option)
-                                expanded = false
-                            },
-                            colors = MenuDefaults.itemColors(
-                                textColor = MaterialTheme.colorScheme.onSurface
-                            )
-                        )
-                    }
-                }
-            }
-        }
+        
+        DropdownField(
+            value = characterClass,
+            onValueChange = onCharacterClassChange,
+            label = "Character Class",
+            options = characterClasses
+        )
     }
 }

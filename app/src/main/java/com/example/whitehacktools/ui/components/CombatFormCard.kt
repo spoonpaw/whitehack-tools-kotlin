@@ -1,15 +1,9 @@
 package com.example.whitehacktools.ui.components
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CombatFormCard(
     currentHP: String,
@@ -26,105 +20,44 @@ fun CombatFormCard(
         title = "Combat Stats",
         modifier = modifier
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Current HP
-            OutlinedTextField(
-                value = currentHP,
-                onValueChange = { value ->
-                    val newValue = value.filter { it.isDigit() || it == '-' }
-                    onCurrentHPChange(newValue)
-                },
-                label = { 
-                    Text(
-                        text = "Current HP",
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                    focusedLabelColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                ),
-                shape = RoundedCornerShape(12.dp)
-            )
-
-            // Max HP
-            OutlinedTextField(
-                value = maxHP,
-                onValueChange = { value ->
-                    val newValue = value.filter { it.isDigit() }
-                    onMaxHPChange(newValue)
-                },
-                label = { 
-                    Text(
-                        text = "Max HP",
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                    focusedLabelColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                ),
-                shape = RoundedCornerShape(12.dp)
-            )
-
-            // Movement
-            OutlinedTextField(
-                value = movement,
-                onValueChange = { value ->
-                    val newValue = value.filter { it.isDigit() }
-                    onMovementChange(newValue)
-                },
-                label = { 
-                    Text(
-                        text = "Movement",
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                    focusedLabelColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                ),
-                shape = RoundedCornerShape(12.dp)
-            )
-
-            // Save Color
-            OutlinedTextField(
-                value = saveColor,
-                onValueChange = onSaveColorChange,
-                label = { 
-                    Text(
-                        text = "Save Color",
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                    focusedLabelColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                ),
-                shape = RoundedCornerShape(12.dp)
-            )
-        }
+        FormField(
+            value = currentHP,
+            onValueChange = { value ->
+                val newValue = value.filter { it.isDigit() || it == '-' }
+                onCurrentHPChange(newValue)
+            },
+            label = "Current HP",
+            keyboardType = KeyboardType.Number,
+            numberOnly = true,
+            validate = { it.isEmpty() || it.first() != '-' || it.count { c -> c == '-' } <= 1 }
+        )
+        
+        FormField(
+            value = maxHP,
+            onValueChange = { value ->
+                val newValue = value.filter { it.isDigit() }
+                onMaxHPChange(newValue)
+            },
+            label = "Max HP",
+            keyboardType = KeyboardType.Number,
+            numberOnly = true
+        )
+        
+        FormField(
+            value = movement,
+            onValueChange = { value ->
+                val newValue = value.filter { it.isDigit() }
+                onMovementChange(newValue)
+            },
+            label = "Movement",
+            keyboardType = KeyboardType.Number,
+            numberOnly = true
+        )
+        
+        FormField(
+            value = saveColor,
+            onValueChange = onSaveColorChange,
+            label = "Save Color"
+        )
     }
 }

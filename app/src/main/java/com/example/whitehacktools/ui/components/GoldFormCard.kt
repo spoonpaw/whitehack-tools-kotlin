@@ -30,81 +30,28 @@ fun GoldFormCard(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Gold on Hand
-            OutlinedTextField(
+            FormField(
                 value = goldOnHand,
-                onValueChange = { value ->
-                    val newValue = value.filter { it.isDigit() }
-                    onGoldOnHandChange(newValue)
-                },
-                label = { 
-                    Text(
-                        text = "Gold on Hand",
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                    focusedLabelColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                ),
-                shape = RoundedCornerShape(12.dp)
+                onValueChange = onGoldOnHandChange,
+                label = "Gold on Hand",
+                keyboardType = KeyboardType.Number,
+                numberOnly = true
             )
-
+            
             // Stashed Gold
-            OutlinedTextField(
+            FormField(
                 value = stashedGold,
-                onValueChange = { value ->
-                    val newValue = value.filter { it.isDigit() }
-                    onStashedGoldChange(newValue)
-                },
-                label = { 
-                    Text(
-                        text = "Stashed Gold",
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                    focusedLabelColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                ),
-                shape = RoundedCornerShape(12.dp)
+                onValueChange = onStashedGoldChange,
+                label = "Stashed Gold",
+                keyboardType = KeyboardType.Number,
+                numberOnly = true
             )
-
+            
             // Total Gold
-            Surface(
-                modifier = Modifier.fillMaxWidth(),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = "Total Gold",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = totalGold.toString(),
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
+            DetailItem(
+                label = "Total Gold",
+                value = totalGold.toString()
+            )
         }
     }
 }
