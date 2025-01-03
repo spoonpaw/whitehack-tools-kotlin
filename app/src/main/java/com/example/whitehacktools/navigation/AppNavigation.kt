@@ -77,7 +77,11 @@ fun AppNavigation(
             CharacterDetailScreen(
                 character = character,
                 initialTab = selectedTab,
-                onNavigateBack = { navController.popBackStack() },
+                onNavigateBack = { 
+                    navController.navigate(Screen.CharacterList.route) {
+                        popUpTo(Screen.CharacterList.route) { inclusive = true }
+                    }
+                },
                 onEdit = { tab ->
                     navController.navigate(Screen.CharacterForm.createRoute(character.id, tab))
                 }
@@ -119,7 +123,17 @@ fun AppNavigation(
                 initialUseDefaultAttributes = character?.useDefaultAttributes ?: true,
                 initialCustomAttributeArray = character?.customAttributeArray,
                 initialTab = selectedTab,
-                onNavigateBack = { navController.popBackStack() },
+                onNavigateBack = { 
+                    if (characterId == "new") {
+                        navController.navigate(Screen.CharacterList.route) {
+                            popUpTo(Screen.CharacterList.route) { inclusive = true }
+                        }
+                    } else {
+                        navController.navigate(Screen.CharacterDetail.createRoute(characterId, selectedTab)) {
+                            popUpTo(Screen.CharacterList.route)
+                        }
+                    }
+                },
                 onSave = { name, level, characterClass, currentHP, maxHP, movement, saveColor, goldOnHand, stashedGold, useDefaultAttributes, strength, agility, toughness, intelligence, willpower, charisma, customAttributeArray, tab ->
                     scope.launch {
                         if (character != null) {
