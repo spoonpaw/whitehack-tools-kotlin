@@ -28,8 +28,10 @@ fun CharacterFormScreen(
     initialMaxHP: Int = 10,
     initialMovement: Int = 30,
     initialSaveColor: String = "",
+    initialGoldOnHand: Int = 0,
+    initialStashedGold: Int = 0,
     initialTab: CharacterTab = CharacterTab.Info,
-    onNavigateBack: () -> Unit = {},
+    onNavigateBack: (CharacterTab) -> Unit = {},
     onSave: (
         name: String,
         level: Int,
@@ -41,8 +43,10 @@ fun CharacterFormScreen(
         movement: Int,
         initiativeBonus: Int,
         saveColor: String,
-        _: CharacterTab
-    ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _ -> }
+        goldOnHand: String,
+        stashedGold: String,
+        tab: CharacterTab
+    ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _, _, _ -> }
 ) {
     var name by remember { mutableStateOf(initialName) }
     var playerName by remember { mutableStateOf(initialPlayerName) }
@@ -58,12 +62,14 @@ fun CharacterFormScreen(
     var movement by remember { mutableStateOf(initialMovement.toString()) }
     var initiativeBonus by remember { mutableStateOf("0") }
     var saveColor by remember { mutableStateOf(initialSaveColor) }
+    var goldOnHand by remember { mutableStateOf(initialGoldOnHand.toString()) }
+    var stashedGold by remember { mutableStateOf(initialStashedGold.toString()) }
 
     Scaffold(
         topBar = {
             WhitehackTopAppBar(
                 title = if (initialName.isEmpty()) "New Character" else "Edit Character",
-                onNavigateBack = onNavigateBack,
+                onNavigateBack = { onNavigateBack(selectedTab) },
                 actions = listOf(
                     TopBarAction.TextAction(
                         text = "Save",
@@ -87,6 +93,8 @@ fun CharacterFormScreen(
                                 movementInt,
                                 initiativeInt,
                                 saveColor,
+                                goldOnHand,
+                                stashedGold,
                                 selectedTab
                             )
                         },
@@ -157,16 +165,13 @@ fun CharacterFormScreen(
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        SectionCard(
-                            title = "Equipment",
+                        GoldFormCard(
+                            goldOnHand = goldOnHand,
+                            onGoldOnHandChange = { goldOnHand = it },
+                            stashedGold = stashedGold,
+                            onStashedGoldChange = { stashedGold = it },
                             modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = "Equipment form coming soon...",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
+                        )
                     }
                 }
             }

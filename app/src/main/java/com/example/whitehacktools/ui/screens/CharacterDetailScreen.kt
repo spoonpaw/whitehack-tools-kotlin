@@ -79,16 +79,11 @@ fun CharacterDetailScreen(
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        SectionCard(
-                            title = "Equipment",
+                        GoldDetailCard(
+                            goldOnHand = character.goldOnHand,
+                            stashedGold = character.stashedGold,
                             modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = "Equipment details coming soon...",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
+                        )
                     }
                 }
             }

@@ -91,8 +91,10 @@ fun AppNavigation(
                 initialMaxHP = character?.maxHP ?: 10,
                 initialMovement = character?.movement ?: 30,
                 initialSaveColor = character?.saveColor ?: "",
+                initialGoldOnHand = character?.goldOnHand ?: 0,
+                initialStashedGold = character?.stashedGold ?: 0,
                 initialTab = selectedTab,
-                onNavigateBack = {
+                onNavigateBack = { tab ->
                     if (characterId == "new") {
                         // From new character form, go back to list
                         navController.navigate(Screen.CharacterList.route) {
@@ -100,12 +102,12 @@ fun AppNavigation(
                         }
                     } else {
                         // From edit form, go back to detail
-                        navController.navigate(Screen.CharacterDetail.createRoute(characterId!!, selectedTab)) {
+                        navController.navigate(Screen.CharacterDetail.createRoute(characterId!!, tab)) {
                             popUpTo(Screen.CharacterForm.route) { inclusive = true }
                         }
                     }
                 },
-                onSave = { name, level, characterClass, currentHP, maxHP, attackValue, defenseValue, movement, initiativeBonus, saveColor, _ ->
+                onSave = { name, level, characterClass, currentHP, maxHP, attackValue, defenseValue, movement, initiativeBonus, saveColor, goldOnHand, stashedGold, tab ->
                     scope.launch {
                         if (character != null) {
                             // Update existing character
@@ -121,14 +123,16 @@ fun AppNavigation(
                                         defenseValue = defenseValue,
                                         movement = movement,
                                         initiativeBonus = initiativeBonus,
-                                        saveColor = saveColor
+                                        saveColor = saveColor,
+                                        goldOnHand = goldOnHand.toIntOrNull() ?: 0,
+                                        stashedGold = stashedGold.toIntOrNull() ?: 0
                                     )
                                 } else {
                                     existingChar
                                 }
                             }
                             characterStore.saveCharacters(updatedCharacters)
-                            navController.navigate(Screen.CharacterDetail.createRoute(character.id, selectedTab)) {
+                            navController.navigate(Screen.CharacterDetail.createRoute(character.id, tab)) {
                                 popUpTo(Screen.CharacterForm.route) { inclusive = true }
                             }
                         } else {
@@ -145,10 +149,12 @@ fun AppNavigation(
                                 defenseValue = defenseValue,
                                 movement = movement,
                                 initiativeBonus = initiativeBonus,
-                                saveColor = saveColor
+                                saveColor = saveColor,
+                                goldOnHand = goldOnHand.toIntOrNull() ?: 0,
+                                stashedGold = stashedGold.toIntOrNull() ?: 0
                             )
                             characterStore.saveCharacters(characters + newCharacter)
-                            navController.navigate(Screen.CharacterDetail.createRoute(newCharacter.id, selectedTab)) {
+                            navController.navigate(Screen.CharacterDetail.createRoute(newCharacter.id, tab)) {
                                 popUpTo(Screen.CharacterForm.route) { inclusive = true }
                             }
                         }

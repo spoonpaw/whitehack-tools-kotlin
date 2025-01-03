@@ -17,5 +17,7 @@ data class PlayerCharacter(
     val defenseValue: Int = 0,
     val movement: Int = 30,
     val initiativeBonus: Int = 0,
-    val saveColor: String = ""
+    val saveColor: String = "",
+    val goldOnHand: Int = 0,
+    val stashedGold: Int = 0
 )
