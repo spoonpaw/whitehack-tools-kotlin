@@ -3,6 +3,8 @@ package com.example.whitehacktools.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -11,6 +13,8 @@ import androidx.compose.ui.unit.dp
 import com.example.whitehacktools.ui.components.*
 import com.example.whitehacktools.ui.models.CharacterTab
 import com.example.whitehacktools.model.AttributeArray
+import com.example.whitehacktools.model.AttributeGroupPair
+import com.example.whitehacktools.model.PlayerCharacter
 
 private val characterClasses = listOf(
     "Deft",
@@ -45,6 +49,7 @@ fun CharacterFormScreen(
     initialCharisma: Int = 10,
     initialUseDefaultAttributes: Boolean = true,
     initialCustomAttributeArray: AttributeArray? = null,
+    initialAttributeGroupPairs: List<AttributeGroupPair> = emptyList(),
     initialTab: CharacterTab = CharacterTab.Info,
     onNavigateBack: () -> Unit = {},
     onSave: (
@@ -68,8 +73,9 @@ fun CharacterFormScreen(
         willpower: String,
         charisma: String,
         customAttributeArray: AttributeArray?,
+        attributeGroupPairs: List<AttributeGroupPair>,
         tab: CharacterTab
-    ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ -> }
+    ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ -> }
 ) {
     var name by remember { mutableStateOf(initialName) }
     var playerName by remember { mutableStateOf(initialPlayerName) }
@@ -97,6 +103,7 @@ fun CharacterFormScreen(
     var willpower by remember { mutableStateOf(initialWillpower.toString()) }
     var charisma by remember { mutableStateOf(initialCharisma.toString()) }
     var customAttributeArray by remember { mutableStateOf(initialCustomAttributeArray) }
+    var attributeGroupPairs by remember { mutableStateOf(initialAttributeGroupPairs) }
 
     Scaffold(
         topBar = {
@@ -128,6 +135,7 @@ fun CharacterFormScreen(
                                 willpower,
                                 charisma,
                                 customAttributeArray,
+                                attributeGroupPairs,
                                 selectedTab
                             )
                         },
@@ -203,6 +211,13 @@ fun CharacterFormScreen(
                             onSpeciesChange = { species = it },
                             affiliations = affiliations,
                             onAffiliationsChange = { affiliations = it },
+                            attributeGroupPairs = attributeGroupPairs,
+                            onAttributeGroupPairsChange = { attributeGroupPairs = it },
+                            availableAttributes = if (useDefaultAttributes) {
+                                PlayerCharacter.DEFAULT_ATTRIBUTES
+                            } else {
+                                customAttributeArray?.attributes?.keys?.toList() ?: emptyList()
+                            },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }

@@ -1,15 +1,15 @@
 package com.example.whitehacktools.navigation
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.whitehacktools.data.CharacterStore
 import com.example.whitehacktools.model.AttributeArray
+import com.example.whitehacktools.model.AttributeGroupPair
 import com.example.whitehacktools.model.PlayerCharacter
 import com.example.whitehacktools.ui.models.CharacterTab
 import com.example.whitehacktools.ui.screens.CharacterDetailScreen
@@ -137,7 +137,7 @@ fun AppNavigation(
                         }
                     }
                 },
-                onSave = { name, level, characterClass, vocation, species, affiliations, currentHP, maxHP, movement, saveColor, goldOnHand, stashedGold, useDefaultAttributes, strength, agility, toughness, intelligence, willpower, charisma, customAttributeArray, tab ->
+                onSave = { name, level, characterClass, vocation, species, affiliations, currentHP, maxHP, movement, saveColor, goldOnHand, stashedGold, useDefaultAttributes, strength, agility, toughness, intelligence, willpower, charisma, customAttributeArray, attributeGroupPairs, tab ->
                     scope.launch {
                         if (character != null) {
                             // Update existing character
@@ -163,7 +163,8 @@ fun AppNavigation(
                                         intelligence = intelligence.toIntOrNull() ?: 10,
                                         willpower = willpower.toIntOrNull() ?: 10,
                                         charisma = charisma.toIntOrNull() ?: 10,
-                                        customAttributeArray = customAttributeArray
+                                        customAttributeArray = customAttributeArray,
+                                        attributeGroupPairs = attributeGroupPairs
                                     )
                                 } else {
                                     existingChar
@@ -197,7 +198,8 @@ fun AppNavigation(
                                 intelligence = intelligence.toIntOrNull() ?: 10,
                                 willpower = willpower.toIntOrNull() ?: 10,
                                 charisma = charisma.toIntOrNull() ?: 10,
-                                customAttributeArray = customAttributeArray
+                                customAttributeArray = customAttributeArray,
+                                attributeGroupPairs = attributeGroupPairs
                             )
                             characterStore.saveCharacters(characters.value + newCharacter)
                             navController.navigate(Screen.CharacterDetail.createRoute(newCharacter.id, tab)) {

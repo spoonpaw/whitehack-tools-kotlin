@@ -10,6 +10,20 @@ data class AttributeArray(
 )
 
 @Serializable
+data class AttributeGroupPair(
+    val attributeName: String,
+    val groupType: GroupType,
+    val groupName: String
+)
+
+@Serializable
+enum class GroupType {
+    Vocation,
+    Species,
+    Affiliation
+}
+
+@Serializable
 data class PlayerCharacter(
     val id: String = UUID.randomUUID().toString(),
     val name: String,
@@ -30,6 +44,7 @@ data class PlayerCharacter(
     val willpower: Int = 10,
     val charisma: Int = 10,
     val customAttributeArray: AttributeArray? = null,
+    val attributeGroupPairs: List<AttributeGroupPair> = emptyList(),
     // Combat Stats
     val currentHP: Int = 10,
     val maxHP: Int = 10,
