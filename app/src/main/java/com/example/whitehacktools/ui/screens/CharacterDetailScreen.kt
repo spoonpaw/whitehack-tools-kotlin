@@ -67,12 +67,7 @@ fun CharacterDetailScreen(
                         )
                         
                         AttributesDetailCard(
-                            strength = character.strength,
-                            agility = character.agility,
-                            toughness = character.toughness,
-                            intelligence = character.intelligence,
-                            willpower = character.willpower,
-                            charisma = character.charisma,
+                            character = character,
                             modifier = Modifier.fillMaxWidth()
                         )
                     }

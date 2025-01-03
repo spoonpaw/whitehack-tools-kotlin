@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.whitehacktools.ui.components.*
 import com.example.whitehacktools.ui.models.CharacterTab
+import com.example.whitehacktools.model.AttributeArray
 
 private val characterClasses = listOf(
     "Deft",
@@ -39,6 +40,8 @@ fun CharacterFormScreen(
     initialIntelligence: Int = 10,
     initialWillpower: Int = 10,
     initialCharisma: Int = 10,
+    initialUseDefaultAttributes: Boolean = true,
+    initialCustomAttributeArray: AttributeArray? = null,
     initialTab: CharacterTab = CharacterTab.Info,
     onNavigateBack: () -> Unit = {},
     onSave: (
@@ -51,14 +54,16 @@ fun CharacterFormScreen(
         saveColor: String,
         goldOnHand: String,
         stashedGold: String,
+        useDefaultAttributes: Boolean,
         strength: String,
         agility: String,
         toughness: String,
         intelligence: String,
         willpower: String,
         charisma: String,
+        customAttributeArray: AttributeArray?,
         tab: CharacterTab
-    ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ -> }
+    ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ -> }
 ) {
     var name by remember { mutableStateOf(initialName) }
     var playerName by remember { mutableStateOf(initialPlayerName) }
@@ -75,12 +80,14 @@ fun CharacterFormScreen(
     var stashedGold by remember { mutableStateOf(initialStashedGold.toString()) }
     
     // Attributes
+    var useDefaultAttributes by remember { mutableStateOf(initialUseDefaultAttributes) }
     var strength by remember { mutableStateOf(initialStrength.toString()) }
     var agility by remember { mutableStateOf(initialAgility.toString()) }
     var toughness by remember { mutableStateOf(initialToughness.toString()) }
     var intelligence by remember { mutableStateOf(initialIntelligence.toString()) }
     var willpower by remember { mutableStateOf(initialWillpower.toString()) }
     var charisma by remember { mutableStateOf(initialCharisma.toString()) }
+    var customAttributeArray by remember { mutableStateOf(initialCustomAttributeArray) }
 
     Scaffold(
         topBar = {
@@ -101,12 +108,14 @@ fun CharacterFormScreen(
                                 saveColor,
                                 goldOnHand,
                                 stashedGold,
+                                useDefaultAttributes,
                                 strength,
                                 agility,
                                 toughness,
                                 intelligence,
                                 willpower,
                                 charisma,
+                                customAttributeArray,
                                 selectedTab
                             )
                         },
@@ -154,6 +163,8 @@ fun CharacterFormScreen(
                         Spacer(modifier = Modifier.height(16.dp))
                         
                         AttributesFormCard(
+                            useDefaultAttributes = useDefaultAttributes,
+                            onUseDefaultAttributesChange = { useDefaultAttributes = it },
                             strength = strength,
                             onStrengthChange = { strength = it },
                             agility = agility,
@@ -166,6 +177,8 @@ fun CharacterFormScreen(
                             onWillpowerChange = { willpower = it },
                             charisma = charisma,
                             onCharismaChange = { charisma = it },
+                            customAttributeArray = customAttributeArray,
+                            onCustomAttributeArrayChange = { customAttributeArray = it },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }

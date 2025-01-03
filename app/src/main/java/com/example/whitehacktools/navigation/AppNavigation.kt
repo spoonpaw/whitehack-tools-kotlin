@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.whitehacktools.data.CharacterStore
+import com.example.whitehacktools.model.AttributeArray
 import com.example.whitehacktools.model.PlayerCharacter
 import com.example.whitehacktools.ui.models.CharacterTab
 import com.example.whitehacktools.ui.screens.CharacterDetailScreen
@@ -115,9 +116,11 @@ fun AppNavigation(
                 initialIntelligence = character?.intelligence ?: 10,
                 initialWillpower = character?.willpower ?: 10,
                 initialCharisma = character?.charisma ?: 10,
+                initialUseDefaultAttributes = character?.useDefaultAttributes ?: true,
+                initialCustomAttributeArray = character?.customAttributeArray,
                 initialTab = selectedTab,
                 onNavigateBack = { navController.popBackStack() },
-                onSave = { name, level, characterClass, currentHP, maxHP, movement, saveColor, goldOnHand, stashedGold, strength, agility, toughness, intelligence, willpower, charisma, tab ->
+                onSave = { name, level, characterClass, currentHP, maxHP, movement, saveColor, goldOnHand, stashedGold, useDefaultAttributes, strength, agility, toughness, intelligence, willpower, charisma, customAttributeArray, tab ->
                     scope.launch {
                         if (character != null) {
                             // Update existing character
@@ -133,12 +136,14 @@ fun AppNavigation(
                                         saveColor = saveColor,
                                         goldOnHand = goldOnHand.toIntOrNull() ?: 0,
                                         stashedGold = stashedGold.toIntOrNull() ?: 0,
+                                        useDefaultAttributes = useDefaultAttributes,
                                         strength = strength.toIntOrNull() ?: 10,
                                         agility = agility.toIntOrNull() ?: 10,
                                         toughness = toughness.toIntOrNull() ?: 10,
                                         intelligence = intelligence.toIntOrNull() ?: 10,
                                         willpower = willpower.toIntOrNull() ?: 10,
-                                        charisma = charisma.toIntOrNull() ?: 10
+                                        charisma = charisma.toIntOrNull() ?: 10,
+                                        customAttributeArray = customAttributeArray
                                     )
                                 } else {
                                     existingChar
@@ -162,12 +167,14 @@ fun AppNavigation(
                                 saveColor = saveColor,
                                 goldOnHand = goldOnHand.toIntOrNull() ?: 0,
                                 stashedGold = stashedGold.toIntOrNull() ?: 0,
+                                useDefaultAttributes = useDefaultAttributes,
                                 strength = strength.toIntOrNull() ?: 10,
                                 agility = agility.toIntOrNull() ?: 10,
                                 toughness = toughness.toIntOrNull() ?: 10,
                                 intelligence = intelligence.toIntOrNull() ?: 10,
                                 willpower = willpower.toIntOrNull() ?: 10,
-                                charisma = charisma.toIntOrNull() ?: 10
+                                charisma = charisma.toIntOrNull() ?: 10,
+                                customAttributeArray = customAttributeArray
                             )
                             characterStore.saveCharacters(characters.value + newCharacter)
                             navController.navigate(Screen.CharacterDetail.createRoute(newCharacter.id, tab)) {
