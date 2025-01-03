@@ -31,10 +31,5 @@ fun BasicInfoDetailCard(
             label = "Character Class",
             value = character.characterClass
         )
-        
-        DetailItem(
-            label = "Save Color",
-            value = character.saveColor
-        )
     }
 }
