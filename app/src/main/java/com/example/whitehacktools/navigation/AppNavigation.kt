@@ -110,6 +110,7 @@ fun AppNavigation(
                 initialCharacterClass = character?.characterClass ?: "Deft",
                 initialVocation = character?.vocation ?: "",
                 initialSpecies = character?.species ?: "",
+                initialAffiliations = character?.affiliations ?: emptyList(),
                 initialCurrentHP = character?.currentHP ?: 10,
                 initialMaxHP = character?.maxHP ?: 10,
                 initialMovement = character?.movement ?: 30,
@@ -136,7 +137,7 @@ fun AppNavigation(
                         }
                     }
                 },
-                onSave = { name, level, characterClass, vocation, species, currentHP, maxHP, movement, saveColor, goldOnHand, stashedGold, useDefaultAttributes, strength, agility, toughness, intelligence, willpower, charisma, customAttributeArray, tab ->
+                onSave = { name, level, characterClass, vocation, species, affiliations, currentHP, maxHP, movement, saveColor, goldOnHand, stashedGold, useDefaultAttributes, strength, agility, toughness, intelligence, willpower, charisma, customAttributeArray, tab ->
                     scope.launch {
                         if (character != null) {
                             // Update existing character
@@ -148,6 +149,7 @@ fun AppNavigation(
                                         characterClass = characterClass,
                                         vocation = vocation,
                                         species = species,
+                                        affiliations = affiliations,
                                         currentHP = currentHP,
                                         maxHP = maxHP,
                                         movement = movement,
@@ -180,6 +182,7 @@ fun AppNavigation(
                                 characterClass = characterClass,
                                 vocation = vocation,
                                 species = species,
+                                affiliations = affiliations,
                                 level = level,
                                 currentHP = currentHP,
                                 maxHP = maxHP,

@@ -30,6 +30,7 @@ fun CharacterFormScreen(
     initialCharacterClass: String = "Deft",
     initialVocation: String = "",
     initialSpecies: String = "",
+    initialAffiliations: List<String> = emptyList(),
     initialCurrentHP: Int = 10,
     initialMaxHP: Int = 10,
     initialMovement: Int = 30,
@@ -52,6 +53,7 @@ fun CharacterFormScreen(
         characterClass: String,
         vocation: String,
         species: String,
+        affiliations: List<String>,
         currentHP: Int,
         maxHP: Int,
         movement: Int,
@@ -67,7 +69,7 @@ fun CharacterFormScreen(
         charisma: String,
         customAttributeArray: AttributeArray?,
         tab: CharacterTab
-    ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ -> }
+    ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ -> }
 ) {
     var name by remember { mutableStateOf(initialName) }
     var playerName by remember { mutableStateOf(initialPlayerName) }
@@ -75,6 +77,7 @@ fun CharacterFormScreen(
     var characterClass by remember { mutableStateOf(initialCharacterClass) }
     var vocation by remember { mutableStateOf(initialVocation) }
     var species by remember { mutableStateOf(initialSpecies) }
+    var affiliations by remember { mutableStateOf(initialAffiliations) }
     var selectedTab by remember { mutableStateOf(initialTab) }
     
     // Combat stats
@@ -110,6 +113,7 @@ fun CharacterFormScreen(
                                 characterClass,
                                 vocation,
                                 species,
+                                affiliations,
                                 currentHP.toIntOrNull() ?: 10,
                                 maxHP.toIntOrNull() ?: 10,
                                 movement.toIntOrNull() ?: 30,
@@ -197,6 +201,8 @@ fun CharacterFormScreen(
                             onVocationChange = { vocation = it },
                             species = species,
                             onSpeciesChange = { species = it },
+                            affiliations = affiliations,
+                            onAffiliationsChange = { affiliations = it },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
