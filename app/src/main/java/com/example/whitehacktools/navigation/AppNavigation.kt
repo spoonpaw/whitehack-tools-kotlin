@@ -108,6 +108,8 @@ fun AppNavigation(
                 initialPlayerName = character?.playerName ?: "",
                 initialLevel = character?.level ?: 1,
                 initialCharacterClass = character?.characterClass ?: "Deft",
+                initialVocation = character?.vocation ?: "",
+                initialSpecies = character?.species ?: "",
                 initialCurrentHP = character?.currentHP ?: 10,
                 initialMaxHP = character?.maxHP ?: 10,
                 initialMovement = character?.movement ?: 30,
@@ -134,7 +136,7 @@ fun AppNavigation(
                         }
                     }
                 },
-                onSave = { name, level, characterClass, currentHP, maxHP, movement, saveColor, goldOnHand, stashedGold, useDefaultAttributes, strength, agility, toughness, intelligence, willpower, charisma, customAttributeArray, tab ->
+                onSave = { name, level, characterClass, vocation, species, currentHP, maxHP, movement, saveColor, goldOnHand, stashedGold, useDefaultAttributes, strength, agility, toughness, intelligence, willpower, charisma, customAttributeArray, tab ->
                     scope.launch {
                         if (character != null) {
                             // Update existing character
@@ -144,6 +146,8 @@ fun AppNavigation(
                                         name = name,
                                         level = level,
                                         characterClass = characterClass,
+                                        vocation = vocation,
+                                        species = species,
                                         currentHP = currentHP,
                                         maxHP = maxHP,
                                         movement = movement,
@@ -174,6 +178,8 @@ fun AppNavigation(
                                 name = name,
                                 playerName = "",
                                 characterClass = characterClass,
+                                vocation = vocation,
+                                species = species,
                                 level = level,
                                 currentHP = currentHP,
                                 maxHP = maxHP,

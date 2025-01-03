@@ -17,6 +17,9 @@ data class PlayerCharacter(
     val characterClass: String,
     val level: Int,
     val experience: Int = 0,
+    // Groups
+    val vocation: String = "",
+    val species: String = "",
     // Attributes
     val useDefaultAttributes: Boolean = true,
     val strength: Int = 10,

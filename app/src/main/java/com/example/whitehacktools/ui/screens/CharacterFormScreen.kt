@@ -28,6 +28,8 @@ fun CharacterFormScreen(
     initialPlayerName: String = "",
     initialLevel: Int = 1,
     initialCharacterClass: String = "Deft",
+    initialVocation: String = "",
+    initialSpecies: String = "",
     initialCurrentHP: Int = 10,
     initialMaxHP: Int = 10,
     initialMovement: Int = 30,
@@ -48,6 +50,8 @@ fun CharacterFormScreen(
         name: String,
         level: Int,
         characterClass: String,
+        vocation: String,
+        species: String,
         currentHP: Int,
         maxHP: Int,
         movement: Int,
@@ -63,12 +67,14 @@ fun CharacterFormScreen(
         charisma: String,
         customAttributeArray: AttributeArray?,
         tab: CharacterTab
-    ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ -> }
+    ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ -> }
 ) {
     var name by remember { mutableStateOf(initialName) }
     var playerName by remember { mutableStateOf(initialPlayerName) }
     var level by remember { mutableStateOf(initialLevel.toString()) }
     var characterClass by remember { mutableStateOf(initialCharacterClass) }
+    var vocation by remember { mutableStateOf(initialVocation) }
+    var species by remember { mutableStateOf(initialSpecies) }
     var selectedTab by remember { mutableStateOf(initialTab) }
     
     // Combat stats
@@ -102,6 +108,8 @@ fun CharacterFormScreen(
                                 name,
                                 level.toIntOrNull() ?: 1,
                                 characterClass,
+                                vocation,
+                                species,
                                 currentHP.toIntOrNull() ?: 10,
                                 maxHP.toIntOrNull() ?: 10,
                                 movement.toIntOrNull() ?: 30,
@@ -179,6 +187,16 @@ fun CharacterFormScreen(
                             onCharismaChange = { charisma = it },
                             customAttributeArray = customAttributeArray,
                             onCustomAttributeArrayChange = { customAttributeArray = it },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        GroupsFormCard(
+                            vocation = vocation,
+                            onVocationChange = { vocation = it },
+                            species = species,
+                            onSpeciesChange = { species = it },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }

@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -118,7 +119,8 @@ fun FormField(
 fun DetailItem(
     label: String,
     value: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    valueColor: Color = MaterialTheme.colorScheme.onSurface
 ) {
     OutlinedTextField(
         value = value,
@@ -134,7 +136,7 @@ fun DetailItem(
         singleLine = true,
         enabled = false,
         colors = OutlinedTextFieldDefaults.colors(
-            disabledTextColor = MaterialTheme.colorScheme.onSurface,
+            disabledTextColor = valueColor,
             disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
             disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
             disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)

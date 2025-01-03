@@ -70,6 +70,11 @@ fun CharacterDetailScreen(
                             character = character,
                             modifier = Modifier.fillMaxWidth()
                         )
+                        
+                        GroupsDetailCard(
+                            character = character,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                     CharacterTab.Combat -> {
                         CombatDetailCard(
