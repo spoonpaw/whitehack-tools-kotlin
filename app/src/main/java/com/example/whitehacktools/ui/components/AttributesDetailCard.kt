@@ -47,12 +47,6 @@ fun AttributesDetailCard(
         } else {
             // Display custom attributes
             character.customAttributeArray?.let { attributeArray ->
-                Text(
-                    text = attributeArray.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
                 Column(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
