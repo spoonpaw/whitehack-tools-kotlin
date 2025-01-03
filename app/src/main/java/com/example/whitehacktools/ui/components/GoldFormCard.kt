@@ -25,33 +25,25 @@ fun GoldFormCard(
         title = "Gold",
         modifier = modifier
     ) {
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Gold on Hand
-            FormField(
-                value = goldOnHand,
-                onValueChange = onGoldOnHandChange,
-                label = "Gold on Hand",
-                keyboardType = KeyboardType.Number,
-                numberOnly = true
-            )
-            
-            // Stashed Gold
-            FormField(
-                value = stashedGold,
-                onValueChange = onStashedGoldChange,
-                label = "Stashed Gold",
-                keyboardType = KeyboardType.Number,
-                numberOnly = true
-            )
-            
-            // Total Gold
-            DetailItem(
-                label = "Total Gold",
-                value = totalGold.toString()
-            )
-        }
+        FormField(
+            value = goldOnHand,
+            onValueChange = onGoldOnHandChange,
+            label = "Gold on Hand",
+            keyboardType = KeyboardType.Number,
+            numberOnly = true
+        )
+        
+        FormField(
+            value = stashedGold,
+            onValueChange = onStashedGoldChange,
+            label = "Stashed Gold",
+            keyboardType = KeyboardType.Number,
+            numberOnly = true
+        )
+        
+        DetailItem(
+            label = "Total Gold",
+            value = totalGold.toString()
+        )
     }
 }
