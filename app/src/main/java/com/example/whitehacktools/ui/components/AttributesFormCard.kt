@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.whitehacktools.model.AttributeArray
+import com.example.whitehacktools.model.AttributeGroupPair
 import com.example.whitehacktools.model.PlayerCharacter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,6 +36,8 @@ fun AttributesFormCard(
     onCharismaChange: (String) -> Unit,
     customAttributeArray: AttributeArray?,
     onCustomAttributeArrayChange: (AttributeArray?) -> Unit,
+    attributeGroupPairs: List<AttributeGroupPair>,
+    onAttributeGroupPairsChange: (List<AttributeGroupPair>) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showAddAttributeDialog by remember { mutableStateOf(false) }
@@ -158,6 +161,9 @@ fun AttributesFormCard(
                                 onClick = {
                                     val updatedAttributes = customAttributeArray.attributes.toMutableMap()
                                     updatedAttributes.remove(name)
+                                    // Remove any attribute-group pairs that use this attribute
+                                    val updatedPairs = attributeGroupPairs.filter { it.attributeName != name }
+                                    onAttributeGroupPairsChange(updatedPairs)
                                     onCustomAttributeArrayChange(
                                         if (updatedAttributes.isEmpty()) null
                                         else customAttributeArray.copy(attributes = updatedAttributes)

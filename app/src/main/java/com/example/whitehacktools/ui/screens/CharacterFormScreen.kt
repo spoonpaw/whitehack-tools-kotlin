@@ -199,6 +199,8 @@ fun CharacterFormScreen(
                             onCharismaChange = { charisma = it },
                             customAttributeArray = customAttributeArray,
                             onCustomAttributeArrayChange = { customAttributeArray = it },
+                            attributeGroupPairs = attributeGroupPairs,
+                            onAttributeGroupPairsChange = { attributeGroupPairs = it },
                             modifier = Modifier.fillMaxWidth()
                         )
                         

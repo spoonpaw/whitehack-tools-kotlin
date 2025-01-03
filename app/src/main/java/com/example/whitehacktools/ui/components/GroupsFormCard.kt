@@ -42,7 +42,22 @@ fun GroupsFormCard(
     ) {
         OutlinedTextField(
             value = vocation,
-            onValueChange = onVocationChange,
+            onValueChange = { newVocation ->
+                onVocationChange(newVocation)
+                // Remove pairs using vocation if it's cleared, otherwise update them
+                val updatedPairs = if (newVocation.isBlank()) {
+                    attributeGroupPairs.filter { it.groupType != GroupType.Vocation }
+                } else {
+                    attributeGroupPairs.map { pair ->
+                        if (pair.groupType == GroupType.Vocation) {
+                            pair.copy(groupName = newVocation)
+                        } else {
+                            pair
+                        }
+                    }
+                }
+                onAttributeGroupPairsChange(updatedPairs)
+            },
             label = { Text("Vocation") },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
@@ -53,7 +68,22 @@ fun GroupsFormCard(
 
         OutlinedTextField(
             value = species,
-            onValueChange = onSpeciesChange,
+            onValueChange = { newSpecies ->
+                onSpeciesChange(newSpecies)
+                // Remove pairs using species if it's cleared, otherwise update them
+                val updatedPairs = if (newSpecies.isBlank()) {
+                    attributeGroupPairs.filter { it.groupType != GroupType.Species }
+                } else {
+                    attributeGroupPairs.map { pair ->
+                        if (pair.groupType == GroupType.Species) {
+                            pair.copy(groupName = newSpecies)
+                        } else {
+                            pair
+                        }
+                    }
+                }
+                onAttributeGroupPairsChange(updatedPairs)
+            },
             label = { Text("Species") },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
@@ -126,7 +156,13 @@ fun GroupsFormCard(
                             trailingIcon = {
                                 IconButton(
                                     onClick = {
+                                        val removedAffiliation = affiliations[index]
                                         onAffiliationsChange(affiliations.filterIndexed { i, _ -> i != index })
+                                        // Remove any attribute-group pairs that use this affiliation
+                                        val updatedPairs = attributeGroupPairs.filter { pair ->
+                                            !(pair.groupType == GroupType.Affiliation && pair.groupName == removedAffiliation)
+                                        }
+                                        onAttributeGroupPairsChange(updatedPairs)
                                     }
                                 ) {
                                     Icon(
