@@ -1,12 +1,15 @@
 package com.example.whitehacktools.ui.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.whitehacktools.ui.components.*
+import com.example.whitehacktools.ui.models.CharacterTab
 
 private val characterClasses = listOf(
     "Deft",
@@ -30,23 +33,32 @@ fun CharacterFormScreen(
     initialSaveColor: String = "",
     initialGoldOnHand: Int = 0,
     initialStashedGold: Int = 0,
+    initialStrength: Int = 10,
+    initialAgility: Int = 10,
+    initialToughness: Int = 10,
+    initialIntelligence: Int = 10,
+    initialWillpower: Int = 10,
+    initialCharisma: Int = 10,
     initialTab: CharacterTab = CharacterTab.Info,
-    onNavigateBack: (CharacterTab) -> Unit = {},
+    onNavigateBack: () -> Unit = {},
     onSave: (
         name: String,
         level: Int,
         characterClass: String,
         currentHP: Int,
         maxHP: Int,
-        attackValue: Int,
-        defenseValue: Int,
         movement: Int,
-        initiativeBonus: Int,
         saveColor: String,
         goldOnHand: String,
         stashedGold: String,
+        strength: String,
+        agility: String,
+        toughness: String,
+        intelligence: String,
+        willpower: String,
+        charisma: String,
         tab: CharacterTab
-    ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _, _, _ -> }
+    ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ -> }
 ) {
     var name by remember { mutableStateOf(initialName) }
     var playerName by remember { mutableStateOf(initialPlayerName) }
@@ -57,73 +69,75 @@ fun CharacterFormScreen(
     // Combat stats
     var currentHP by remember { mutableStateOf(initialCurrentHP.toString()) }
     var maxHP by remember { mutableStateOf(initialMaxHP.toString()) }
-    var attackValue by remember { mutableStateOf("0") }
-    var defenseValue by remember { mutableStateOf("0") }
     var movement by remember { mutableStateOf(initialMovement.toString()) }
-    var initiativeBonus by remember { mutableStateOf("0") }
     var saveColor by remember { mutableStateOf(initialSaveColor) }
     var goldOnHand by remember { mutableStateOf(initialGoldOnHand.toString()) }
     var stashedGold by remember { mutableStateOf(initialStashedGold.toString()) }
+    
+    // Attributes
+    var strength by remember { mutableStateOf(initialStrength.toString()) }
+    var agility by remember { mutableStateOf(initialAgility.toString()) }
+    var toughness by remember { mutableStateOf(initialToughness.toString()) }
+    var intelligence by remember { mutableStateOf(initialIntelligence.toString()) }
+    var willpower by remember { mutableStateOf(initialWillpower.toString()) }
+    var charisma by remember { mutableStateOf(initialCharisma.toString()) }
 
     Scaffold(
         topBar = {
             WhitehackTopAppBar(
                 title = if (initialName.isEmpty()) "New Character" else "Edit Character",
-                onNavigateBack = { onNavigateBack(selectedTab) },
+                onNavigateBack = onNavigateBack,
                 actions = listOf(
                     TopBarAction.TextAction(
                         text = "Save",
                         onClick = {
-                            val levelInt = level.toIntOrNull() ?: 1
-                            val currentHPInt = currentHP.toIntOrNull() ?: 10
-                            val maxHPInt = maxHP.toIntOrNull() ?: 10
-                            val attackInt = attackValue.toIntOrNull() ?: 0
-                            val defenseInt = defenseValue.toIntOrNull() ?: 0
-                            val movementInt = movement.toIntOrNull() ?: 30
-                            val initiativeInt = initiativeBonus.toIntOrNull() ?: 0
-                            
                             onSave(
                                 name,
-                                levelInt,
+                                level.toIntOrNull() ?: 1,
                                 characterClass,
-                                currentHPInt,
-                                maxHPInt,
-                                attackInt,
-                                defenseInt,
-                                movementInt,
-                                initiativeInt,
+                                currentHP.toIntOrNull() ?: 10,
+                                maxHP.toIntOrNull() ?: 10,
+                                movement.toIntOrNull() ?: 30,
                                 saveColor,
                                 goldOnHand,
                                 stashedGold,
+                                strength,
+                                agility,
+                                toughness,
+                                intelligence,
+                                willpower,
+                                charisma,
                                 selectedTab
                             )
                         },
-                        enabled = name.isNotBlank() && level.toIntOrNull() in 1..10,
-                        isPrimary = true
+                        enabled = name.isNotBlank() && level.toIntOrNull() in 1..10
                     )
                 )
             )
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            CharacterTabBar(
-                selectedTab = selectedTab,
-                onTabSelected = { selectedTab = it }
+        Column(modifier = Modifier.padding(padding)) {
+            TabRow(
+                selectedTabIndex = selectedTab.ordinal,
+                tabs = {
+                    CharacterTab.values().forEach { tab ->
+                        Tab(
+                            selected = selectedTab == tab,
+                            onClick = { selectedTab = tab },
+                            text = { Text(text = tab.title) }
+                        )
+                    }
+                }
             )
-            
-            when (selectedTab) {
-                CharacterTab.Info -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp)
+            ) {
+                when (selectedTab) {
+                    CharacterTab.Info -> {
                         BasicInfoFormCard(
                             name = name,
                             onNameChange = { name = it },
@@ -136,15 +150,26 @@ fun CharacterFormScreen(
                             characterClasses = characterClasses,
                             modifier = Modifier.fillMaxWidth()
                         )
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        AttributesFormCard(
+                            strength = strength,
+                            onStrengthChange = { strength = it },
+                            agility = agility,
+                            onAgilityChange = { agility = it },
+                            toughness = toughness,
+                            onToughnessChange = { toughness = it },
+                            intelligence = intelligence,
+                            onIntelligenceChange = { intelligence = it },
+                            willpower = willpower,
+                            onWillpowerChange = { willpower = it },
+                            charisma = charisma,
+                            onCharismaChange = { charisma = it },
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
-                }
-                CharacterTab.Combat -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
+                    CharacterTab.Combat -> {
                         CombatFormCard(
                             currentHP = currentHP,
                             onCurrentHPChange = { currentHP = it },
@@ -157,14 +182,7 @@ fun CharacterFormScreen(
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
-                }
-                CharacterTab.Equipment -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
+                    CharacterTab.Equipment -> {
                         GoldFormCard(
                             goldOnHand = goldOnHand,
                             onGoldOnHandChange = { goldOnHand = it },

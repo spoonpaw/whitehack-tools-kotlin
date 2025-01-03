@@ -1,7 +1,11 @@
 package com.example.whitehacktools.ui.components
 
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.example.whitehacktools.model.PlayerCharacter
 
 @Composable
@@ -41,6 +45,11 @@ fun CombatDetailCard(
         DetailItem(
             label = "Initiative Bonus",
             value = character.initiativeBonus.toString()
+        )
+        
+        DetailItem(
+            label = "Save Color",
+            value = character.saveColor
         )
     }
 }

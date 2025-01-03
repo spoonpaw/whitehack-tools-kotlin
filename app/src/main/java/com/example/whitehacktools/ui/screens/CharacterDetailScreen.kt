@@ -1,6 +1,8 @@
 package com.example.whitehacktools.ui.screens
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
@@ -9,14 +11,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.whitehacktools.model.PlayerCharacter
 import com.example.whitehacktools.ui.components.*
+import com.example.whitehacktools.ui.models.CharacterTab
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharacterDetailScreen(
     character: PlayerCharacter,
-    onNavigateBack: () -> Unit,
-    onEditCharacter: (PlayerCharacter, com.example.whitehacktools.ui.components.CharacterTab) -> Unit,
-    initialTab: com.example.whitehacktools.ui.components.CharacterTab = com.example.whitehacktools.ui.components.CharacterTab.Info
+    initialTab: CharacterTab = CharacterTab.Info,
+    onNavigateBack: () -> Unit = {},
+    onEdit: (CharacterTab) -> Unit = {}
 ) {
     var selectedTab by remember { mutableStateOf(initialTab) }
 
@@ -27,58 +30,59 @@ fun CharacterDetailScreen(
                 onNavigateBack = onNavigateBack,
                 actions = listOf(
                     TopBarAction.IconAction(
-                        icon = Icons.Default.Edit,
-                        contentDescription = "Edit Character",
-                        onClick = { onEditCharacter(character, selectedTab) }
+                        icon = Icons.Filled.Edit,
+                        contentDescription = "Edit",
+                        onClick = { onEdit(selectedTab) }
                     )
                 )
             )
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            CharacterTabBar(
-                selectedTab = selectedTab,
-                onTabSelected = { selectedTab = it }
+        Column(modifier = Modifier.padding(padding)) {
+            TabRow(
+                selectedTabIndex = selectedTab.ordinal,
+                tabs = {
+                    CharacterTab.values().forEach { tab ->
+                        Tab(
+                            selected = selectedTab == tab,
+                            onClick = { selectedTab = tab },
+                            text = { Text(text = tab.title) }
+                        )
+                    }
+                }
             )
             
-            when (selectedTab) {
-                com.example.whitehacktools.ui.components.CharacterTab.Info -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                when (selectedTab) {
+                    CharacterTab.Info -> {
                         BasicInfoDetailCard(
                             character = character,
                             modifier = Modifier.fillMaxWidth()
                         )
+                        
+                        AttributesDetailCard(
+                            strength = character.strength,
+                            agility = character.agility,
+                            toughness = character.toughness,
+                            intelligence = character.intelligence,
+                            willpower = character.willpower,
+                            charisma = character.charisma,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
-                }
-                com.example.whitehacktools.ui.components.CharacterTab.Combat -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
+                    CharacterTab.Combat -> {
                         CombatDetailCard(
                             character = character,
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
-                }
-                com.example.whitehacktools.ui.components.CharacterTab.Equipment -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
+                    CharacterTab.Equipment -> {
                         GoldDetailCard(
                             goldOnHand = character.goldOnHand,
                             stashedGold = character.stashedGold,

@@ -1,87 +1,103 @@
 package com.example.whitehacktools.navigation
 
-import android.content.Context
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.whitehacktools.data.CharacterStore
 import com.example.whitehacktools.model.PlayerCharacter
-import com.example.whitehacktools.ui.screens.*
-import com.example.whitehacktools.ui.components.CharacterTab
+import com.example.whitehacktools.ui.models.CharacterTab
+import com.example.whitehacktools.ui.screens.CharacterDetailScreen
+import com.example.whitehacktools.ui.screens.CharacterFormScreen
+import com.example.whitehacktools.ui.screens.CharacterListScreen
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.UUID
 
 sealed class Screen(val route: String) {
-    object CharacterList : Screen("characterList")
-    object CharacterForm : Screen("characterForm/{characterId}/{selectedTab}") {
-        fun createRoute(characterId: String? = null, selectedTab: CharacterTab = CharacterTab.Info) = 
-            "characterForm/${characterId ?: "new"}/${selectedTab.name}"
+    object CharacterList : Screen("characters")
+    object CharacterDetail : Screen("character/{characterId}?tab={tab}") {
+        fun createRoute(characterId: String, tab: CharacterTab = CharacterTab.Info) =
+            "character/$characterId?tab=${tab.name}"
     }
-    object CharacterDetail : Screen("characterDetail/{characterId}/{selectedTab}") {
-        fun createRoute(characterId: String, selectedTab: CharacterTab = CharacterTab.Info) = 
-            "characterDetail/$characterId/${selectedTab.name}"
+    object CharacterForm : Screen("character/{characterId}/edit?tab={tab}") {
+        fun createRoute(characterId: String, tab: CharacterTab = CharacterTab.Info) =
+            "character/$characterId/edit?tab=${tab.name}"
     }
 }
 
 @Composable
 fun AppNavigation(
-    modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController,
+    characterStore: CharacterStore
 ) {
-    val context = LocalContext.current
-    val characterStore = remember { CharacterStore(context) }
-    val characters by characterStore.characters.collectAsState(initial = emptyList())
+    val characters = characterStore.characters.collectAsState(initial = emptyList())
     val scope = rememberCoroutineScope()
-    
+
     NavHost(
         navController = navController,
-        startDestination = Screen.CharacterList.route,
-        modifier = modifier
+        startDestination = Screen.CharacterList.route
     ) {
         composable(Screen.CharacterList.route) {
             CharacterListScreen(
-                characters = characters,
-                onAddCharacter = {
-                    navController.navigate(Screen.CharacterForm.createRoute())
-                },
+                characters = characters.value,
                 onSelectCharacter = { character ->
                     navController.navigate(Screen.CharacterDetail.createRoute(character.id))
                 },
-                onImportCharacter = {},  // Keeping these for now
-                onExportCharacter = {},  // Keeping these for now
+                onAddCharacter = {
+                    navController.navigate(Screen.CharacterForm.createRoute("new"))
+                },
                 onDeleteCharacter = { character ->
                     scope.launch {
-                        characterStore.saveCharacters(characters.filter { it.id != character.id })
+                        characterStore.saveCharacters(characters.value - character)
                     }
                 }
             )
         }
-        
+
         composable(
-            route = Screen.CharacterForm.route,
+            route = Screen.CharacterDetail.route,
             arguments = listOf(
-                navArgument("characterId") {
-                    type = NavType.StringType
-                    nullable = true
-                    defaultValue = null
-                },
-                navArgument("selectedTab") {
+                navArgument("characterId") { type = NavType.StringType },
+                navArgument("tab") {
                     type = NavType.StringType
                     defaultValue = CharacterTab.Info.name
                 }
             )
         ) { backStackEntry ->
-            val characterId = backStackEntry.arguments?.getString("characterId")
-            val selectedTabName = backStackEntry.arguments?.getString("selectedTab") ?: CharacterTab.Info.name
-            val selectedTab = CharacterTab.valueOf(selectedTabName)
-            val character = if (characterId != "new") characters.find { it.id == characterId } else null
-            
+            val characterId = backStackEntry.arguments?.getString("characterId") ?: return@composable
+            val tabName = backStackEntry.arguments?.getString("tab") ?: CharacterTab.Info.name
+            val selectedTab = CharacterTab.valueOf(tabName)
+            val character = characters.value.find { it.id == characterId } ?: return@composable
+
+            CharacterDetailScreen(
+                character = character,
+                initialTab = selectedTab,
+                onNavigateBack = { navController.popBackStack() },
+                onEdit = { tab ->
+                    navController.navigate(Screen.CharacterForm.createRoute(character.id, tab))
+                }
+            )
+        }
+
+        composable(
+            route = Screen.CharacterForm.route,
+            arguments = listOf(
+                navArgument("characterId") { type = NavType.StringType },
+                navArgument("tab") {
+                    type = NavType.StringType
+                    defaultValue = CharacterTab.Info.name
+                }
+            )
+        ) { backStackEntry ->
+            val characterId = backStackEntry.arguments?.getString("characterId") ?: return@composable
+            val tabName = backStackEntry.arguments?.getString("tab") ?: CharacterTab.Info.name
+            val selectedTab = CharacterTab.valueOf(tabName)
+            val character = if (characterId != "new") characters.value.find { it.id == characterId } else null
+
             CharacterFormScreen(
                 initialName = character?.name ?: "",
                 initialPlayerName = character?.playerName ?: "",
@@ -93,39 +109,36 @@ fun AppNavigation(
                 initialSaveColor = character?.saveColor ?: "",
                 initialGoldOnHand = character?.goldOnHand ?: 0,
                 initialStashedGold = character?.stashedGold ?: 0,
+                initialStrength = character?.strength ?: 10,
+                initialAgility = character?.agility ?: 10,
+                initialToughness = character?.toughness ?: 10,
+                initialIntelligence = character?.intelligence ?: 10,
+                initialWillpower = character?.willpower ?: 10,
+                initialCharisma = character?.charisma ?: 10,
                 initialTab = selectedTab,
-                onNavigateBack = { tab ->
-                    if (characterId == "new") {
-                        // From new character form, go back to list
-                        navController.navigate(Screen.CharacterList.route) {
-                            popUpTo(Screen.CharacterList.route) { inclusive = true }
-                        }
-                    } else {
-                        // From edit form, go back to detail
-                        navController.navigate(Screen.CharacterDetail.createRoute(characterId!!, tab)) {
-                            popUpTo(Screen.CharacterForm.route) { inclusive = true }
-                        }
-                    }
-                },
-                onSave = { name, level, characterClass, currentHP, maxHP, attackValue, defenseValue, movement, initiativeBonus, saveColor, goldOnHand, stashedGold, tab ->
+                onNavigateBack = { navController.popBackStack() },
+                onSave = { name, level, characterClass, currentHP, maxHP, movement, saveColor, goldOnHand, stashedGold, strength, agility, toughness, intelligence, willpower, charisma, tab ->
                     scope.launch {
                         if (character != null) {
                             // Update existing character
-                            val updatedCharacters = characters.map { existingChar -> 
+                            val updatedCharacters = characters.value.map { existingChar ->
                                 if (existingChar.id == character.id) {
-                                    existingChar.copy(
+                                    character.copy(
                                         name = name,
                                         level = level,
                                         characterClass = characterClass,
                                         currentHP = currentHP,
                                         maxHP = maxHP,
-                                        attackValue = attackValue,
-                                        defenseValue = defenseValue,
                                         movement = movement,
-                                        initiativeBonus = initiativeBonus,
                                         saveColor = saveColor,
                                         goldOnHand = goldOnHand.toIntOrNull() ?: 0,
-                                        stashedGold = stashedGold.toIntOrNull() ?: 0
+                                        stashedGold = stashedGold.toIntOrNull() ?: 0,
+                                        strength = strength.toIntOrNull() ?: 10,
+                                        agility = agility.toIntOrNull() ?: 10,
+                                        toughness = toughness.toIntOrNull() ?: 10,
+                                        intelligence = intelligence.toIntOrNull() ?: 10,
+                                        willpower = willpower.toIntOrNull() ?: 10,
+                                        charisma = charisma.toIntOrNull() ?: 10
                                     )
                                 } else {
                                     existingChar
@@ -133,7 +146,7 @@ fun AppNavigation(
                             }
                             characterStore.saveCharacters(updatedCharacters)
                             navController.navigate(Screen.CharacterDetail.createRoute(character.id, tab)) {
-                                popUpTo(Screen.CharacterForm.route) { inclusive = true }
+                                popUpTo(Screen.CharacterList.route)
                             }
                         } else {
                             // Create new character
@@ -141,59 +154,29 @@ fun AppNavigation(
                                 id = UUID.randomUUID().toString(),
                                 name = name,
                                 playerName = "",
-                                level = level,
                                 characterClass = characterClass,
+                                level = level,
                                 currentHP = currentHP,
                                 maxHP = maxHP,
-                                attackValue = attackValue,
-                                defenseValue = defenseValue,
                                 movement = movement,
-                                initiativeBonus = initiativeBonus,
                                 saveColor = saveColor,
                                 goldOnHand = goldOnHand.toIntOrNull() ?: 0,
-                                stashedGold = stashedGold.toIntOrNull() ?: 0
+                                stashedGold = stashedGold.toIntOrNull() ?: 0,
+                                strength = strength.toIntOrNull() ?: 10,
+                                agility = agility.toIntOrNull() ?: 10,
+                                toughness = toughness.toIntOrNull() ?: 10,
+                                intelligence = intelligence.toIntOrNull() ?: 10,
+                                willpower = willpower.toIntOrNull() ?: 10,
+                                charisma = charisma.toIntOrNull() ?: 10
                             )
-                            characterStore.saveCharacters(characters + newCharacter)
+                            characterStore.saveCharacters(characters.value + newCharacter)
                             navController.navigate(Screen.CharacterDetail.createRoute(newCharacter.id, tab)) {
-                                popUpTo(Screen.CharacterForm.route) { inclusive = true }
+                                popUpTo(Screen.CharacterList.route)
                             }
                         }
                     }
                 }
             )
-        }
-        
-        composable(
-            route = Screen.CharacterDetail.route,
-            arguments = listOf(
-                navArgument("characterId") {
-                    type = NavType.StringType
-                },
-                navArgument("selectedTab") {
-                    type = NavType.StringType
-                    defaultValue = CharacterTab.Info.name
-                }
-            )
-        ) { backStackEntry ->
-            val characterId = backStackEntry.arguments?.getString("characterId")!!
-            val selectedTabName = backStackEntry.arguments?.getString("selectedTab") ?: CharacterTab.Info.name
-            val selectedTab = CharacterTab.valueOf(selectedTabName)
-            val character = characters.find { it.id == characterId }
-            
-            if (character != null) {
-                CharacterDetailScreen(
-                    character = character,
-                    onNavigateBack = {
-                        navController.navigate(Screen.CharacterList.route) {
-                            popUpTo(Screen.CharacterList.route) { inclusive = true }
-                        }
-                    },
-                    onEditCharacter = { currentCharacter, currentTab ->
-                        navController.navigate(Screen.CharacterForm.createRoute(currentCharacter.id, currentTab))
-                    },
-                    initialTab = selectedTab
-                )
-            }
         }
     }
 }
