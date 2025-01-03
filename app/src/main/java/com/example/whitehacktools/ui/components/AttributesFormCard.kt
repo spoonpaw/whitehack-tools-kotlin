@@ -140,42 +140,38 @@ fun AttributesFormCard(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 customAttributeArray?.attributes?.forEach { (name, value) ->
-                    Row(
+                    FormField(
+                        value = value.toString(),
+                        onValueChange = { newValue ->
+                            val updatedAttributes = customAttributeArray.attributes.toMutableMap()
+                            updatedAttributes[name] = newValue.toIntOrNull() ?: 10
+                            onCustomAttributeArrayChange(
+                                customAttributeArray.copy(attributes = updatedAttributes)
+                            )
+                        },
+                        label = name,
+                        keyboardType = KeyboardType.Number,
+                        numberOnly = true,
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        FormField(
-                            value = value.toString(),
-                            onValueChange = { newValue ->
-                                val updatedAttributes = customAttributeArray.attributes.toMutableMap()
-                                updatedAttributes[name] = newValue.toIntOrNull() ?: 10
-                                onCustomAttributeArrayChange(
-                                    customAttributeArray.copy(attributes = updatedAttributes)
-                                )
-                            },
-                            label = name,
-                            keyboardType = KeyboardType.Number,
-                            numberOnly = true,
-                            modifier = Modifier.weight(1f)
-                        )
-                        IconButton(
-                            onClick = {
-                                val updatedAttributes = customAttributeArray.attributes.toMutableMap()
-                                updatedAttributes.remove(name)
-                                onCustomAttributeArrayChange(
-                                    if (updatedAttributes.isEmpty()) null
-                                    else customAttributeArray.copy(attributes = updatedAttributes)
+                        trailingIcon = {
+                            IconButton(
+                                onClick = {
+                                    val updatedAttributes = customAttributeArray.attributes.toMutableMap()
+                                    updatedAttributes.remove(name)
+                                    onCustomAttributeArrayChange(
+                                        if (updatedAttributes.isEmpty()) null
+                                        else customAttributeArray.copy(attributes = updatedAttributes)
+                                    )
+                                }
+                            ) {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = "Delete attribute",
+                                    tint = MaterialTheme.colorScheme.error
                                 )
                             }
-                        ) {
-                            Icon(
-                                Icons.Default.Delete,
-                                contentDescription = "Delete attribute",
-                                tint = MaterialTheme.colorScheme.error
-                            )
                         }
-                    }
+                    )
                 }
 
                 Button(

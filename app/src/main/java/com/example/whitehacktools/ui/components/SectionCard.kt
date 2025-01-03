@@ -84,7 +84,8 @@ fun FormField(
     keyboardType: KeyboardType = KeyboardType.Text,
     numberOnly: Boolean = false,
     isError: Boolean = false,
-    validate: ((String) -> Boolean)? = null
+    validate: ((String) -> Boolean)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null
 ) {
     OutlinedTextField(
         value = value,
@@ -110,7 +111,8 @@ fun FormField(
             focusedLabelColor = MaterialTheme.colorScheme.primary,
             unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         ),
-        shape = RoundedCornerShape(12.dp)
+        shape = RoundedCornerShape(12.dp),
+        trailingIcon = trailingIcon
     )
 }
 
