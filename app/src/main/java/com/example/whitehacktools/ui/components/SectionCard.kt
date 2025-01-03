@@ -150,7 +150,7 @@ fun SectionCard(
     content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier.padding(bottom = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
