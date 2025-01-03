@@ -52,7 +52,9 @@ fun AttributesDetailCard(
                         value = attributesList[i].second.toString(),
                         groups = character.attributeGroupPairs.filter { it.attributeName == attributesList[i].first },
                         character = character,
-                        modifier = Modifier.width(140.dp)
+                        modifier = Modifier
+                            .width(140.dp)
+                            .heightIn(min = 120.dp)
                     )
                     if (i + 1 < attributesList.size) {
                         Spacer(modifier = Modifier.width(16.dp))
@@ -61,7 +63,9 @@ fun AttributesDetailCard(
                             value = attributesList[i + 1].second.toString(),
                             groups = character.attributeGroupPairs.filter { it.attributeName == attributesList[i + 1].first },
                             character = character,
-                            modifier = Modifier.width(140.dp)
+                            modifier = Modifier
+                                .width(140.dp)
+                                .heightIn(min = 120.dp)
                         )
                     }
                 }
@@ -86,13 +90,15 @@ private fun AttributeCard(
         shadowElevation = 2.dp
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxHeight(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
         ) {
             Text(
                 text = name,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(

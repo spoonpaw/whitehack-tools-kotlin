@@ -125,6 +125,7 @@ fun AppNavigation(
                 initialCharisma = character?.charisma ?: 10,
                 initialUseDefaultAttributes = character?.useDefaultAttributes ?: true,
                 initialCustomAttributeArray = character?.customAttributeArray,
+                initialAttributeGroupPairs = character?.attributeGroupPairs ?: emptyList(),
                 initialTab = selectedTab,
                 onNavigateBack = { 
                     if (characterId == "new") {
@@ -164,7 +165,8 @@ fun AppNavigation(
                                         willpower = willpower.toIntOrNull() ?: 10,
                                         charisma = charisma.toIntOrNull() ?: 10,
                                         customAttributeArray = customAttributeArray,
-                                        attributeGroupPairs = attributeGroupPairs
+                                        attributeGroupPairs = attributeGroupPairs,
+                                        playerName = character.playerName
                                     )
                                 } else {
                                     existingChar
