@@ -16,39 +16,46 @@ fun CombatFormCard(
     onSaveColorChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val maxHPValue = maxHP.toIntOrNull() ?: 0
+    val currentHPValue = currentHP.toIntOrNull() ?: 0
+    val isCurrentHPValid = currentHP.isEmpty() || currentHP == "-" || 
+        (currentHPValue <= maxHPValue && currentHP.toIntOrNull() != null)
+
     SectionCard(
         title = "Combat Stats",
         modifier = modifier
     ) {
         FormField(
             value = currentHP,
-            onValueChange = { value ->
-                val newValue = value.filter { it.isDigit() || it == '-' }
-                onCurrentHPChange(newValue)
-            },
+            onValueChange = onCurrentHPChange,
             label = "Current HP",
             keyboardType = KeyboardType.Number,
-            numberOnly = true,
-            validate = { it.isEmpty() || it.first() != '-' || it.count { c -> c == '-' } <= 1 }
+            numberOnly = false, // Allow minus sign
+            validate = { value ->
+                // Allow empty, minus sign, or valid integer that doesn't exceed max
+                val intValue = value.toIntOrNull()
+                value.isEmpty() || value == "-" || 
+                    (intValue != null && intValue <= maxHPValue)
+            },
+            isError = !isCurrentHPValid
         )
         
         FormField(
             value = maxHP,
-            onValueChange = { value ->
-                val newValue = value.filter { it.isDigit() }
-                onMaxHPChange(newValue)
-            },
+            onValueChange = onMaxHPChange,
             label = "Max HP",
             keyboardType = KeyboardType.Number,
-            numberOnly = true
+            numberOnly = true,
+            validate = { value ->
+                // Allow empty or positive integer >= 1
+                value.isEmpty() || (value.toIntOrNull() ?: 0) >= 1
+            },
+            isError = maxHP.isNotEmpty() && (maxHP.toIntOrNull() ?: 0) < 1
         )
         
         FormField(
             value = movement,
-            onValueChange = { value ->
-                val newValue = value.filter { it.isDigit() }
-                onMovementChange(newValue)
-            },
+            onValueChange = onMovementChange,
             label = "Movement",
             keyboardType = KeyboardType.Number,
             numberOnly = true
