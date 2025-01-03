@@ -26,10 +26,7 @@ fun CharacterFormScreen(
     initialCharacterClass: String = "Deft",
     initialCurrentHP: Int = 10,
     initialMaxHP: Int = 10,
-    initialAttackValue: Int = 0,
-    initialDefenseValue: Int = 0,
     initialMovement: Int = 30,
-    initialInitiativeBonus: Int = 0,
     initialSaveColor: String = "",
     initialTab: CharacterTab = CharacterTab.Info,
     onNavigateBack: () -> Unit = {},
@@ -44,7 +41,7 @@ fun CharacterFormScreen(
         movement: Int,
         initiativeBonus: Int,
         saveColor: String,
-        selectedTab: CharacterTab
+        _: CharacterTab
     ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _ -> }
 ) {
     var name by remember { mutableStateOf(initialName) }
@@ -56,10 +53,10 @@ fun CharacterFormScreen(
     // Combat stats
     var currentHP by remember { mutableStateOf(initialCurrentHP.toString()) }
     var maxHP by remember { mutableStateOf(initialMaxHP.toString()) }
-    var attackValue by remember { mutableStateOf(initialAttackValue.toString()) }
-    var defenseValue by remember { mutableStateOf(initialDefenseValue.toString()) }
+    var attackValue by remember { mutableStateOf("0") }
+    var defenseValue by remember { mutableStateOf("0") }
     var movement by remember { mutableStateOf(initialMovement.toString()) }
-    var initiativeBonus by remember { mutableStateOf(initialInitiativeBonus.toString()) }
+    var initiativeBonus by remember { mutableStateOf("0") }
     var saveColor by remember { mutableStateOf(initialSaveColor) }
 
     Scaffold(

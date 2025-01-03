@@ -89,10 +89,7 @@ fun AppNavigation(
                 initialCharacterClass = character?.characterClass ?: "Deft",
                 initialCurrentHP = character?.currentHP ?: 10,
                 initialMaxHP = character?.maxHP ?: 10,
-                initialAttackValue = character?.attackValue ?: 0,
-                initialDefenseValue = character?.defenseValue ?: 0,
                 initialMovement = character?.movement ?: 30,
-                initialInitiativeBonus = character?.initiativeBonus ?: 0,
                 initialSaveColor = character?.saveColor ?: "",
                 initialTab = selectedTab,
                 onNavigateBack = {
@@ -108,7 +105,7 @@ fun AppNavigation(
                         }
                     }
                 },
-                onSave = { name, level, characterClass, currentHP, maxHP, attackValue, defenseValue, movement, initiativeBonus, saveColor, selectedTab ->
+                onSave = { name, level, characterClass, currentHP, maxHP, attackValue, defenseValue, movement, initiativeBonus, saveColor, _ ->
                     scope.launch {
                         if (character != null) {
                             // Update existing character
