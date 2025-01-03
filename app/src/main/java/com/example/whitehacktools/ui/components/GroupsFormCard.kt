@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -103,34 +104,30 @@ fun GroupsFormCard(
                     )
                 } else {
                     affiliations.forEachIndexed { index, affiliation ->
-                        Row(
+                        OutlinedTextField(
+                            value = affiliation,
+                            onValueChange = { },
+                            readOnly = true,
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            OutlinedTextField(
-                                value = affiliation,
-                                onValueChange = { },
-                                readOnly = true,
-                                modifier = Modifier.weight(1f),
-                                shape = RoundedCornerShape(12.dp),
-                                colors = OutlinedTextFieldDefaults.colors(
-                                    unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                                    disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                                )
-                            )
-                            IconButton(
-                                onClick = {
-                                    onAffiliationsChange(affiliations.filterIndexed { i, _ -> i != index })
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                                disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                            ),
+                            trailingIcon = {
+                                IconButton(
+                                    onClick = {
+                                        onAffiliationsChange(affiliations.filterIndexed { i, _ -> i != index })
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = "Remove Affiliation",
+                                        tint = MaterialTheme.colorScheme.error
+                                    )
                                 }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = "Remove Affiliation",
-                                    tint = MaterialTheme.colorScheme.error
-                                )
                             }
-                        }
+                        )
                     }
                 }
             }
