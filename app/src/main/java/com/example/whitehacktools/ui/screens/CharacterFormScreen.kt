@@ -35,6 +35,7 @@ fun CharacterFormScreen(
     initialVocation: String = "",
     initialSpecies: String = "",
     initialAffiliations: List<String> = emptyList(),
+    initialLanguages: List<String> = emptyList(),
     initialCurrentHP: Int = 10,
     initialMaxHP: Int = 10,
     initialMovement: Int = 30,
@@ -59,6 +60,7 @@ fun CharacterFormScreen(
         vocation: String,
         species: String,
         affiliations: List<String>,
+        languages: List<String>,
         currentHP: Int,
         maxHP: Int,
         movement: Int,
@@ -75,7 +77,7 @@ fun CharacterFormScreen(
         customAttributeArray: AttributeArray?,
         attributeGroupPairs: List<AttributeGroupPair>,
         tab: CharacterTab
-    ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ -> }
+    ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ -> }
 ) {
     var name by remember { mutableStateOf(initialName) }
     var playerName by remember { mutableStateOf(initialPlayerName) }
@@ -84,6 +86,7 @@ fun CharacterFormScreen(
     var vocation by remember { mutableStateOf(initialVocation) }
     var species by remember { mutableStateOf(initialSpecies) }
     var affiliations by remember { mutableStateOf(initialAffiliations) }
+    var languages by remember { mutableStateOf(initialLanguages) }
     var selectedTab by remember { mutableStateOf(initialTab) }
     
     // Combat stats
@@ -121,6 +124,7 @@ fun CharacterFormScreen(
                                 vocation,
                                 species,
                                 affiliations,
+                                languages,
                                 currentHP.toIntOrNull() ?: 10,
                                 maxHP.toIntOrNull() ?: 10,
                                 movement.toIntOrNull() ?: 30,
@@ -220,6 +224,14 @@ fun CharacterFormScreen(
                             } else {
                                 customAttributeArray?.attributes?.keys?.toList() ?: emptyList()
                             },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        LanguagesFormCard(
+                            languages = languages,
+                            onLanguagesChange = { languages = it },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }

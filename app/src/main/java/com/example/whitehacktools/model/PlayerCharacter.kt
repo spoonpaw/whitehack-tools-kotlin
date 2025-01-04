@@ -35,6 +35,7 @@ data class PlayerCharacter(
     val vocation: String = "",
     val species: String = "",
     val affiliations: List<String> = emptyList(),
+    val languages: List<String> = emptyList(),
     // Attributes
     val useDefaultAttributes: Boolean = true,
     val strength: Int = 10,

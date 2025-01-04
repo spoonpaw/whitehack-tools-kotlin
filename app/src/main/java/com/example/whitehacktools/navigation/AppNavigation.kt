@@ -111,6 +111,7 @@ fun AppNavigation(
                 initialVocation = character?.vocation ?: "",
                 initialSpecies = character?.species ?: "",
                 initialAffiliations = character?.affiliations ?: emptyList(),
+                initialLanguages = character?.languages ?: emptyList(),
                 initialCurrentHP = character?.currentHP ?: 10,
                 initialMaxHP = character?.maxHP ?: 10,
                 initialMovement = character?.movement ?: 30,
@@ -138,7 +139,7 @@ fun AppNavigation(
                         }
                     }
                 },
-                onSave = { name, level, characterClass, vocation, species, affiliations, currentHP, maxHP, movement, saveColor, goldOnHand, stashedGold, useDefaultAttributes, strength, agility, toughness, intelligence, willpower, charisma, customAttributeArray, attributeGroupPairs, tab ->
+                onSave = { name, level, characterClass, vocation, species, affiliations, languages, currentHP, maxHP, movement, saveColor, goldOnHand, stashedGold, useDefaultAttributes, strength, agility, toughness, intelligence, willpower, charisma, customAttributeArray, attributeGroupPairs, tab ->
                     scope.launch {
                         if (character != null) {
                             // Update existing character
@@ -151,6 +152,7 @@ fun AppNavigation(
                                         vocation = vocation,
                                         species = species,
                                         affiliations = affiliations,
+                                        languages = languages,
                                         currentHP = currentHP,
                                         maxHP = maxHP,
                                         movement = movement,
@@ -186,6 +188,7 @@ fun AppNavigation(
                                 vocation = vocation,
                                 species = species,
                                 affiliations = affiliations,
+                                languages = languages,
                                 level = level,
                                 currentHP = currentHP,
                                 maxHP = maxHP,

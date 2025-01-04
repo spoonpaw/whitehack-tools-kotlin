@@ -75,6 +75,11 @@ fun CharacterDetailScreen(
                             character = character,
                             modifier = Modifier.fillMaxWidth()
                         )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        LanguagesDetailCard(
+                            character = character,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                     CharacterTab.Combat -> {
                         CombatDetailCard(
