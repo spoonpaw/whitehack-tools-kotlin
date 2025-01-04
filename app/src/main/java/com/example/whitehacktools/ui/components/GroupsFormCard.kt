@@ -226,7 +226,8 @@ fun GroupsFormCard(
                     Text(
                         text = "No attribute-group pairs added",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        modifier = Modifier.padding(start = 4.dp)
                     )
                 } else {
                     attributeGroupPairs.forEachIndexed { index, pair ->
