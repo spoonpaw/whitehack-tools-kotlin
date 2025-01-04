@@ -26,19 +26,34 @@ fun LanguagesFormCard(
         modifier = modifier
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth()
         ) {
-            FilledTonalButton(
-                onClick = { showAddLanguageDialog = true },
-                modifier = Modifier.align(Alignment.End)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add Language"
+            languages.forEachIndexed { index, language ->
+                OutlinedTextField(
+                    value = language,
+                    onValueChange = { },
+                    readOnly = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                        disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                    ),
+                    trailingIcon = {
+                        IconButton(
+                            onClick = {
+                                onLanguagesChange(languages.filterIndexed { i, _ -> i != index })
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Remove Language",
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
                 )
-                Spacer(modifier = Modifier.width(4.dp))
-                Text("Add")
             }
 
             if (languages.isEmpty()) {
@@ -46,35 +61,17 @@ fun LanguagesFormCard(
                     text = "No languages added",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    modifier = Modifier.padding(start = 4.dp)
+                    modifier = Modifier.padding(vertical = 8.dp)
                 )
-            } else {
-                languages.forEachIndexed { index, language ->
-                    OutlinedTextField(
-                        value = language,
-                        onValueChange = { },
-                        readOnly = true,
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                            disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                        ),
-                        trailingIcon = {
-                            IconButton(
-                                onClick = {
-                                    onLanguagesChange(languages.filterIndexed { i, _ -> i != index })
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = "Remove Language",
-                                    tint = MaterialTheme.colorScheme.error
-                                )
-                            }
-                        }
-                    )
-                }
+            }
+
+            Button(
+                onClick = { showAddLanguageDialog = true },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Add language")
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Add Language")
             }
         }
     }

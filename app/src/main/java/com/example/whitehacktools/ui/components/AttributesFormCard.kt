@@ -142,6 +142,15 @@ fun AttributesFormCard(
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
+                if (customAttributeArray?.attributes?.isEmpty() != false) {
+                    Text(
+                        text = "No custom attributes added",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                }
+
                 customAttributeArray?.attributes?.forEach { (name, value) ->
                     FormField(
                         value = value.toString(),
