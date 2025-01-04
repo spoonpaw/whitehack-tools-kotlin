@@ -57,7 +57,14 @@ fun AttributesFormCard(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             FilledTonalButton(
-                onClick = { onUseDefaultAttributesChange(true) },
+                onClick = { 
+                    // Remove any attribute-group pairs for custom attributes
+                    if (!useDefaultAttributes) {
+                        val defaultAttributeNames = setOf("Strength", "Agility", "Toughness", "Intelligence", "Willpower", "Charisma")
+                        onAttributeGroupPairsChange(attributeGroupPairs.filter { it.attributeName in defaultAttributeNames })
+                    }
+                    onUseDefaultAttributesChange(true)
+                },
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.filledTonalButtonColors(
                     containerColor = if (useDefaultAttributes) 
@@ -75,7 +82,14 @@ fun AttributesFormCard(
             }
             
             FilledTonalButton(
-                onClick = { onUseDefaultAttributesChange(false) },
+                onClick = { 
+                    // Remove any attribute-group pairs for default attributes
+                    if (useDefaultAttributes) {
+                        val defaultAttributeNames = setOf("Strength", "Agility", "Toughness", "Intelligence", "Willpower", "Charisma")
+                        onAttributeGroupPairsChange(attributeGroupPairs.filter { it.attributeName !in defaultAttributeNames })
+                    }
+                    onUseDefaultAttributesChange(false)
+                },
                 modifier = Modifier.weight(1f),
                 colors = ButtonDefaults.filledTonalButtonColors(
                     containerColor = if (!useDefaultAttributes) 
