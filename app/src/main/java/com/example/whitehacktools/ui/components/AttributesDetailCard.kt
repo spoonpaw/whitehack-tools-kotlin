@@ -2,17 +2,20 @@ package com.example.whitehacktools.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.whitehacktools.model.GroupType
 import com.example.whitehacktools.model.PlayerCharacter
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun AttributesDetailCard(
     character: PlayerCharacter,
@@ -36,36 +39,35 @@ fun AttributesDetailCard(
         }
 
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            val attributesList = attributes.toList()
-            for (i in attributesList.indices step 2) {
-                Row(
+            if (attributes.isEmpty()) {
+                Text(
+                    text = "No custom attributes added",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    textAlign = TextAlign.Center
+                )
+            } else {
+                val attributesList = attributes.toList()
+                FlowRow(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = if (i + 1 >= attributesList.size) Arrangement.Center else Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    maxItemsInEachRow = 2
                 ) {
-                    AttributeCard(
-                        name = attributesList[i].first,
-                        value = attributesList[i].second.toString(),
-                        groups = character.attributeGroupPairs.filter { it.attributeName == attributesList[i].first },
-                        character = character,
-                        modifier = Modifier
-                            .width(140.dp)
-                            .heightIn(min = 120.dp)
-                    )
-                    if (i + 1 < attributesList.size) {
-                        Spacer(modifier = Modifier.width(16.dp))
+                    attributesList.forEach { (name, value) ->
                         AttributeCard(
-                            name = attributesList[i + 1].first,
-                            value = attributesList[i + 1].second.toString(),
-                            groups = character.attributeGroupPairs.filter { it.attributeName == attributesList[i + 1].first },
+                            name = name,
+                            value = value.toString(),
+                            groups = character.attributeGroupPairs.filter { it.attributeName == name },
                             character = character,
                             modifier = Modifier
-                                .width(140.dp)
-                                .heightIn(min = 120.dp)
+                                .weight(1f)
+                                .padding(4.dp)
                         )
                     }
                 }
@@ -113,12 +115,16 @@ private fun AttributeCard(
                 ) {
                     groups.forEach { pair ->
                         Surface(
+                            shape = RoundedCornerShape(8.dp),
                             color = getGroupColor(pair.groupType, character).copy(alpha = 0.1f),
-                            shape = RoundedCornerShape(8.dp)
+                            border = BorderStroke(
+                                width = 1.dp,
+                                color = getGroupColor(pair.groupType, character).copy(alpha = 0.5f)
+                            )
                         ) {
                             Text(
                                 text = pair.groupName,
-                                style = MaterialTheme.typography.bodySmall,
+                                style = MaterialTheme.typography.labelMedium,
                                 color = getGroupColor(pair.groupType, character),
                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                             )
@@ -133,8 +139,8 @@ private fun AttributeCard(
 @Composable
 private fun getGroupColor(type: GroupType, character: PlayerCharacter): Color {
     return when (type) {
-        GroupType.Species -> MaterialTheme.colorScheme.primary
-        GroupType.Vocation -> MaterialTheme.colorScheme.tertiary
-        GroupType.Affiliation -> MaterialTheme.colorScheme.secondary
+        GroupType.Vocation -> MaterialTheme.colorScheme.primary
+        GroupType.Species -> MaterialTheme.colorScheme.secondary
+        GroupType.Affiliation -> MaterialTheme.colorScheme.tertiary
     }
 }
