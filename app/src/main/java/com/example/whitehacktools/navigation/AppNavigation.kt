@@ -128,6 +128,8 @@ fun AppNavigation(
                 initialCustomAttributeArray = character?.customAttributeArray,
                 initialAttributeGroupPairs = character?.attributeGroupPairs ?: emptyList(),
                 initialAttunementSlots = character?.attunementSlots ?: emptyList(),
+                initialStrongCombatOptions = character?.strongCombatOptions,
+                initialConflictLoot = character?.conflictLoot,
                 initialTab = selectedTab,
                 onNavigateBack = { 
                     if (characterId == "new") {

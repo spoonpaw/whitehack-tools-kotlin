@@ -11,10 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.whitehacktools.ui.components.*
-import com.example.whitehacktools.model.AttributeArray
-import com.example.whitehacktools.model.AttributeGroupPair
-import com.example.whitehacktools.model.PlayerCharacter
-import com.example.whitehacktools.model.AttunementSlot
+import com.example.whitehacktools.model.*
+import com.example.whitehacktools.utilities.AdvancementTables
 import com.example.whitehacktools.ui.models.CharacterTab
 
 private val characterClasses = listOf(
@@ -56,6 +54,8 @@ fun CharacterFormScreen(
     initialCustomAttributeArray: AttributeArray? = null,
     initialAttributeGroupPairs: List<AttributeGroupPair> = emptyList(),
     initialAttunementSlots: List<AttunementSlot> = emptyList(),
+    initialStrongCombatOptions: StrongCombatOptions? = null,
+    initialConflictLoot: ConflictLoot? = null,
     initialTab: CharacterTab = CharacterTab.Info,
     onNavigateBack: () -> Unit = {},
     onSave: (PlayerCharacter) -> Unit = {}
@@ -93,6 +93,10 @@ fun CharacterFormScreen(
     var attributeGroupPairs by remember { mutableStateOf(initialAttributeGroupPairs) }
     var attunementSlots by remember { mutableStateOf(initialAttunementSlots) }
 
+    // Strong Features
+    var strongCombatOptions by remember { mutableStateOf(initialStrongCombatOptions ?: StrongCombatOptions()) }
+    var conflictLoot by remember { mutableStateOf(initialConflictLoot) }
+
     // Create a temporary character for class-specific forms
     var tempCharacter by remember { mutableStateOf(
         PlayerCharacter(
@@ -122,7 +126,9 @@ fun CharacterFormScreen(
             charisma = charisma.toIntOrNull() ?: 10,
             customAttributeArray = customAttributeArray,
             attributeGroupPairs = attributeGroupPairs,
-            attunementSlots = attunementSlots
+            attunementSlots = attunementSlots,
+            strongCombatOptions = strongCombatOptions,
+            conflictLoot = conflictLoot
         )
     ) }
 
@@ -132,7 +138,8 @@ fun CharacterFormScreen(
         affiliations, languages, currentHP, maxHP, movement, saveColor,
         goldOnHand, stashedGold, experience, corruption, notes,
         useDefaultAttributes, strength, agility, toughness, intelligence,
-        willpower, charisma, customAttributeArray, attributeGroupPairs, attunementSlots
+        willpower, charisma, customAttributeArray, attributeGroupPairs, attunementSlots,
+        strongCombatOptions, conflictLoot
     ) {
         tempCharacter = PlayerCharacter(
             name = name,
@@ -161,7 +168,9 @@ fun CharacterFormScreen(
             charisma = charisma.toIntOrNull() ?: 10,
             customAttributeArray = customAttributeArray,
             attributeGroupPairs = attributeGroupPairs,
-            attunementSlots = attunementSlots
+            attunementSlots = attunementSlots,
+            strongCombatOptions = strongCombatOptions,
+            conflictLoot = conflictLoot
         )
     }
 
@@ -202,7 +211,9 @@ fun CharacterFormScreen(
                                     charisma = charisma.toIntOrNull() ?: 10,
                                     customAttributeArray = customAttributeArray,
                                     attributeGroupPairs = attributeGroupPairs,
-                                    attunementSlots = tempCharacter.attunementSlots
+                                    attunementSlots = tempCharacter.attunementSlots,
+                                    strongCombatOptions = strongCombatOptions,
+                                    conflictLoot = conflictLoot
                                 )
                             )
                         },
@@ -309,7 +320,15 @@ fun CharacterFormScreen(
                                 },
                                 modifier = Modifier.fillMaxWidth()
                             )
-                            "Strong" -> StrongFormCard(modifier = Modifier.fillMaxWidth())
+                            "Strong" -> StrongFormCard(
+                                characterClass = characterClass,
+                                level = level.toIntOrNull() ?: 1,
+                                strongCombatOptions = strongCombatOptions,
+                                currentConflictLoot = conflictLoot,
+                                onStrongCombatOptionsChanged = { strongCombatOptions = it },
+                                onConflictLootChanged = { conflictLoot = it },
+                                modifier = Modifier.fillMaxWidth()
+                            )
                             "Wise" -> WiseFormCard(modifier = Modifier.fillMaxWidth())
                             "Brave" -> BraveFormCard(modifier = Modifier.fillMaxWidth())
                             "Clever" -> CleverFormCard(modifier = Modifier.fillMaxWidth())

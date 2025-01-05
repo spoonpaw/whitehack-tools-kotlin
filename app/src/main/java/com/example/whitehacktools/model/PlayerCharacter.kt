@@ -2,6 +2,7 @@ package com.example.whitehacktools.model
 
 import java.util.UUID
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Contextual
 
 @Serializable
 data class AttributeArray(
@@ -52,6 +53,7 @@ data class PlayerCharacter(
     val defenseValue: Int = 10,
     val movement: Int = 30,
     val initiativeBonus: Int = 0,
+    val savingValue: Int = 7,
     val saveColor: String = "",
     // Equipment
     val goldOnHand: Int = 0,
@@ -65,7 +67,16 @@ data class PlayerCharacter(
         AttunementSlot(),
         AttunementSlot(),
         AttunementSlot()
-    )
+    ),
+    // Strong Features
+    @Serializable
+    val strongCombatOptions: StrongCombatOptions? = null,
+    @Serializable
+    val conflictLoot: ConflictLoot? = null,
+    // Deft Features
+    val attunements: List<Attunement> = emptyList(),
+    // Wise Features
+    val miracles: List<String> = emptyList()
 ) {
     companion object {
         val DEFAULT_ATTRIBUTES = listOf(
@@ -79,8 +90,8 @@ data class PlayerCharacter(
     }
 
     fun getAttributeValue(name: String): Int {
-        return if (useDefaultAttributes) {
-            when (name.lowercase()) {
+        return when {
+            useDefaultAttributes -> when (name.lowercase()) {
                 "strength" -> strength
                 "agility" -> agility
                 "toughness" -> toughness
@@ -89,8 +100,7 @@ data class PlayerCharacter(
                 "charisma" -> charisma
                 else -> 10
             }
-        } else {
-            customAttributeArray?.attributes?.get(name) ?: 10
+            else -> customAttributeArray?.attributes?.get(name) ?: 10
         }
     }
 
