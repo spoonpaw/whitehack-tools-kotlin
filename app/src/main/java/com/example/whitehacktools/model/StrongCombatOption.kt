@@ -36,6 +36,9 @@ enum class StrongCombatOption {
             PARRY_WAIT -> "Instead of attacking, parry to gain +2 defense this round and double combat advantage against the parried enemy next round. Parrying two rounds in a row grants triple advantage. If you take damage while parrying, you must save or lose the effect."
         }
 
+    val displayName: String
+        get() = name.split('_').joinToString(" ") { it.lowercase().replaceFirstChar { char -> char.uppercase() } }
+
     companion object {
         fun fromString(str: String): StrongCombatOption? = 
             values().find { it.toString() == str }
