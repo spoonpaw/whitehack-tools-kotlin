@@ -30,7 +30,7 @@ fun StrongDetailCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 // Combat Options Section
                 if (character.strongCombatOptions != null) {
