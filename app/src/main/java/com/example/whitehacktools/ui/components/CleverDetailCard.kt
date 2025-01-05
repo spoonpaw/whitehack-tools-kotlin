@@ -61,51 +61,56 @@ fun CleverDetailCard(
             }
 
             // Knacks Section
-            Text(
-                text = "Knacks",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = "Knacks",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
 
-            character.cleverAbilities.knackSlots.forEachIndexed { index, slot ->
-                slot.knack?.let { knack ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(8.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant
-                        )
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                character.cleverAbilities.knackSlots.forEachIndexed { index, slot ->
+                    slot.knack?.let { knack ->
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            )
                         ) {
-                            Text(
-                                text = knack.displayName,
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Medium
-                            )
-                            
-                            Text(
-                                text = knack.description,
-                                style = MaterialTheme.typography.bodySmall
-                            )
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = knack.displayName,
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                
+                                Text(
+                                    text = knack.description,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
 
-                            // Combat Exploiter Status
-                            if (knack == CleverKnack.COMBAT_EXPLOITER) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(top = 8.dp),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = "Combat Die: ${if (!slot.hasUsedCombatDie) "Available" else "Used"}",
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
+                                // Combat Exploiter Status
+                                if (knack == CleverKnack.COMBAT_EXPLOITER) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(top = 8.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "Combat Die: ${if (!slot.hasUsedCombatDie) "Available" else "Used"}",
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                    }
                                 }
                             }
                         }
