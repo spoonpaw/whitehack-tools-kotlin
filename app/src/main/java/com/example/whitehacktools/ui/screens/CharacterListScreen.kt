@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.whitehacktools.model.PlayerCharacter
+import com.example.whitehacktools.model.GroupType
 import com.example.whitehacktools.ui.components.TopBarAction
 import com.example.whitehacktools.ui.components.WhitehackTopAppBar
 
@@ -135,8 +136,14 @@ private fun CharacterListItem(
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = "Level ${character.level} ${character.characterClass}",
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "${character.species.ifBlank { "No Species" }} • ${character.vocation.ifBlank { "No Vocation" }}",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )
             }
             IconButton(onClick = onDelete) {
