@@ -146,12 +146,12 @@ fun AppNavigation(
                         }
                     }
                 },
-                onSave = { character ->
+                onSave = { newCharacterData ->
                     scope.launch {
                         if (characterId != "new") {
                             // Update existing character
                             val updatedCharacters = characters.value.map { existingChar ->
-                                if (existingChar.id == characterId) character.copy(id = characterId) else existingChar
+                                if (existingChar.id == characterId) newCharacterData.copy(id = characterId) else existingChar
                             }
                             characterStore.saveCharacters(updatedCharacters)
                             navController.navigate(Screen.CharacterDetail.createRoute(characterId, selectedTab)) {
@@ -159,7 +159,7 @@ fun AppNavigation(
                             }
                         } else {
                             // Create new character
-                            val newCharacter = character.copy(id = UUID.randomUUID().toString())
+                            val newCharacter = newCharacterData.copy(id = UUID.randomUUID().toString())
                             characterStore.saveCharacters(characters.value + newCharacter)
                             navController.navigate(Screen.CharacterList.route) {
                                 popUpTo(Screen.CharacterList.route) { inclusive = true }
