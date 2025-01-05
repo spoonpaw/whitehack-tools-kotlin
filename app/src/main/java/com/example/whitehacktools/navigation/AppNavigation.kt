@@ -139,76 +139,23 @@ fun AppNavigation(
                         }
                     }
                 },
-                onSave = { name, level, characterClass, vocation, species, affiliations, languages, currentHP, maxHP, movement, saveColor, goldOnHand, stashedGold, useDefaultAttributes, strength, agility, toughness, intelligence, willpower, charisma, customAttributeArray, attributeGroupPairs, tab ->
+                onSave = { character ->
                     scope.launch {
-                        if (character != null) {
+                        if (characterId != "new") {
                             // Update existing character
                             val updatedCharacters = characters.value.map { existingChar ->
-                                if (existingChar.id == character.id) {
-                                    character.copy(
-                                        name = name,
-                                        level = level,
-                                        characterClass = characterClass,
-                                        vocation = vocation,
-                                        species = species,
-                                        affiliations = affiliations,
-                                        languages = languages,
-                                        currentHP = currentHP,
-                                        maxHP = maxHP,
-                                        movement = movement,
-                                        saveColor = saveColor,
-                                        goldOnHand = goldOnHand.toIntOrNull() ?: 0,
-                                        stashedGold = stashedGold.toIntOrNull() ?: 0,
-                                        useDefaultAttributes = useDefaultAttributes,
-                                        strength = strength.toIntOrNull() ?: 10,
-                                        agility = agility.toIntOrNull() ?: 10,
-                                        toughness = toughness.toIntOrNull() ?: 10,
-                                        intelligence = intelligence.toIntOrNull() ?: 10,
-                                        willpower = willpower.toIntOrNull() ?: 10,
-                                        charisma = charisma.toIntOrNull() ?: 10,
-                                        customAttributeArray = customAttributeArray,
-                                        attributeGroupPairs = attributeGroupPairs,
-                                        playerName = character.playerName
-                                    )
-                                } else {
-                                    existingChar
-                                }
+                                if (existingChar.id == characterId) character.copy(id = characterId) else existingChar
                             }
                             characterStore.saveCharacters(updatedCharacters)
-                            navController.navigate(Screen.CharacterDetail.createRoute(character.id, tab)) {
+                            navController.navigate(Screen.CharacterDetail.createRoute(characterId, selectedTab)) {
                                 popUpTo(Screen.CharacterList.route)
                             }
                         } else {
                             // Create new character
-                            val newCharacter = PlayerCharacter(
-                                id = UUID.randomUUID().toString(),
-                                name = name,
-                                playerName = "",
-                                characterClass = characterClass,
-                                vocation = vocation,
-                                species = species,
-                                affiliations = affiliations,
-                                languages = languages,
-                                level = level,
-                                currentHP = currentHP,
-                                maxHP = maxHP,
-                                movement = movement,
-                                saveColor = saveColor,
-                                goldOnHand = goldOnHand.toIntOrNull() ?: 0,
-                                stashedGold = stashedGold.toIntOrNull() ?: 0,
-                                useDefaultAttributes = useDefaultAttributes,
-                                strength = strength.toIntOrNull() ?: 10,
-                                agility = agility.toIntOrNull() ?: 10,
-                                toughness = toughness.toIntOrNull() ?: 10,
-                                intelligence = intelligence.toIntOrNull() ?: 10,
-                                willpower = willpower.toIntOrNull() ?: 10,
-                                charisma = charisma.toIntOrNull() ?: 10,
-                                customAttributeArray = customAttributeArray,
-                                attributeGroupPairs = attributeGroupPairs
-                            )
+                            val newCharacter = character.copy(id = UUID.randomUUID().toString())
                             characterStore.saveCharacters(characters.value + newCharacter)
-                            navController.navigate(Screen.CharacterDetail.createRoute(newCharacter.id, tab)) {
-                                popUpTo(Screen.CharacterList.route)
+                            navController.navigate(Screen.CharacterList.route) {
+                                popUpTo(Screen.CharacterList.route) { inclusive = true }
                             }
                         }
                     }

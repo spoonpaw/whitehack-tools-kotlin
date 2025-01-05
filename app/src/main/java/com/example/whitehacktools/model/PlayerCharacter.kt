@@ -30,7 +30,6 @@ data class PlayerCharacter(
     val playerName: String,
     val characterClass: String,
     val level: Int,
-    val experience: Int = 0,
     // Groups
     val vocation: String = "",
     val species: String = "",
@@ -56,7 +55,11 @@ data class PlayerCharacter(
     val saveColor: String = "",
     // Equipment
     val goldOnHand: Int = 0,
-    val stashedGold: Int = 0
+    val stashedGold: Int = 0,
+    // Additional Info
+    val experience: Int = 0,
+    val corruption: Int = 0,
+    val notes: String = ""
 ) {
     companion object {
         val DEFAULT_ATTRIBUTES = listOf(

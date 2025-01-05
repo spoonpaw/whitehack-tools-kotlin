@@ -87,6 +87,13 @@ fun CharacterDetailScreen(
                             "Clever" -> CleverDetailCard(character = character, modifier = Modifier.fillMaxWidth())
                             "Fortunate" -> FortunateDetailCard(character = character, modifier = Modifier.fillMaxWidth())
                         }
+                        
+                        AdditionalInfoDetailCard(
+                            experience = character.experience,
+                            corruption = character.corruption,
+                            notes = character.notes,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                     CharacterTab.Combat -> {
                         CombatDetailCard(

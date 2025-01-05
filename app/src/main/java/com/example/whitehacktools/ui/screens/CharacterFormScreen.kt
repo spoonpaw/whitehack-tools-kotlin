@@ -42,6 +42,9 @@ fun CharacterFormScreen(
     initialSaveColor: String = "",
     initialGoldOnHand: Int = 0,
     initialStashedGold: Int = 0,
+    initialExperience: Int = 0,
+    initialCorruption: Int = 0,
+    initialNotes: String = "",
     initialStrength: Int = 10,
     initialAgility: Int = 10,
     initialToughness: Int = 10,
@@ -53,31 +56,7 @@ fun CharacterFormScreen(
     initialAttributeGroupPairs: List<AttributeGroupPair> = emptyList(),
     initialTab: CharacterTab = CharacterTab.Info,
     onNavigateBack: () -> Unit = {},
-    onSave: (
-        name: String,
-        level: Int,
-        characterClass: String,
-        vocation: String,
-        species: String,
-        affiliations: List<String>,
-        languages: List<String>,
-        currentHP: Int,
-        maxHP: Int,
-        movement: Int,
-        saveColor: String,
-        goldOnHand: String,
-        stashedGold: String,
-        useDefaultAttributes: Boolean,
-        strength: String,
-        agility: String,
-        toughness: String,
-        intelligence: String,
-        willpower: String,
-        charisma: String,
-        customAttributeArray: AttributeArray?,
-        attributeGroupPairs: List<AttributeGroupPair>,
-        tab: CharacterTab
-    ) -> Unit = { _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _ -> }
+    onSave: (PlayerCharacter) -> Unit = {}
 ) {
     var name by remember { mutableStateOf(initialName) }
     var playerName by remember { mutableStateOf(initialPlayerName) }
@@ -96,6 +75,9 @@ fun CharacterFormScreen(
     var saveColor by remember { mutableStateOf(initialSaveColor) }
     var goldOnHand by remember { mutableStateOf(initialGoldOnHand.toString()) }
     var stashedGold by remember { mutableStateOf(initialStashedGold.toString()) }
+    var experience by remember { mutableStateOf(initialExperience.toString()) }
+    var corruption by remember { mutableStateOf(initialCorruption.toString()) }
+    var notes by remember { mutableStateOf(initialNotes) }
     
     // Attributes
     var useDefaultAttributes by remember { mutableStateOf(initialUseDefaultAttributes) }
@@ -118,29 +100,34 @@ fun CharacterFormScreen(
                         text = "Save",
                         onClick = {
                             onSave(
-                                name,
-                                level.toIntOrNull() ?: 1,
-                                characterClass,
-                                vocation,
-                                species,
-                                affiliations,
-                                languages,
-                                currentHP.toIntOrNull() ?: 10,
-                                maxHP.toIntOrNull() ?: 10,
-                                movement.toIntOrNull() ?: 30,
-                                saveColor,
-                                goldOnHand,
-                                stashedGold,
-                                useDefaultAttributes,
-                                strength,
-                                agility,
-                                toughness,
-                                intelligence,
-                                willpower,
-                                charisma,
-                                customAttributeArray,
-                                attributeGroupPairs,
-                                selectedTab
+                                PlayerCharacter(
+                                    name = name,
+                                    playerName = playerName,
+                                    characterClass = characterClass,
+                                    level = level.toIntOrNull() ?: 1,
+                                    vocation = vocation,
+                                    species = species,
+                                    affiliations = affiliations,
+                                    languages = languages,
+                                    currentHP = currentHP.toIntOrNull() ?: 10,
+                                    maxHP = maxHP.toIntOrNull() ?: 10,
+                                    movement = movement.toIntOrNull() ?: 30,
+                                    saveColor = saveColor,
+                                    goldOnHand = goldOnHand.toIntOrNull() ?: 0,
+                                    stashedGold = stashedGold.toIntOrNull() ?: 0,
+                                    experience = experience.toIntOrNull() ?: 0,
+                                    corruption = corruption.toIntOrNull() ?: 0,
+                                    notes = notes,
+                                    useDefaultAttributes = useDefaultAttributes,
+                                    strength = strength.toIntOrNull() ?: 10,
+                                    agility = agility.toIntOrNull() ?: 10,
+                                    toughness = toughness.toIntOrNull() ?: 10,
+                                    intelligence = intelligence.toIntOrNull() ?: 10,
+                                    willpower = willpower.toIntOrNull() ?: 10,
+                                    charisma = charisma.toIntOrNull() ?: 10,
+                                    customAttributeArray = customAttributeArray,
+                                    attributeGroupPairs = attributeGroupPairs
+                                )
                             )
                         },
                         enabled = name.isNotBlank() && level.toIntOrNull() in 1..10
@@ -245,7 +232,18 @@ fun CharacterFormScreen(
                             "Clever" -> CleverFormCard(modifier = Modifier.fillMaxWidth())
                             "Fortunate" -> FortunateFormCard(modifier = Modifier.fillMaxWidth())
                         }
-
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        AdditionalInfoFormCard(
+                            experience = experience,
+                            onExperienceChange = { experience = it },
+                            corruption = corruption,
+                            onCorruptionChange = { corruption = it },
+                            notes = notes,
+                            onNotesChange = { notes = it },
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                     CharacterTab.Combat -> {
                         CombatFormCard(
