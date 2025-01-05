@@ -50,14 +50,12 @@ fun AdditionalInfoFormCard(
         
         Spacer(modifier = Modifier.height(8.dp))
         
-        OutlinedTextField(
+        FormField(
             value = notes,
             onValueChange = onNotesChange,
-            label = { Text("Notes") },
-            modifier = Modifier.fillMaxWidth(),
+            label = "Notes",
             minLines = 3,
-            maxLines = 5,
-            shape = MaterialTheme.shapes.medium
+            maxLines = 5
         )
     }
 }
