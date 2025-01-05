@@ -79,6 +79,14 @@ fun CharacterDetailScreen(
                             character = character,
                             modifier = Modifier.fillMaxWidth()
                         )
+                        when (character.characterClass) {
+                            "Deft" -> DeftDetailCard(character = character, modifier = Modifier.fillMaxWidth())
+                            "Strong" -> StrongDetailCard(character = character, modifier = Modifier.fillMaxWidth())
+                            "Wise" -> WiseDetailCard(character = character, modifier = Modifier.fillMaxWidth())
+                            "Brave" -> BraveDetailCard(character = character, modifier = Modifier.fillMaxWidth())
+                            "Clever" -> CleverDetailCard(character = character, modifier = Modifier.fillMaxWidth())
+                            "Fortunate" -> FortunateDetailCard(character = character, modifier = Modifier.fillMaxWidth())
+                        }
                     }
                     CharacterTab.Combat -> {
                         CombatDetailCard(

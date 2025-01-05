@@ -234,6 +234,18 @@ fun CharacterFormScreen(
                             onLanguagesChange = { languages = it },
                             modifier = Modifier.fillMaxWidth()
                         )
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        when (characterClass) {
+                            "Deft" -> DeftFormCard(modifier = Modifier.fillMaxWidth())
+                            "Strong" -> StrongFormCard(modifier = Modifier.fillMaxWidth())
+                            "Wise" -> WiseFormCard(modifier = Modifier.fillMaxWidth())
+                            "Brave" -> BraveFormCard(modifier = Modifier.fillMaxWidth())
+                            "Clever" -> CleverFormCard(modifier = Modifier.fillMaxWidth())
+                            "Fortunate" -> FortunateFormCard(modifier = Modifier.fillMaxWidth())
+                        }
+
                     }
                     CharacterTab.Combat -> {
                         CombatFormCard(
