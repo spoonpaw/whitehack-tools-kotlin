@@ -47,7 +47,7 @@ fun StrongFormCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(48.dp)
+                verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                 // Combat Options Section
                 Column(
@@ -137,8 +137,6 @@ fun StrongFormCard(
                         }
                     }
                 }
-
-                Spacer(modifier = Modifier.height(24.dp))
 
                 // Conflict Loot Section
                 Column(

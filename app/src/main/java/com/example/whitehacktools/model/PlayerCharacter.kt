@@ -79,7 +79,8 @@ data class PlayerCharacter(
     val miracles: List<String> = emptyList(),
     val wiseMiracles: WiseMiracles = WiseMiracles(),
     // Brave Features
-    val braveAbilities: BraveAbilities = BraveAbilities()
+    val braveAbilities: BraveAbilities = BraveAbilities(),
+    val cleverAbilities: CleverAbilities = CleverAbilities()
 ) {
     companion object {
         val DEFAULT_ATTRIBUTES = listOf(

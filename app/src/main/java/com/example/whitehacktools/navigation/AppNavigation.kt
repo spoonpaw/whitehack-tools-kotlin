@@ -11,6 +11,7 @@ import com.example.whitehacktools.data.CharacterStore
 import com.example.whitehacktools.model.AttributeArray
 import com.example.whitehacktools.model.AttributeGroupPair
 import com.example.whitehacktools.model.BraveAbilities
+import com.example.whitehacktools.model.CleverAbilities
 import com.example.whitehacktools.model.PlayerCharacter
 import com.example.whitehacktools.model.WiseMiracles
 import com.example.whitehacktools.ui.models.CharacterTab
@@ -134,6 +135,7 @@ fun AppNavigation(
                 initialConflictLoot = character?.conflictLoot,
                 initialWiseMiracles = character?.wiseMiracles ?: WiseMiracles(),
                 initialBraveAbilities = character?.braveAbilities ?: BraveAbilities(),
+                initialCleverAbilities = character?.cleverAbilities ?: CleverAbilities(),
                 initialTab = selectedTab,
                 onNavigateBack = { 
                     if (characterId == "new") {
