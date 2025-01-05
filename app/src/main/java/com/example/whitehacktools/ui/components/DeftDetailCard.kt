@@ -2,14 +2,155 @@ package com.example.whitehacktools.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.shape.RoundedCornerShape
 import com.example.whitehacktools.model.*
+
+@Composable
+private fun AttunementFieldCard(
+    label: String,
+    value: String,
+    color: Color = MaterialTheme.colorScheme.onSurface,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp)
+        ) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.bodyMedium,
+                color = color
+            )
+        }
+    }
+}
+
+@Composable
+private fun EmptyAttunementCard(
+    title: String,
+    titleColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.1f)
+        ),
+        border = BorderStroke(1.dp, titleColor.copy(alpha = 0.3f))
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = titleColor,
+                fontWeight = FontWeight.Bold
+            )
+            Text(
+                text = "Empty",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+            )
+        }
+    }
+}
+
+@Composable
+private fun AttunementDetailCard(
+    attunement: Attunement,
+    title: String,
+    titleColor: Color,
+    modifier: Modifier = Modifier
+) {
+    if (attunement.name.isEmpty()) {
+        EmptyAttunementCard(
+            title = title,
+            titleColor = titleColor,
+            modifier = modifier
+        )
+    } else {
+        Card(
+            modifier = modifier,
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.1f)
+            ),
+            border = BorderStroke(1.dp, titleColor.copy(alpha = 0.3f))
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Title
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = titleColor,
+                    fontWeight = FontWeight.Bold
+                )
+
+                // Name
+                AttunementFieldCard(
+                    label = "Name",
+                    value = attunement.name,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Type
+                AttunementFieldCard(
+                    label = "Type",
+                    value = attunement.type.name,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Status
+                AttunementFieldCard(
+                    label = "Status",
+                    value = when {
+                        attunement.isLost -> "Lost"
+                        attunement.isActive -> "Active"
+                        else -> "Inactive"
+                    },
+                    color = when {
+                        attunement.isLost -> MaterialTheme.colorScheme.error
+                        attunement.isActive -> MaterialTheme.colorScheme.primary
+                        else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+    }
+}
 
 @Composable
 fun DeftDetailCard(
@@ -54,67 +195,50 @@ fun DeftDetailCard(
                                     modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
                                 )
 
-                                // Always show primary and secondary
-                                DetailItem(
-                                    label = "Primary Attunement",
-                                    value = if (slot.primaryAttunement.name.isEmpty()) {
-                                        "None"
-                                    } else {
-                                        "${slot.primaryAttunement.name} (${slot.primaryAttunement.type.name.lowercase().replaceFirstChar { it.uppercase() }})" +
-                                            if (slot.primaryAttunement.isActive) " - Active" else "" +
-                                            if (slot.primaryAttunement.isLost) " - Lost" else ""
-                                    }
-                                )
-                                
-                                DetailItem(
-                                    label = "Secondary Attunement",
-                                    value = if (slot.secondaryAttunement.name.isEmpty()) {
-                                        "None"
-                                    } else {
-                                        "${slot.secondaryAttunement.name} (${slot.secondaryAttunement.type.name.lowercase().replaceFirstChar { it.uppercase() }})" +
-                                            if (slot.secondaryAttunement.isActive) " - Active" else "" +
-                                            if (slot.secondaryAttunement.isLost) " - Lost" else ""
-                                    }
+                                // Primary
+                                AttunementDetailCard(
+                                    attunement = slot.primaryAttunement,
+                                    title = "Primary Attunement",
+                                    titleColor = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.fillMaxWidth()
                                 )
 
-                                // Show tertiary if enabled
+                                // Secondary
+                                AttunementDetailCard(
+                                    attunement = slot.secondaryAttunement,
+                                    title = "Secondary Attunement",
+                                    titleColor = MaterialTheme.colorScheme.secondary,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+
+                                // Tertiary
                                 if (slot.hasTertiaryAttunement) {
-                                    DetailItem(
-                                        label = "Tertiary Attunement",
-                                        value = if (slot.tertiaryAttunement.name.isEmpty()) {
-                                            "None"
-                                        } else {
-                                            "${slot.tertiaryAttunement.name} (${slot.tertiaryAttunement.type.name.lowercase().replaceFirstChar { it.uppercase() }})" +
-                                                if (slot.tertiaryAttunement.isActive) " - Active" else "" +
-                                                if (slot.tertiaryAttunement.isLost) " - Lost" else ""
-                                        }
+                                    AttunementDetailCard(
+                                        attunement = slot.tertiaryAttunement,
+                                        title = "Tertiary Attunement",
+                                        titleColor = MaterialTheme.colorScheme.tertiary,
+                                        modifier = Modifier.fillMaxWidth()
                                     )
                                 }
 
-                                // Show quaternary if enabled
+                                // Quaternary
                                 if (slot.hasQuaternaryAttunement) {
-                                    DetailItem(
-                                        label = "Quaternary Attunement",
-                                        value = if (slot.quaternaryAttunement.name.isEmpty()) {
-                                            "None"
-                                        } else {
-                                            "${slot.quaternaryAttunement.name} (${slot.quaternaryAttunement.type.name.lowercase().replaceFirstChar { it.uppercase() }})" +
-                                                if (slot.quaternaryAttunement.isActive) " - Active" else "" +
-                                                if (slot.quaternaryAttunement.isLost) " - Lost" else ""
-                                        }
+                                    AttunementDetailCard(
+                                        attunement = slot.quaternaryAttunement,
+                                        title = "Quaternary Attunement",
+                                        titleColor = MaterialTheme.colorScheme.error,
+                                        modifier = Modifier.fillMaxWidth()
                                     )
                                 }
 
-                                DetailItem(
-                                    label = "Daily Power",
-                                    value = if (slot.hasUsedDailyPower) 
-                                        "Used" 
-                                    else 
-                                        "Available",
-                                    valueColor = if (slot.hasUsedDailyPower) 
+                                AttunementFieldCard(
+                                    label = "Attunement Slot ${index + 1} Daily Power Status",
+                                    value = if (slot.hasUsedDailyPower) "Used" else "Available",
+                                    color = if (slot.hasUsedDailyPower) 
                                         MaterialTheme.colorScheme.error 
                                     else 
-                                        MaterialTheme.colorScheme.tertiary
+                                        MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.fillMaxWidth()
                                 )
                             }
                         }
