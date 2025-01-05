@@ -323,7 +323,7 @@ fun GroupsFormCard(
                         var attributeExpanded by remember { mutableStateOf(false) }
                         ExposedDropdownMenuBox(
                             expanded = attributeExpanded,
-                            onExpandedChange = { attributeExpanded = it }
+                            onExpandedChange = { attributeExpanded = !attributeExpanded }
                         ) {
                             OutlinedTextField(
                                 value = selectedAttribute,
@@ -362,7 +362,7 @@ fun GroupsFormCard(
 
                         ExposedDropdownMenuBox(
                             expanded = groupExpanded,
-                            onExpandedChange = { groupExpanded = it }
+                            onExpandedChange = { groupExpanded = !groupExpanded }
                         ) {
                             OutlinedTextField(
                                 value = selectedGroupName,
