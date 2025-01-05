@@ -29,7 +29,7 @@ fun DropdownField(
     Box(modifier = modifier.fillMaxWidth()) {
         ExposedDropdownMenuBox(
             expanded = expanded,
-            onExpandedChange = { expanded = it }
+            onExpandedChange = { expanded = !expanded }
         ) {
             OutlinedTextField(
                 value = value,
@@ -53,6 +53,7 @@ fun DropdownField(
                 ),
                 shape = RoundedCornerShape(12.dp)
             )
+
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
