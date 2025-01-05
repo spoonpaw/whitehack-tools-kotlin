@@ -54,129 +54,117 @@ fun WiseDetailCard(
                         fontWeight = FontWeight.SemiBold
                     )
 
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                    repeat(availableSlots) { index ->
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            )
                         ) {
-                            repeat(availableSlots) { index ->
-                                Card(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = RoundedCornerShape(8.dp),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                                    )
-                                ) {
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(12.dp),
-                                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                                    ) {
-                                        Text(
-                                            text = "Slot ${index + 1}",
-                                            style = MaterialTheme.typography.titleSmall,
-                                            fontWeight = FontWeight.Medium
-                                        )
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = "Slot ${index + 1}",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Medium
+                                )
 
-                                        val slot = character.wiseMiracles.slots.getOrNull(index)
-                                        val miracleCount = if (index == 0) 2 + extraInactiveMiracles else 2
-                                        
-                                        // Show base miracles
-                                        repeat(miracleCount) { miracleIndex ->
-                                            val miracle = slot?.miracles?.getOrNull(miracleIndex) ?: WiseMiracle()
-                                            Card(
+                                val slot = character.wiseMiracles.slots.getOrNull(index)
+                                val miracleCount = if (index == 0) 2 + extraInactiveMiracles else 2
+                                
+                                // Show base miracles
+                                repeat(miracleCount) { miracleIndex ->
+                                    val miracle = slot?.miracles?.getOrNull(miracleIndex) ?: WiseMiracle()
+                                    Card(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        shape = RoundedCornerShape(8.dp),
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = MaterialTheme.colorScheme.surface
+                                        )
+                                    ) {
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(12.dp)
+                                        ) {
+                                            Text(
+                                                text = if (miracle.name.isEmpty()) "(Empty)" else miracle.name,
+                                                style = MaterialTheme.typography.bodyLarge,
+                                                fontWeight = FontWeight.Medium,
+                                                color = if (miracle.name.isEmpty()) 
+                                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                                else 
+                                                    MaterialTheme.colorScheme.onSurface
+                                            )
+                                            Row(
                                                 modifier = Modifier.fillMaxWidth(),
-                                                shape = RoundedCornerShape(8.dp),
-                                                colors = CardDefaults.cardColors(
-                                                    containerColor = MaterialTheme.colorScheme.surface
-                                                )
+                                                horizontalArrangement = Arrangement.Start,
+                                                verticalAlignment = Alignment.CenterVertically
                                             ) {
-                                                Column(
-                                                    modifier = Modifier
-                                                        .fillMaxWidth()
-                                                        .padding(12.dp)
-                                                ) {
-                                                    Text(
-                                                        text = if (miracle.name.isEmpty()) "(Empty)" else miracle.name,
-                                                        style = MaterialTheme.typography.bodyLarge,
-                                                        fontWeight = FontWeight.Medium,
-                                                        color = if (miracle.name.isEmpty()) 
-                                                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                                                        else 
-                                                            MaterialTheme.colorScheme.onSurface
-                                                    )
-                                                    Row(
-                                                        modifier = Modifier.fillMaxWidth(),
-                                                        horizontalArrangement = Arrangement.Start,
-                                                        verticalAlignment = Alignment.CenterVertically
-                                                    ) {
-                                                        Text(
-                                                            text = if (miracle.isActive) "Active" else "Inactive",
-                                                            style = MaterialTheme.typography.bodyMedium,
-                                                            color = if (miracle.isActive) 
-                                                                MaterialTheme.colorScheme.primary 
-                                                            else 
-                                                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                                                        )
-                                                    }
-                                                }
+                                                Text(
+                                                    text = if (miracle.isActive) "Active" else "Inactive",
+                                                    style = MaterialTheme.typography.bodyMedium,
+                                                    color = if (miracle.isActive) 
+                                                        MaterialTheme.colorScheme.primary 
+                                                    else 
+                                                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                                )
                                             }
                                         }
+                                    }
+                                }
 
-                                        // Show additional miracles for first slot
-                                        if (index == 0 && slot?.miracles?.size ?: 0 > miracleCount) {
-                                            Text(
-                                                text = "Additional Miracles",
-                                                style = MaterialTheme.typography.titleSmall,
-                                                fontWeight = FontWeight.Medium,
-                                                modifier = Modifier.padding(top = 8.dp)
+                                // Show additional miracles for first slot
+                                if (index == 0 && slot?.miracles?.size ?: 0 > miracleCount) {
+                                    Text(
+                                        text = "Additional Miracles",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Medium,
+                                        modifier = Modifier.padding(top = 8.dp)
+                                    )
+
+                                    // Show additional miracles
+                                    for (additionalIndex in miracleCount until (slot?.miracles?.size ?: 0)) {
+                                        val additionalMiracle = slot?.miracles?.getOrNull(additionalIndex) ?: WiseMiracle()
+                                        Card(
+                                            modifier = Modifier.fillMaxWidth(),
+                                            shape = RoundedCornerShape(8.dp),
+                                            colors = CardDefaults.cardColors(
+                                                containerColor = MaterialTheme.colorScheme.surface
                                             )
-
-                                            // Show additional miracles
-                                            for (additionalIndex in miracleCount until (slot?.miracles?.size ?: 0)) {
-                                                val additionalMiracle = slot?.miracles?.getOrNull(additionalIndex) ?: WiseMiracle()
-                                                Card(
+                                        ) {
+                                            Column(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(12.dp)
+                                            ) {
+                                                Text(
+                                                    text = if (additionalMiracle.name.isEmpty()) "(Empty)" else additionalMiracle.name,
+                                                    style = MaterialTheme.typography.bodyLarge,
+                                                    fontWeight = FontWeight.Medium,
+                                                    color = if (additionalMiracle.name.isEmpty()) 
+                                                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                                    else 
+                                                        MaterialTheme.colorScheme.onSurface
+                                                )
+                                                Row(
                                                     modifier = Modifier.fillMaxWidth(),
-                                                    shape = RoundedCornerShape(8.dp),
-                                                    colors = CardDefaults.cardColors(
-                                                        containerColor = MaterialTheme.colorScheme.surface
-                                                    )
+                                                    horizontalArrangement = Arrangement.Start,
+                                                    verticalAlignment = Alignment.CenterVertically
                                                 ) {
-                                                    Column(
-                                                        modifier = Modifier
-                                                            .fillMaxWidth()
-                                                            .padding(12.dp)
-                                                    ) {
-                                                        Text(
-                                                            text = if (additionalMiracle.name.isEmpty()) "(Empty)" else additionalMiracle.name,
-                                                            style = MaterialTheme.typography.bodyLarge,
-                                                            fontWeight = FontWeight.Medium,
-                                                            color = if (additionalMiracle.name.isEmpty()) 
-                                                                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                                                            else 
-                                                                MaterialTheme.colorScheme.onSurface
-                                                        )
-                                                        Row(
-                                                            modifier = Modifier.fillMaxWidth(),
-                                                            horizontalArrangement = Arrangement.Start,
-                                                            verticalAlignment = Alignment.CenterVertically
-                                                        ) {
-                                                            Text(
-                                                                text = if (additionalMiracle.isActive) "Active" else "Inactive",
-                                                                style = MaterialTheme.typography.bodyMedium,
-                                                                color = if (additionalMiracle.isActive) 
-                                                                    MaterialTheme.colorScheme.primary 
-                                                                else 
-                                                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                                                            )
-                                                        }
-                                                    }
+                                                    Text(
+                                                        text = if (additionalMiracle.isActive) "Active" else "Inactive",
+                                                        style = MaterialTheme.typography.bodyMedium,
+                                                        color = if (additionalMiracle.isActive) 
+                                                            MaterialTheme.colorScheme.primary 
+                                                        else 
+                                                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                                                    )
                                                 }
                                             }
                                         }
