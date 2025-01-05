@@ -56,6 +56,7 @@ fun CharacterFormScreen(
     initialAttunementSlots: List<AttunementSlot> = emptyList(),
     initialStrongCombatOptions: StrongCombatOptions? = null,
     initialConflictLoot: ConflictLoot? = null,
+    initialWiseMiracles: WiseMiracles = WiseMiracles(),
     initialTab: CharacterTab = CharacterTab.Info,
     onNavigateBack: () -> Unit = {},
     onSave: (PlayerCharacter) -> Unit = {}
@@ -97,6 +98,9 @@ fun CharacterFormScreen(
     var strongCombatOptions by remember { mutableStateOf(initialStrongCombatOptions ?: StrongCombatOptions()) }
     var conflictLoot by remember { mutableStateOf(initialConflictLoot) }
 
+    // Wise Features
+    var wiseMiracles by remember { mutableStateOf(initialWiseMiracles) }
+
     // Create a temporary character for class-specific forms
     var tempCharacter by remember { mutableStateOf(
         PlayerCharacter(
@@ -128,7 +132,8 @@ fun CharacterFormScreen(
             attributeGroupPairs = attributeGroupPairs,
             attunementSlots = attunementSlots,
             strongCombatOptions = strongCombatOptions,
-            conflictLoot = conflictLoot
+            conflictLoot = conflictLoot,
+            wiseMiracles = wiseMiracles
         )
     ) }
 
@@ -139,7 +144,7 @@ fun CharacterFormScreen(
         goldOnHand, stashedGold, experience, corruption, notes,
         useDefaultAttributes, strength, agility, toughness, intelligence,
         willpower, charisma, customAttributeArray, attributeGroupPairs, attunementSlots,
-        strongCombatOptions, conflictLoot
+        strongCombatOptions, conflictLoot, wiseMiracles
     ) {
         tempCharacter = PlayerCharacter(
             name = name,
@@ -170,7 +175,8 @@ fun CharacterFormScreen(
             attributeGroupPairs = attributeGroupPairs,
             attunementSlots = attunementSlots,
             strongCombatOptions = strongCombatOptions,
-            conflictLoot = conflictLoot
+            conflictLoot = conflictLoot,
+            wiseMiracles = wiseMiracles
         )
     }
 
@@ -213,7 +219,8 @@ fun CharacterFormScreen(
                                     attributeGroupPairs = attributeGroupPairs,
                                     attunementSlots = tempCharacter.attunementSlots,
                                     strongCombatOptions = strongCombatOptions,
-                                    conflictLoot = conflictLoot
+                                    conflictLoot = conflictLoot,
+                                    wiseMiracles = wiseMiracles
                                 )
                             )
                         },
@@ -329,7 +336,15 @@ fun CharacterFormScreen(
                                 onConflictLootChanged = { conflictLoot = it },
                                 modifier = Modifier.fillMaxWidth()
                             )
-                            "Wise" -> WiseFormCard(modifier = Modifier.fillMaxWidth())
+                            "Wise" -> WiseFormCard(
+                                characterClass = characterClass,
+                                level = level.toIntOrNull() ?: 1,
+                                willpower = willpower.toIntOrNull() ?: 10,
+                                useCustomAttributes = !useDefaultAttributes,
+                                wiseMiracles = wiseMiracles,
+                                onWiseMiraclesChanged = { wiseMiracles = it },
+                                modifier = Modifier.fillMaxWidth()
+                            )
                             "Brave" -> BraveFormCard(modifier = Modifier.fillMaxWidth())
                             "Clever" -> CleverFormCard(modifier = Modifier.fillMaxWidth())
                             "Fortunate" -> FortunateFormCard(modifier = Modifier.fillMaxWidth())

@@ -76,7 +76,8 @@ data class PlayerCharacter(
     // Deft Features
     val attunements: List<Attunement> = emptyList(),
     // Wise Features
-    val miracles: List<String> = emptyList()
+    val miracles: List<String> = emptyList(),
+    val wiseMiracles: WiseMiracles = WiseMiracles()
 ) {
     companion object {
         val DEFAULT_ATTRIBUTES = listOf(
