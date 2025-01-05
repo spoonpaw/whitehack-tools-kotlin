@@ -60,77 +60,78 @@ fun StrongFormCard(
                         fontWeight = FontWeight.SemiBold
                     )
 
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                    repeat(availableSlots) { index ->
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            )
                         ) {
-                            repeat(availableSlots) { index ->
-                                Card(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = RoundedCornerShape(8.dp),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                                    )
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = "Option ${index + 1}",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Medium
+                                )
+
+                                val currentOption = strongCombatOptions.getOption(index)
+                                var expanded by remember { mutableStateOf(false) }
+                                
+                                ExposedDropdownMenuBox(
+                                    expanded = expanded,
+                                    onExpandedChange = { expanded = it },
+                                    modifier = Modifier.fillMaxWidth()
                                 ) {
-                                    Column(
+                                    OutlinedTextField(
+                                        value = currentOption?.toString() ?: "Select a Combat Option",
+                                        onValueChange = { },
+                                        readOnly = true,
+                                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .padding(12.dp)
-                                    ) {
-                                        Text(
-                                            text = "Slot ${index + 1}",
-                                            style = MaterialTheme.typography.titleSmall,
-                                            fontWeight = FontWeight.Medium
-                                        )
-                                        
-                                        Spacer(modifier = Modifier.height(8.dp))
+                                            .menuAnchor()
+                                    )
 
-                                        Card(
-                                            modifier = Modifier.fillMaxWidth(),
-                                            shape = RoundedCornerShape(8.dp),
-                                            colors = CardDefaults.cardColors(
-                                                containerColor = MaterialTheme.colorScheme.surface
-                                            )
-                                        ) {
-                                            Column(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .padding(12.dp)
-                                            ) {
-                                                CombatOptionSlot(
-                                                    slotIndex = index,
-                                                    currentOption = strongCombatOptions.options.getOrNull(index),
-                                                    availableOptions = StrongCombatOption.values().toList().filter { option ->
-                                                        // Include if it's either the current option for this slot or not used in any slot
-                                                        option == strongCombatOptions.options.getOrNull(index) ||
-                                                        !strongCombatOptions.options.contains(option)
-                                                    },
-                                                    onOptionSelected = { option ->
-                                                        val newOptions = strongCombatOptions.options.toMutableList()
-                                                        if (option != null) {
-                                                            while (newOptions.size <= index) {
-                                                                newOptions.add(null)
-                                                            }
-                                                            newOptions[index] = option
-                                                        } else if (index < newOptions.size) {
-                                                            newOptions[index] = null
-                                                            // Remove trailing nulls
-                                                            while (newOptions.isNotEmpty() && newOptions.last() == null) {
-                                                                newOptions.removeAt(newOptions.lastIndex)
-                                                            }
-                                                        }
-                                                        onStrongCombatOptionsChanged(strongCombatOptions.copy(options = newOptions))
+                                    ExposedDropdownMenu(
+                                        expanded = expanded,
+                                        onDismissRequest = { expanded = false }
+                                    ) {
+                                        StrongCombatOption.values().filter { option ->
+                                            // Include if it's either the current option for this slot or not used in any slot
+                                            option == currentOption || !strongCombatOptions.options.take(availableSlots).any { it == option }
+                                        }.forEach { option ->
+                                            DropdownMenuItem(
+                                                text = {
+                                                    Column {
+                                                        Text(option.toString())
+                                                        Text(
+                                                            text = option.description,
+                                                            style = MaterialTheme.typography.bodySmall,
+                                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                                        )
                                                     }
-                                                )
-                                            }
+                                                },
+                                                onClick = {
+                                                    onStrongCombatOptionsChanged(strongCombatOptions.setOption(option, index))
+                                                    expanded = false
+                                                }
+                                            )
                                         }
                                     }
+                                }
+
+                                if (currentOption != null) {
+                                    Text(
+                                        text = currentOption.description,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                    )
                                 }
                             }
                         }

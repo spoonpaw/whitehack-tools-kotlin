@@ -56,8 +56,11 @@ data class StrongCombatOptions(
         if (at < options.size) options[at] else null
 
     fun setOption(option: StrongCombatOption?, at: Int): StrongCombatOptions {
-        if (at >= options.size) return this
+        // Create a new list with enough capacity
         val newOptions = options.toMutableList()
+        while (newOptions.size <= at) {
+            newOptions.add(null)
+        }
         newOptions[at] = option
         return copy(options = newOptions)
     }
