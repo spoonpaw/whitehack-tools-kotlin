@@ -38,7 +38,11 @@ fun CharacterDetailScreen(
             )
         }
     ) { padding ->
-        Column(modifier = Modifier.padding(padding)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
             TabRow(
                 selectedTabIndex = selectedTab.ordinal,
                 tabs = {
@@ -52,61 +56,71 @@ fun CharacterDetailScreen(
                 }
             )
             
-            Column(
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    .padding(horizontal = 16.dp)
             ) {
-                when (selectedTab) {
-                    CharacterTab.Info -> {
-                        BasicInfoDetailCard(
-                            character = character,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        
-                        AttributesDetailCard(
-                            character = character,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        
-                        GroupsDetailCard(
-                            character = character,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        LanguagesDetailCard(
-                            character = character,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                        when (character.characterClass) {
-                            "Deft" -> DeftDetailCard(character = character, modifier = Modifier.fillMaxWidth())
-                            "Strong" -> StrongDetailCard(character = character, modifier = Modifier.fillMaxWidth())
-                            "Wise" -> WiseDetailCard(character = character, modifier = Modifier.fillMaxWidth())
-                            "Brave" -> BraveDetailCard(character = character, modifier = Modifier.fillMaxWidth())
-                            "Clever" -> CleverDetailCard(character = character, modifier = Modifier.fillMaxWidth())
-                            "Fortunate" -> FortunateDetailCard(character = character, modifier = Modifier.fillMaxWidth())
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                        .padding(vertical = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    when (selectedTab) {
+                        CharacterTab.Info -> {
+                            BasicInfoDetailCard(
+                                character = character,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            
+                            AttributesDetailCard(
+                                character = character,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            
+                            GroupsDetailCard(
+                                character = character,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            LanguagesDetailCard(
+                                character = character,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            when (character.characterClass) {
+                                "Deft" -> DeftDetailCard(
+                                    character = character,
+                                    onCharacterChange = {},  // This is a detail view, so no changes needed
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                                "Strong" -> StrongDetailCard(character = character, modifier = Modifier.fillMaxWidth())
+                                "Wise" -> WiseDetailCard(character = character, modifier = Modifier.fillMaxWidth())
+                                "Brave" -> BraveDetailCard(character = character, modifier = Modifier.fillMaxWidth())
+                                "Clever" -> CleverDetailCard(character = character, modifier = Modifier.fillMaxWidth())
+                                "Fortunate" -> FortunateDetailCard(character = character, modifier = Modifier.fillMaxWidth())
+                            }
+                            
+                            AdditionalInfoDetailCard(
+                                experience = character.experience,
+                                corruption = character.corruption,
+                                notes = character.notes,
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         }
-                        
-                        AdditionalInfoDetailCard(
-                            experience = character.experience,
-                            corruption = character.corruption,
-                            notes = character.notes,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                    CharacterTab.Combat -> {
-                        CombatDetailCard(
-                            character = character,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                    CharacterTab.Equipment -> {
-                        GoldDetailCard(
-                            goldOnHand = character.goldOnHand,
-                            stashedGold = character.stashedGold,
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                        CharacterTab.Combat -> {
+                            CombatDetailCard(
+                                character = character,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                        CharacterTab.Equipment -> {
+                            GoldDetailCard(
+                                goldOnHand = character.goldOnHand,
+                                stashedGold = character.stashedGold,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                     }
                 }
             }

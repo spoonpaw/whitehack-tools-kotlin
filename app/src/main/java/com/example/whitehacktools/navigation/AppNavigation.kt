@@ -127,6 +127,7 @@ fun AppNavigation(
                 initialUseDefaultAttributes = character?.useDefaultAttributes ?: true,
                 initialCustomAttributeArray = character?.customAttributeArray,
                 initialAttributeGroupPairs = character?.attributeGroupPairs ?: emptyList(),
+                initialAttunementSlots = character?.attunementSlots ?: emptyList(),
                 initialTab = selectedTab,
                 onNavigateBack = { 
                     if (characterId == "new") {

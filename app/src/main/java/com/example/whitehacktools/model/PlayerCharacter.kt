@@ -1,7 +1,7 @@
 package com.example.whitehacktools.model
 
-import kotlinx.serialization.Serializable
 import java.util.UUID
+import kotlinx.serialization.Serializable
 
 @Serializable
 data class AttributeArray(
@@ -59,7 +59,13 @@ data class PlayerCharacter(
     // Additional Info
     val experience: Int = 0,
     val corruption: Int = 0,
-    val notes: String = ""
+    val notes: String = "",
+    val attunementSlots: List<AttunementSlot> = listOf(
+        AttunementSlot(),
+        AttunementSlot(),
+        AttunementSlot(),
+        AttunementSlot()
+    )
 ) {
     companion object {
         val DEFAULT_ATTRIBUTES = listOf(

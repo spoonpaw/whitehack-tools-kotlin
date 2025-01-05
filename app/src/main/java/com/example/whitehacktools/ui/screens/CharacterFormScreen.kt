@@ -11,10 +11,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.whitehacktools.ui.components.*
-import com.example.whitehacktools.ui.models.CharacterTab
 import com.example.whitehacktools.model.AttributeArray
 import com.example.whitehacktools.model.AttributeGroupPair
 import com.example.whitehacktools.model.PlayerCharacter
+import com.example.whitehacktools.model.AttunementSlot
+import com.example.whitehacktools.ui.models.CharacterTab
 
 private val characterClasses = listOf(
     "Deft",
@@ -54,6 +55,7 @@ fun CharacterFormScreen(
     initialUseDefaultAttributes: Boolean = true,
     initialCustomAttributeArray: AttributeArray? = null,
     initialAttributeGroupPairs: List<AttributeGroupPair> = emptyList(),
+    initialAttunementSlots: List<AttunementSlot> = emptyList(),
     initialTab: CharacterTab = CharacterTab.Info,
     onNavigateBack: () -> Unit = {},
     onSave: (PlayerCharacter) -> Unit = {}
@@ -89,6 +91,79 @@ fun CharacterFormScreen(
     var charisma by remember { mutableStateOf(initialCharisma.toString()) }
     var customAttributeArray by remember { mutableStateOf(initialCustomAttributeArray) }
     var attributeGroupPairs by remember { mutableStateOf(initialAttributeGroupPairs) }
+    var attunementSlots by remember { mutableStateOf(initialAttunementSlots) }
+
+    // Create a temporary character for class-specific forms
+    var tempCharacter by remember { mutableStateOf(
+        PlayerCharacter(
+            name = name,
+            playerName = playerName,
+            characterClass = characterClass,
+            level = level.toIntOrNull() ?: 1,
+            vocation = vocation,
+            species = species,
+            affiliations = affiliations,
+            languages = languages,
+            currentHP = currentHP.toIntOrNull() ?: 10,
+            maxHP = maxHP.toIntOrNull() ?: 10,
+            movement = movement.toIntOrNull() ?: 30,
+            saveColor = saveColor,
+            goldOnHand = goldOnHand.toIntOrNull() ?: 0,
+            stashedGold = stashedGold.toIntOrNull() ?: 0,
+            experience = experience.toIntOrNull() ?: 0,
+            corruption = corruption.toIntOrNull() ?: 0,
+            notes = notes,
+            useDefaultAttributes = useDefaultAttributes,
+            strength = strength.toIntOrNull() ?: 10,
+            agility = agility.toIntOrNull() ?: 10,
+            toughness = toughness.toIntOrNull() ?: 10,
+            intelligence = intelligence.toIntOrNull() ?: 10,
+            willpower = willpower.toIntOrNull() ?: 10,
+            charisma = charisma.toIntOrNull() ?: 10,
+            customAttributeArray = customAttributeArray,
+            attributeGroupPairs = attributeGroupPairs,
+            attunementSlots = attunementSlots
+        )
+    ) }
+
+    // Update tempCharacter whenever any of its fields change
+    LaunchedEffect(
+        name, playerName, characterClass, level, vocation, species,
+        affiliations, languages, currentHP, maxHP, movement, saveColor,
+        goldOnHand, stashedGold, experience, corruption, notes,
+        useDefaultAttributes, strength, agility, toughness, intelligence,
+        willpower, charisma, customAttributeArray, attributeGroupPairs, attunementSlots
+    ) {
+        tempCharacter = PlayerCharacter(
+            name = name,
+            playerName = playerName,
+            characterClass = characterClass,
+            level = level.toIntOrNull() ?: 1,
+            vocation = vocation,
+            species = species,
+            affiliations = affiliations,
+            languages = languages,
+            currentHP = currentHP.toIntOrNull() ?: 10,
+            maxHP = maxHP.toIntOrNull() ?: 10,
+            movement = movement.toIntOrNull() ?: 30,
+            saveColor = saveColor,
+            goldOnHand = goldOnHand.toIntOrNull() ?: 0,
+            stashedGold = stashedGold.toIntOrNull() ?: 0,
+            experience = experience.toIntOrNull() ?: 0,
+            corruption = corruption.toIntOrNull() ?: 0,
+            notes = notes,
+            useDefaultAttributes = useDefaultAttributes,
+            strength = strength.toIntOrNull() ?: 10,
+            agility = agility.toIntOrNull() ?: 10,
+            toughness = toughness.toIntOrNull() ?: 10,
+            intelligence = intelligence.toIntOrNull() ?: 10,
+            willpower = willpower.toIntOrNull() ?: 10,
+            charisma = charisma.toIntOrNull() ?: 10,
+            customAttributeArray = customAttributeArray,
+            attributeGroupPairs = attributeGroupPairs,
+            attunementSlots = attunementSlots
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -126,7 +201,8 @@ fun CharacterFormScreen(
                                     willpower = willpower.toIntOrNull() ?: 10,
                                     charisma = charisma.toIntOrNull() ?: 10,
                                     customAttributeArray = customAttributeArray,
-                                    attributeGroupPairs = attributeGroupPairs
+                                    attributeGroupPairs = attributeGroupPairs,
+                                    attunementSlots = tempCharacter.attunementSlots
                                 )
                             )
                         },
@@ -225,7 +301,14 @@ fun CharacterFormScreen(
                         Spacer(modifier = Modifier.height(16.dp))
                         
                         when (characterClass) {
-                            "Deft" -> DeftFormCard(modifier = Modifier.fillMaxWidth())
+                            "Deft" -> DeftFormCard(
+                                character = tempCharacter,
+                                onCharacterChange = { updatedCharacter ->
+                                    tempCharacter = updatedCharacter
+                                    attunementSlots = updatedCharacter.attunementSlots
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
                             "Strong" -> StrongFormCard(modifier = Modifier.fillMaxWidth())
                             "Wise" -> WiseFormCard(modifier = Modifier.fillMaxWidth())
                             "Brave" -> BraveFormCard(modifier = Modifier.fillMaxWidth())
