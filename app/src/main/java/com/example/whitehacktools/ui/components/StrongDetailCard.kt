@@ -53,14 +53,14 @@ fun StrongDetailCard(
                         )
                         
                         Text(
-                            text = "Strong characters rely on combat skills and physique. They can for example be warriors, guards, brigands, knights, bounty hunters or barbarians.",
+                            text = "Strong characters rely on combat skills and physique. They can be warriors, guards, brigands, knights, bounty hunters or barbarians.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
 
-                // Class Features Card
+                // Attribute Bonuses Card
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
@@ -75,7 +75,55 @@ fun StrongDetailCard(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Text(
-                            text = "Class Features",
+                            text = "Class Bonuses",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = "• Gain +1 Attack Value at Strength 13, and +1 damage at Strength 16.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = "• Gain +1 Hit Points at Toughness 13, and another +1 at Toughness 16.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = "• Proficient with all weapons and armor.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = "• Gain +1 Saving Value against poison and death, and +4 against special melee attacks.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+
+                // Combat Features Card
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text = "Combat Features",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -86,21 +134,28 @@ fun StrongDetailCard(
                         ) {
                             StrongFeatureRow(
                                 title = "Basic Combat",
-                                description = "Get the same single basic attack per round as other classes, but two free attacks (others get one)."
+                                description = "Two free attacks per round (others get one)"
                             )
+
+                            val stats = remember(character.level) {
+                                AdvancementTables.stats("Strong", character.level)
+                            }
+                            val maxFlowAttacks = remember(stats.raises) {
+                                if (stats.raises == "-") 1 else stats.raises.toInt() + 1
+                            }
                             StrongFeatureRow(
-                                title = "Flow Attacks",
-                                description = "When putting an enemy at zero or negative harm points, may attack another enemy adjacent to the Strong (melee) or prior target (ranged). Limited to raises + 1 per round."
+                                title = "Flow Attacks ($maxFlowAttacks per round)",
+                                description = "After reducing enemy to 0 HP, attack adjacent enemy (melee) or enemy adjacent to prior target (ranged)"
                             )
                             StrongFeatureRow(
                                 title = "Combat Options",
-                                description = "Can use any special combat option, and permanently fill slots with options from the Strong ability list. Effects last one round unless noted."
+                                description = "Use any special combat option and fill slots with Strong abilities. Effects last one round"
                             )
                         }
                     }
                 }
 
-                // Flow Attacks Card
+                // Conflict Looting Card
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
@@ -115,33 +170,34 @@ fun StrongDetailCard(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Text(
-                            text = "Flow Attacks",
+                            text = "Conflict Looting",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
 
-                        val stats = remember(character.level) {
-                            AdvancementTables.stats("Strong", character.level)
-                        }
-                        val maxFlowAttacks = remember(stats.raises) {
-                            if (stats.raises == "-") 1 else stats.raises.toInt() + 1
-                        }
-                        
                         Column(
                             modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            Text(
-                                text = "Maximum Flow Attacks per Round: $maxFlowAttacks",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium
+                            StrongLootTypeCard(
+                                title = "Special",
+                                description = "Note special/cultural conflicts. Later gain +2 for one round to any stat if related to the memory"
                             )
-                            Text(
-                                text = "When you reduce an enemy to 0 HP, you can make an additional attack against an adjacent enemy (melee) or an enemy adjacent to the prior target (ranged).",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            StrongLootTypeCard(
+                                title = "Substance",
+                                description = "Extract rare substance (poison, acid, etc.) from enemy with suitable keyword"
+                            )
+                            StrongLootTypeCard(
+                                title = "Supernatural",
+                                description = "On killing blow, gain enemy's non-violent supernatural ability"
                             )
                         }
+
+                        Text(
+                            text = "Can hold one loot at a time, usable character-level times. Substances count as inventory",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
 
@@ -296,6 +352,29 @@ fun StrongDetailCard(
 
 @Composable
 private fun StrongFeatureRow(
+    title: String,
+    description: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Medium
+        )
+        Text(
+            text = description,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun StrongLootTypeCard(
     title: String,
     description: String,
     modifier: Modifier = Modifier
