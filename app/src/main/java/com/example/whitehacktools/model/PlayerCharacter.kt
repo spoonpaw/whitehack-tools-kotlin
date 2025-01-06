@@ -80,7 +80,9 @@ data class PlayerCharacter(
     val wiseMiracles: WiseMiracles = WiseMiracles(),
     // Brave Features
     val braveAbilities: BraveAbilities = BraveAbilities(),
-    val cleverAbilities: CleverAbilities = CleverAbilities()
+    val cleverAbilities: CleverAbilities = CleverAbilities(),
+    // Fortunate Features
+    val fortunateOptions: FortunateOptions = FortunateOptions()
 ) {
     companion object {
         val DEFAULT_ATTRIBUTES = listOf(
@@ -104,7 +106,8 @@ data class PlayerCharacter(
                 "charisma" -> charisma
                 else -> 10
             }
-            else -> customAttributeArray?.attributes?.get(name) ?: 10
+            customAttributeArray != null -> customAttributeArray.attributes[name] ?: 10
+            else -> 10
         }
     }
 

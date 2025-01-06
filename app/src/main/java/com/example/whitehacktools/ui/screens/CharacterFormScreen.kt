@@ -59,6 +59,7 @@ fun CharacterFormScreen(
     initialWiseMiracles: WiseMiracles = WiseMiracles(),
     initialBraveAbilities: BraveAbilities = BraveAbilities(),
     initialCleverAbilities: CleverAbilities = CleverAbilities(),
+    initialFortunateOptions: FortunateOptions = FortunateOptions(),
     initialTab: CharacterTab = CharacterTab.Info,
     onNavigateBack: () -> Unit = {},
     onSave: (PlayerCharacter) -> Unit = {}
@@ -109,6 +110,9 @@ fun CharacterFormScreen(
     // Clever Features
     var cleverAbilities by remember { mutableStateOf(initialCleverAbilities) }
 
+    // Fortunate Features
+    var fortunateOptions by remember { mutableStateOf(initialFortunateOptions) }
+
     // Create a temporary character for class-specific forms
     var tempCharacter by remember { mutableStateOf(
         PlayerCharacter(
@@ -143,7 +147,8 @@ fun CharacterFormScreen(
             conflictLoot = conflictLoot,
             wiseMiracles = wiseMiracles,
             braveAbilities = braveAbilities,
-            cleverAbilities = cleverAbilities
+            cleverAbilities = cleverAbilities,
+            fortunateOptions = fortunateOptions
         )
     ) }
 
@@ -154,7 +159,8 @@ fun CharacterFormScreen(
         goldOnHand, stashedGold, experience, corruption, notes,
         useDefaultAttributes, strength, agility, toughness, intelligence,
         willpower, charisma, customAttributeArray, attributeGroupPairs, attunementSlots,
-        strongCombatOptions, conflictLoot, wiseMiracles, braveAbilities, cleverAbilities
+        strongCombatOptions, conflictLoot, wiseMiracles, braveAbilities, cleverAbilities,
+        fortunateOptions
     ) {
         tempCharacter = PlayerCharacter(
             name = name,
@@ -188,7 +194,8 @@ fun CharacterFormScreen(
             conflictLoot = conflictLoot,
             wiseMiracles = wiseMiracles,
             braveAbilities = braveAbilities,
-            cleverAbilities = cleverAbilities
+            cleverAbilities = cleverAbilities,
+            fortunateOptions = fortunateOptions
         )
     }
 
@@ -234,7 +241,8 @@ fun CharacterFormScreen(
                                     conflictLoot = conflictLoot,
                                     wiseMiracles = wiseMiracles,
                                     braveAbilities = braveAbilities,
-                                    cleverAbilities = cleverAbilities
+                                    cleverAbilities = cleverAbilities,
+                                    fortunateOptions = fortunateOptions.updateForLevel(level.toIntOrNull() ?: 1)
                                 )
                             )
                         },
@@ -373,7 +381,12 @@ fun CharacterFormScreen(
                                 onCleverAbilitiesChanged = { cleverAbilities = it },
                                 modifier = Modifier.fillMaxWidth()
                             )
-                            "Fortunate" -> FortunateFormCard(modifier = Modifier.fillMaxWidth())
+                            "Fortunate" -> FortunateFormCard(
+                                level = level.toIntOrNull() ?: 1,
+                                fortunateOptions = fortunateOptions,
+                                onFortunateOptionsChanged = { fortunateOptions = it },
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         }
                         
                         Spacer(modifier = Modifier.height(16.dp))
