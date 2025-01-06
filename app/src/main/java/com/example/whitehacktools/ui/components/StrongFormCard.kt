@@ -28,13 +28,25 @@ fun StrongFormCard(
 ) {
     if (characterClass == "Strong") {
         val availableSlots = remember(level) {
-            AdvancementTables.stats(characterClass, level).slots
+            when {
+                level < 4 -> 1
+                level < 7 -> 2
+                level < 10 -> 3
+                else -> 4
+            }
         }
 
-        // Clear out any combat options beyond the current level's slot limit
-        LaunchedEffect(level) {
-            if (strongCombatOptions.options.size > availableSlots) {
-                val newOptions = strongCombatOptions.options.take(availableSlots)
+        // Initialize or resize options list if needed
+        LaunchedEffect(availableSlots) {
+            if (strongCombatOptions.options.size < 4) {
+                // Create a new list with 4 slots, copying over existing values
+                val newOptions = List(4) { index ->
+                    if (index < strongCombatOptions.options.size) {
+                        strongCombatOptions.options[index]
+                    } else {
+                        null
+                    }
+                }
                 onStrongCombatOptionsChanged(strongCombatOptions.copy(options = newOptions))
             }
         }
@@ -58,6 +70,12 @@ fun StrongFormCard(
                         text = "Combat Options",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold
+                    )
+
+                    Text(
+                        text = "Available Slots: $availableSlots",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                     )
 
                     repeat(availableSlots) { index ->
@@ -103,8 +121,12 @@ fun StrongFormCard(
                                         onDismissRequest = { expanded = false }
                                     ) {
                                         StrongCombatOption.values().filter { option ->
-                                            // Include if it's either the current option for this slot or not used in any slot
-                                            option == currentOption || !strongCombatOptions.options.take(availableSlots).any { it == option }
+                                            // Only filter out options that are selected in visible slots
+                                            val selectedInVisibleSlots = strongCombatOptions.options
+                                                .take(availableSlots)
+                                                .filterIndexed { i, _ -> i != index }
+                                                .contains(option)
+                                            !selectedInVisibleSlots || option == currentOption
                                         }.forEach { option ->
                                             DropdownMenuItem(
                                                 text = {
@@ -118,7 +140,20 @@ fun StrongFormCard(
                                                     }
                                                 },
                                                 onClick = {
-                                                    onStrongCombatOptionsChanged(strongCombatOptions.setOption(option, index))
+                                                    var updatedOptions = strongCombatOptions.options.toMutableList()
+                                                    
+                                                    // If this option is selected in a hidden slot, clear that slot
+                                                    val hiddenIndex = updatedOptions
+                                                        .drop(availableSlots)
+                                                        .indexOfFirst { it == option }
+                                                    if (hiddenIndex != -1) {
+                                                        updatedOptions[hiddenIndex + availableSlots] = null
+                                                    }
+                                                    
+                                                    // Set the new option for this slot
+                                                    updatedOptions[index] = option
+                                                    
+                                                    onStrongCombatOptionsChanged(strongCombatOptions.copy(options = updatedOptions))
                                                     expanded = false
                                                 }
                                             )
