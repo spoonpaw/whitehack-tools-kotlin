@@ -27,14 +27,27 @@ fun BraveFormCard(
     modifier: Modifier = Modifier
 ) {
     if (characterClass == "Brave") {
-        val availableSlots by remember(level) {
-            mutableStateOf(AdvancementTables.stats("Brave", level).slots)
+        val availableSlots = remember(level) {
+            when {
+                level < 4 -> 1
+                level < 7 -> 2
+                level < 10 -> 3
+                else -> 4
+            }
         }
 
-        // Only update for level if we don't have any quirks yet or if we have too many quirks
-        LaunchedEffect(level) {
-            if (braveAbilities.quirkSlots.isEmpty() || braveAbilities.quirkSlots.size > availableSlots) {
-                onBraveAbilitiesChanged(braveAbilities.updateForLevel(level))
+        // Initialize or resize quirks list if needed
+        LaunchedEffect(availableSlots) {
+            if (braveAbilities.quirkSlots.size < 4) {
+                // Create a new list with 4 slots, copying over existing values
+                val newQuirks = List(4) { index ->
+                    if (index < braveAbilities.quirkSlots.size) {
+                        braveAbilities.quirkSlots[index]
+                    } else {
+                        BraveQuirkSlot(null, "")
+                    }
+                }
+                onBraveAbilitiesChanged(braveAbilities.copy(quirkSlots = newQuirks))
             }
         }
 
