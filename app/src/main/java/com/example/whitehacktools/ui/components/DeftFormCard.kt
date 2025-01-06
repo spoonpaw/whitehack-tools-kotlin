@@ -1,7 +1,6 @@
 package com.example.whitehacktools.ui.components
 
 import android.util.Log
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -64,8 +63,7 @@ private fun AttunementSlotCard(
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.05f)
-        ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
+        )
     ) {
         Column(
             modifier = Modifier
@@ -246,27 +244,42 @@ private fun AttunementSlotCard(
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Text(
-                        text = if (slot.hasUsedDailyPower) 
-                            "This slot's daily power has been used and cannot be used again until tomorrow"
-                        else 
-                            "This slot's daily power is available to use",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = if (slot.hasUsedDailyPower) 
-                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                        else 
-                            MaterialTheme.colorScheme.tertiary
-                    )
-                    Switch(
-                        checked = slot.hasUsedDailyPower,
-                        onCheckedChange = { onSlotChange(slot.copy(hasUsedDailyPower = it)) },
-                        colors = SwitchDefaults.colors(
-                            checkedTrackColor = MaterialTheme.colorScheme.error
+                    // Left box with title and status
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(12.dp)
+                    ) {
+                        Text(
+                            text = "Daily Power Status",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Medium
                         )
-                    )
+                        Text(
+                            text = if (slot.hasUsedDailyPower) {
+                                "This slot's daily power has been used and cannot be used again until tomorrow"
+                            } else {
+                                "This slot's daily power is available to use"
+                            },
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                    
+                    // Right box with switch
+                    Box(
+                        modifier = Modifier
+                            .padding(12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Switch(
+                            checked = slot.hasUsedDailyPower,
+                            onCheckedChange = { onSlotChange(slot.copy(hasUsedDailyPower = it)) }
+                        )
+                    }
                 }
             }
         }
@@ -287,8 +300,7 @@ private fun AttunementField(
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
-        ),
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+        )
     ) {
         Column(
             modifier = Modifier
@@ -410,20 +422,41 @@ private fun AttunementToggleRow(
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-        )
-        Switch(
-            checked = isChecked,
-            onCheckedChange = onCheckedChange,
-            colors = SwitchDefaults.colors(
-                checkedTrackColor = MaterialTheme.colorScheme.primary
+        // Left box with title and status
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(12.dp)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Medium
             )
-        )
+            Text(
+                text = if (isChecked) {
+                    "This attunement is active"
+                } else {
+                    "This attunement is not active"
+                },
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+        
+        // Right box with switch
+        Box(
+            modifier = Modifier
+                .padding(12.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Switch(
+                checked = isChecked,
+                onCheckedChange = onCheckedChange
+            )
+        }
     }
 }
