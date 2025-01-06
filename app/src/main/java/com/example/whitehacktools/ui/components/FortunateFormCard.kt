@@ -143,22 +143,11 @@ fun FortunateFormCard(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     // Header
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Retainers",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = "${fortunateOptions.retainers.count { it.name.isNotEmpty() }}/$availableSlots",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    Text(
+                        text = "Retainers",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Medium
+                    )
 
                     // Individual Retainer Cards
                     Column(
@@ -173,27 +162,45 @@ fun FortunateFormCard(
                                 border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
                                 shape = RoundedCornerShape(8.dp)
                             ) {
-                                RetainerCard(
-                                    retainer = retainer,
-                                    onRetainerChanged = { updatedRetainer ->
-                                        val updatedRetainers = fortunateOptions.retainers.toMutableList()
-                                        while (updatedRetainers.size <= index) {
-                                            updatedRetainers.add(Retainer())
-                                        }
-                                        updatedRetainers[index] = updatedRetainer
-                                        onFortunateOptionsChanged(fortunateOptions.copy(retainers = updatedRetainers))
-                                    },
-                                    onDeleteRetainer = {
-                                        val updatedRetainers = fortunateOptions.retainers.toMutableList()
-                                        if (index < updatedRetainers.size) {
-                                            updatedRetainers[index] = Retainer() // Clear instead of remove to maintain indices
-                                            onFortunateOptionsChanged(fortunateOptions.copy(retainers = updatedRetainers))
-                                        }
-                                    },
+                                Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(16.dp)
-                                )
+                                        .padding(16.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "Retainer ${index + 1}",
+                                            style = MaterialTheme.typography.titleSmall,
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                    RetainerCard(
+                                        retainer = retainer,
+                                        onRetainerChanged = { updatedRetainer ->
+                                            val updatedRetainers = fortunateOptions.retainers.toMutableList()
+                                            while (updatedRetainers.size <= index) {
+                                                updatedRetainers.add(Retainer())
+                                            }
+                                            updatedRetainers[index] = updatedRetainer
+                                            onFortunateOptionsChanged(fortunateOptions.copy(retainers = updatedRetainers))
+                                        },
+                                        onDeleteRetainer = {
+                                            val updatedRetainers = fortunateOptions.retainers.toMutableList()
+                                            if (index < updatedRetainers.size) {
+                                                updatedRetainers[index] = Retainer() // Clear instead of remove to maintain indices
+                                                onFortunateOptionsChanged(fortunateOptions.copy(retainers = updatedRetainers))
+                                            }
+                                        },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(16.dp)
+                                    )
+                                }
                             }
                         }
                     }
@@ -218,24 +225,6 @@ private fun RetainerCard(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Retainer",
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Medium
-            )
-            IconButton(onClick = onDeleteRetainer) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete Retainer"
-                )
-            }
-        }
-
         OutlinedTextField(
             value = retainer.name,
             onValueChange = { onRetainerChanged(retainer.copy(name = it)) },
