@@ -11,7 +11,9 @@ data class WiseMiracle(
 @Serializable
 data class WiseMiracleSlot(
     val miracles: List<WiseMiracle> = emptyList(),
-    val additionalMiracleCount: Int = 0
+    val additionalMiracleCount: Int = 0,
+    val isMagicItemSlot: Boolean = false,
+    val magicItemName: String = ""
 )
 
 @Serializable
