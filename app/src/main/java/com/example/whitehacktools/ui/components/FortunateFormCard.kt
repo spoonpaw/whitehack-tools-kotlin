@@ -91,6 +91,16 @@ fun FortunateFormCard(
                             onCheckedChange = { onFortunateOptionsChanged(fortunateOptions.copy(hasUsedFortune = it)) }
                         )
                     }
+                    Text(
+                        text = if (fortunateOptions.hasUsedFortune) {
+                            "Fortune power has been used this session"
+                        } else {
+                            "Fortune power is available"
+                        },
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
                 }
             }
 
