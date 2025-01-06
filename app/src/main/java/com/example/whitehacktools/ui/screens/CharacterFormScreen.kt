@@ -61,8 +61,8 @@ fun CharacterFormScreen(
     initialCleverAbilities: CleverAbilities = CleverAbilities(),
     initialFortunateOptions: FortunateOptions = FortunateOptions(),
     initialTab: CharacterTab = CharacterTab.Info,
-    onNavigateBack: () -> Unit = {},
-    onSave: (PlayerCharacter) -> Unit = {}
+    onNavigateBack: (CharacterTab) -> Unit = {},
+    onSave: (PlayerCharacter, CharacterTab) -> Unit = { _, _ -> }
 ) {
     var name by remember { mutableStateOf(initialName) }
     var playerName by remember { mutableStateOf(initialPlayerName) }
@@ -199,11 +199,15 @@ fun CharacterFormScreen(
         )
     }
 
+    DisposableEffect(selectedTab) {
+        onDispose { }
+    }
+
     Scaffold(
         topBar = {
             WhitehackTopAppBar(
                 title = if (initialName.isEmpty()) "New Character" else "Edit Character",
-                onNavigateBack = onNavigateBack,
+                onNavigateBack = { onNavigateBack(selectedTab) },
                 actions = listOf(
                     TopBarAction.TextAction(
                         text = "Save",
@@ -243,7 +247,8 @@ fun CharacterFormScreen(
                                     braveAbilities = braveAbilities,
                                     cleverAbilities = cleverAbilities,
                                     fortunateOptions = fortunateOptions.updateForLevel(level.toIntOrNull() ?: 1)
-                                )
+                                ),
+                                selectedTab
                             )
                         },
                         enabled = name.isNotBlank() && level.toIntOrNull() in 1..10

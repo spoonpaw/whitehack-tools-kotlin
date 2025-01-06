@@ -81,7 +81,7 @@ fun AppNavigation(
             CharacterDetailScreen(
                 character = character,
                 initialTab = selectedTab,
-                onNavigateBack = { 
+                onNavigateBack = {
                     navController.navigate(Screen.CharacterList.route) {
                         popUpTo(Screen.CharacterList.route) { inclusive = true }
                     }
@@ -139,18 +139,18 @@ fun AppNavigation(
                 initialCleverAbilities = character?.cleverAbilities ?: CleverAbilities(),
                 initialFortunateOptions = character?.fortunateOptions ?: FortunateOptions(),
                 initialTab = selectedTab,
-                onNavigateBack = { 
+                onNavigateBack = { tab -> 
                     if (characterId == "new") {
                         navController.navigate(Screen.CharacterList.route) {
                             popUpTo(Screen.CharacterList.route) { inclusive = true }
                         }
                     } else {
-                        navController.navigate(Screen.CharacterDetail.createRoute(characterId, selectedTab)) {
+                        navController.navigate(Screen.CharacterDetail.createRoute(characterId, tab)) {
                             popUpTo(Screen.CharacterList.route)
                         }
                     }
                 },
-                onSave = { newCharacterData ->
+                onSave = { newCharacterData, tab ->
                     scope.launch {
                         if (characterId != "new") {
                             // Update existing character
@@ -158,15 +158,15 @@ fun AppNavigation(
                                 if (existingChar.id == characterId) newCharacterData.copy(id = characterId) else existingChar
                             }
                             characterStore.saveCharacters(updatedCharacters)
-                            navController.navigate(Screen.CharacterDetail.createRoute(characterId, selectedTab)) {
+                            navController.navigate(Screen.CharacterDetail.createRoute(characterId, tab)) {
                                 popUpTo(Screen.CharacterList.route)
                             }
                         } else {
                             // Create new character
                             val newCharacter = newCharacterData.copy(id = UUID.randomUUID().toString())
                             characterStore.saveCharacters(characters.value + newCharacter)
-                            navController.navigate(Screen.CharacterList.route) {
-                                popUpTo(Screen.CharacterList.route) { inclusive = true }
+                            navController.navigate(Screen.CharacterDetail.createRoute(newCharacter.id, tab)) {
+                                popUpTo(Screen.CharacterList.route)
                             }
                         }
                     }

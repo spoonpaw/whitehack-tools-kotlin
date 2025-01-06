@@ -23,6 +23,10 @@ fun CharacterDetailScreen(
 ) {
     var selectedTab by remember { mutableStateOf(initialTab) }
 
+    DisposableEffect(selectedTab) {
+        onDispose { }
+    }
+
     Scaffold(
         topBar = {
             WhitehackTopAppBar(
