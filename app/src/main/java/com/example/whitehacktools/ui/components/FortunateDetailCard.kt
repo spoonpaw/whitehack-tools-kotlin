@@ -29,8 +29,7 @@ fun FortunateDetailCard(
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                    .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 // Class Overview Card
