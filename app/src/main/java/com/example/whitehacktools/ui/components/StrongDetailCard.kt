@@ -32,6 +32,119 @@ fun StrongDetailCard(
                     .padding(horizontal = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
+                // Class Overview Card
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text = "Class Overview",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        
+                        Text(
+                            text = "Strong characters rely on combat skills and physique. They can for example be warriors, guards, brigands, knights, bounty hunters or barbarians.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                // Class Features Card
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text = "Class Features",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+                        
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            StrongFeatureRow(
+                                title = "Basic Combat",
+                                description = "Get the same single basic attack per round as other classes, but two free attacks (others get one)."
+                            )
+                            StrongFeatureRow(
+                                title = "Flow Attacks",
+                                description = "When putting an enemy at zero or negative harm points, may attack another enemy adjacent to the Strong (melee) or prior target (ranged). Limited to raises + 1 per round."
+                            )
+                            StrongFeatureRow(
+                                title = "Combat Options",
+                                description = "Can use any special combat option, and permanently fill slots with options from the Strong ability list. Effects last one round unless noted."
+                            )
+                        }
+                    }
+                }
+
+                // Flow Attacks Card
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text = "Flow Attacks",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        val stats = remember(character.level) {
+                            AdvancementTables.stats("Strong", character.level)
+                        }
+                        val maxFlowAttacks = remember(stats.raises) {
+                            if (stats.raises == "-") 1 else stats.raises.toInt() + 1
+                        }
+                        
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text(
+                                text = "Maximum Flow Attacks per Round: $maxFlowAttacks",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Text(
+                                text = "When you reduce an enemy to 0 HP, you can make an additional attack against an adjacent enemy (melee) or an enemy adjacent to the prior target (ranged).",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+
                 // Combat Options Section
                 if (character.strongCombatOptions != null) {
                     Column(
@@ -178,5 +291,28 @@ fun StrongDetailCard(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun StrongFeatureRow(
+    title: String,
+    description: String,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Medium
+        )
+        Text(
+            text = description,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
