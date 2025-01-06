@@ -216,7 +216,10 @@ fun FortunateDetailCard(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = 16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    )
                 ) {
                     Column(
                         modifier = Modifier
@@ -241,12 +244,17 @@ fun FortunateDetailCard(
                             )
                         }
                         
-                        character.fortunateOptions.retainers.forEachIndexed { index, retainer ->
-                            RetainerCard(
-                                retainer = retainer,
-                                index = index,
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            character.fortunateOptions.retainers.forEachIndexed { index, retainer ->
+                                RetainerCard(
+                                    retainer = retainer,
+                                    index = index,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
                         }
                     }
                 }
@@ -334,44 +342,55 @@ private fun RetainerCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+        shape = RoundedCornerShape(8.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = "Retainer ${index + 1}",
                 style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.Center
             )
             if (retainer.name.isNotEmpty()) {
                 Text(
                     text = retainer.name,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    textAlign = TextAlign.Center
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     StatBox(label = "HP", value = "${retainer.currentHP}/${retainer.maxHP}")
+                    Spacer(modifier = Modifier.width(8.dp))
                     StatBox(label = "HD", value = retainer.hitDice.toString())
+                    Spacer(modifier = Modifier.width(8.dp))
                     StatBox(label = "DF", value = retainer.defense.toString())
+                    Spacer(modifier = Modifier.width(8.dp))
                     StatBox(label = "MV", value = retainer.movement.toString())
                 }
                 if (retainer.keywords.isNotEmpty()) {
                     Column(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
                             text = "Keywords",
                             style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
+                            textAlign = TextAlign.Center
                         )
                         
                         val rows = remember(retainer.keywords) {
@@ -406,12 +425,14 @@ private fun RetainerCard(
                         
                         Column(
                             modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                            verticalArrangement = Arrangement.spacedBy(4.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             rows.forEach { rowKeywords ->
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally)
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     rowKeywords.forEach { keyword ->
                                         Surface(
@@ -430,6 +451,9 @@ private fun RetainerCard(
                                                 textAlign = TextAlign.Center
                                             )
                                         }
+                                        if (keyword != rowKeywords.last()) {
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                        }
                                     }
                                 }
                             }
@@ -439,16 +463,19 @@ private fun RetainerCard(
                 if (retainer.notes.isNotEmpty()) {
                     Column(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
                             text = "Notes",
                             style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
+                            textAlign = TextAlign.Center
                         )
                         Text(
                             text = retainer.notes,
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center
                         )
                     }
                 }
@@ -456,7 +483,8 @@ private fun RetainerCard(
                 Text(
                     text = "Empty",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.outline
+                    color = MaterialTheme.colorScheme.outline,
+                    textAlign = TextAlign.Center
                 )
             }
         }
