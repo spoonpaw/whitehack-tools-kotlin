@@ -1,5 +1,7 @@
 package com.example.whitehacktools.ui.components
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -18,6 +20,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.clip
 import com.example.whitehacktools.model.*
 import com.example.whitehacktools.utilities.AdvancementTables
 
@@ -47,34 +51,47 @@ fun FortunateFormCard(
         modifier = modifier
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Standing
-            OutlinedTextField(
-                value = fortunateOptions.standing,
-                onValueChange = { onFortunateOptionsChanged(fortunateOptions.copy(standing = it)) },
-                label = { Text("Standing") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            // Fortune Usage
-            Row(
+            Card(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                ),
+                shape = RoundedCornerShape(8.dp)
             ) {
-                Text(
-                    text = "Fortune Power",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Medium
-                )
-                Switch(
-                    checked = fortunateOptions.hasUsedFortune,
-                    onCheckedChange = { onFortunateOptionsChanged(fortunateOptions.copy(hasUsedFortune = it)) }
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // Standing
+                    OutlinedTextField(
+                        value = fortunateOptions.standing,
+                        onValueChange = { onFortunateOptionsChanged(fortunateOptions.copy(standing = it)) },
+                        label = { Text("Standing") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    // Fortune Usage
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Fortune Power",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Switch(
+                            checked = fortunateOptions.hasUsedFortune,
+                            onCheckedChange = { onFortunateOptionsChanged(fortunateOptions.copy(hasUsedFortune = it)) }
+                        )
+                    }
+                }
             }
 
             // Signature Object
@@ -111,48 +128,75 @@ fun FortunateFormCard(
                 }
             }
 
-            // Retainers Header
-            Row(
+            // Retainers Section
+            Card(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                shape = RoundedCornerShape(8.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                )
             ) {
-                Text(
-                    text = "Retainers",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = "${fortunateOptions.retainers.count { it.name.isNotEmpty() }}/$availableSlots",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    // Header
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Retainers",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Text(
+                            text = "${fortunateOptions.retainers.count { it.name.isNotEmpty() }}/$availableSlots",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
 
-            // Retainers
-            Column(
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                displayedRetainers.forEachIndexed { index, retainer ->
-                    RetainerCard(
-                        retainer = retainer,
-                        onRetainerChanged = { updatedRetainer ->
-                            val updatedRetainers = fortunateOptions.retainers.toMutableList()
-                            while (updatedRetainers.size <= index) {
-                                updatedRetainers.add(Retainer())
+                    // Individual Retainer Cards
+                    Column(
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        displayedRetainers.forEachIndexed { index, retainer ->
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surface
+                                ),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                RetainerCard(
+                                    retainer = retainer,
+                                    onRetainerChanged = { updatedRetainer ->
+                                        val updatedRetainers = fortunateOptions.retainers.toMutableList()
+                                        while (updatedRetainers.size <= index) {
+                                            updatedRetainers.add(Retainer())
+                                        }
+                                        updatedRetainers[index] = updatedRetainer
+                                        onFortunateOptionsChanged(fortunateOptions.copy(retainers = updatedRetainers))
+                                    },
+                                    onDeleteRetainer = {
+                                        val updatedRetainers = fortunateOptions.retainers.toMutableList()
+                                        if (index < updatedRetainers.size) {
+                                            updatedRetainers[index] = Retainer() // Clear instead of remove to maintain indices
+                                            onFortunateOptionsChanged(fortunateOptions.copy(retainers = updatedRetainers))
+                                        }
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp)
+                                )
                             }
-                            updatedRetainers[index] = updatedRetainer
-                            onFortunateOptionsChanged(fortunateOptions.copy(retainers = updatedRetainers))
-                        },
-                        onDeleteRetainer = {
-                            val updatedRetainers = fortunateOptions.retainers.toMutableList()
-                            if (index < updatedRetainers.size) {
-                                updatedRetainers[index] = Retainer() // Clear instead of remove to maintain indices
-                                onFortunateOptionsChanged(fortunateOptions.copy(retainers = updatedRetainers))
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                        }
+                    }
                 }
             }
         }
@@ -170,238 +214,207 @@ private fun RetainerCard(
     var showKeywordDialog by remember { mutableStateOf(false) }
     var newKeyword by remember { mutableStateOf("") }
 
-    Card(
+    Column(
         modifier = modifier,
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Retainer",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Medium
-                )
-                IconButton(onClick = onDeleteRetainer) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete Retainer"
-                    )
-                }
-            }
-
-            OutlinedTextField(
-                value = retainer.name,
-                onValueChange = { onRetainerChanged(retainer.copy(name = it)) },
-                label = { Text("Name") },
-                modifier = Modifier.fillMaxWidth()
+            Text(
+                text = "Retainer",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Medium
             )
-
-            // Stats Row
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedTextField(
-                    value = retainer.currentHP.toString(),
-                    onValueChange = { newValue -> 
-                        val newHP = newValue.toIntOrNull() ?: 0
-                        onRetainerChanged(retainer.copy(currentHP = newHP))
-                    },
-                    label = { Text("Current HP") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f)
-                )
-                OutlinedTextField(
-                    value = retainer.maxHP.toString(),
-                    onValueChange = { newValue -> 
-                        val newHP = newValue.toIntOrNull() ?: 0
-                        onRetainerChanged(retainer.copy(maxHP = newHP))
-                    },
-                    label = { Text("Max HP") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f)
+            IconButton(onClick = onDeleteRetainer) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Delete Retainer"
                 )
             }
+        }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                OutlinedTextField(
-                    value = retainer.hitDice.toString(),
-                    onValueChange = { newValue -> 
-                        val newHD = newValue.toIntOrNull() ?: 1
-                        onRetainerChanged(retainer.copy(hitDice = newHD))
-                    },
-                    label = { Text("HD") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f)
-                )
-                OutlinedTextField(
-                    value = retainer.defense.toString(),
-                    onValueChange = { newValue -> 
-                        val newDF = newValue.toIntOrNull() ?: 10
-                        onRetainerChanged(retainer.copy(defense = newDF))
-                    },
-                    label = { Text("DF") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f)
-                )
-                OutlinedTextField(
-                    value = retainer.movement.toString(),
-                    onValueChange = { newValue -> 
-                        val newMV = newValue.toIntOrNull() ?: 30
-                        onRetainerChanged(retainer.copy(movement = newMV))
-                    },
-                    label = { Text("MV") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f)
-                )
-            }
+        OutlinedTextField(
+            value = retainer.name,
+            onValueChange = { onRetainerChanged(retainer.copy(name = it)) },
+            label = { Text("Name") },
+            modifier = Modifier.fillMaxWidth()
+        )
 
-            // Keywords
+        // Stats Row
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            OutlinedTextField(
+                value = retainer.currentHP.toString(),
+                onValueChange = { newValue -> 
+                    val newHP = newValue.toIntOrNull() ?: 0
+                    onRetainerChanged(retainer.copy(currentHP = newHP))
+                },
+                label = { Text("Current HP") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.weight(1f)
+            )
+            OutlinedTextField(
+                value = retainer.maxHP.toString(),
+                onValueChange = { newValue -> 
+                    val newHP = newValue.toIntOrNull() ?: 0
+                    onRetainerChanged(retainer.copy(maxHP = newHP))
+                },
+                label = { Text("Max HP") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            OutlinedTextField(
+                value = retainer.hitDice.toString(),
+                onValueChange = { newValue -> 
+                    val newHD = newValue.toIntOrNull() ?: 1
+                    onRetainerChanged(retainer.copy(hitDice = newHD))
+                },
+                label = { Text("HD") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.weight(1f)
+            )
+            OutlinedTextField(
+                value = retainer.defense.toString(),
+                onValueChange = { newValue -> 
+                    val newDF = newValue.toIntOrNull() ?: 10
+                    onRetainerChanged(retainer.copy(defense = newDF))
+                },
+                label = { Text("DF") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.weight(1f)
+            )
+            OutlinedTextField(
+                value = retainer.movement.toString(),
+                onValueChange = { newValue -> 
+                    val newMV = newValue.toIntOrNull() ?: 30
+                    onRetainerChanged(retainer.copy(movement = newMV))
+                },
+                label = { Text("MV") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        // Keywords
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "Keywords",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Medium
+            )
+            
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Text(
-                    text = "Keywords",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Medium
-                )
-                
-                var currentRowWidth by remember { mutableStateOf(0f) }
-                var currentRow by remember { mutableStateOf(mutableListOf<String>()) }
                 val rows = remember(retainer.keywords) {
-                    val result = mutableListOf<List<String>>()
-                    currentRow.clear()
-                    currentRowWidth = 0f
-                    
-                    retainer.keywords.forEach { keyword ->
-                        // Approximate width calculation: 12dp per character + padding + icon
-                        val itemWidth = keyword.length * 12f + 60f // 60dp for padding and icon
-                        
-                        if (currentRowWidth + itemWidth > 360f) { // Assuming max width of 360dp
-                            if (currentRow.isNotEmpty()) {
-                                result.add(currentRow.toList())
-                                currentRow.clear()
-                                currentRowWidth = itemWidth
-                                currentRow.add(keyword)
-                            } else {
-                                // If single item is wider than container, put it on its own row
-                                result.add(listOf(keyword))
-                            }
-                        } else {
-                            currentRowWidth += itemWidth
-                            currentRow.add(keyword)
+                    val keywords = retainer.keywords.toSet().toList()
+                    val rows = mutableListOf<List<String>>()
+                    var currentRow = mutableListOf<String>()
+                    var currentWidth = 0
+                    for (keyword in keywords) {
+                        val keywordWidth = keyword.length * 10
+                        if (currentWidth + keywordWidth > 200) {
+                            rows.add(currentRow)
+                            currentRow = mutableListOf()
+                            currentWidth = 0
                         }
+                        currentRow.add(keyword)
+                        currentWidth += keywordWidth
                     }
-                    
                     if (currentRow.isNotEmpty()) {
-                        result.add(currentRow.toList())
+                        rows.add(currentRow)
                     }
-                    
-                    result
+                    rows
                 }
-                
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    rows.forEach { rowKeywords ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally)
-                        ) {
-                            rowKeywords.forEach { keyword ->
-                                Surface(
-                                    modifier = Modifier
-                                        .wrapContentWidth()
-                                        .border(
-                                            width = 1.dp,
-                                            color = MaterialTheme.colorScheme.outline,
-                                            shape = RoundedCornerShape(16.dp)
-                                        ),
-                                    shape = RoundedCornerShape(16.dp),
-                                    color = MaterialTheme.colorScheme.surfaceVariant,
-                                    onClick = {
+                rows.forEach { rowKeywords ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally)
+                    ) {
+                        rowKeywords.forEach { keyword ->
+                            Box(
+                                modifier = Modifier
+                                    .wrapContentWidth()
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .border(
+                                        width = 1.dp,
+                                        color = MaterialTheme.colorScheme.outline,
+                                        shape = RoundedCornerShape(16.dp)
+                                    )
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .clickable {
                                         onRetainerChanged(
                                             retainer.copy(
                                                 keywords = retainer.keywords - keyword
                                             )
                                         )
                                     }
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .padding(start = 12.dp, end = 8.dp, top = 6.dp, bottom = 6.dp),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Row(
+                                    Text(
+                                        text = keyword,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.weight(1f, fill = false)
+                                    )
+                                    Box(
                                         modifier = Modifier
-                                            .padding(start = 12.dp, top = 6.dp, bottom = 6.dp, end = 8.dp),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.SpaceBetween
+                                            .size(24.dp)
+                                            .padding(4.dp)
                                     ) {
-                                        Text(
-                                            text = keyword,
-                                            modifier = Modifier
-                                                .weight(1f, fill = false)
-                                                .padding(end = 8.dp),
-                                            style = MaterialTheme.typography.bodyMedium
+                                        Icon(
+                                            imageVector = Icons.Default.Delete,
+                                            contentDescription = "Remove Keyword",
+                                            modifier = Modifier.matchParentSize(),
+                                            tint = MaterialTheme.colorScheme.error
                                         )
-                                        IconButton(
-                                            onClick = {
-                                                onRetainerChanged(
-                                                    retainer.copy(
-                                                        keywords = retainer.keywords - keyword
-                                                    )
-                                                )
-                                            },
-                                            modifier = Modifier.size(24.dp)
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.Delete,
-                                                contentDescription = "Remove Keyword",
-                                                modifier = Modifier.size(16.dp),
-                                                tint = MaterialTheme.colorScheme.error
-                                            )
-                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
-
-                Button(
-                    onClick = { showKeywordDialog = true },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add Keyword"
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text("Add Keyword")
-                }
             }
 
-            OutlinedTextField(
-                value = retainer.notes,
-                onValueChange = { onRetainerChanged(retainer.copy(notes = it)) },
-                label = { Text("Notes") },
-                modifier = Modifier.fillMaxWidth(),
-                minLines = 2
-            )
+            Button(
+                onClick = { showKeywordDialog = true },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add Keyword"
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Add Keyword")
+            }
         }
+
+        OutlinedTextField(
+            value = retainer.notes,
+            onValueChange = { onRetainerChanged(retainer.copy(notes = it)) },
+            label = { Text("Notes") },
+            modifier = Modifier.fillMaxWidth(),
+            minLines = 2
+        )
     }
 
     if (showKeywordDialog) {
