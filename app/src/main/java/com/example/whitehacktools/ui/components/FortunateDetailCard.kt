@@ -244,7 +244,8 @@ fun FortunateDetailCard(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -255,11 +256,6 @@ fun FortunateDetailCard(
                                 text = "Retainers",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Medium
-                            )
-                            Text(
-                                text = "${character.fortunateOptions.retainers.count { it.name.isNotEmpty() }}/4",
-                                style = MaterialTheme.typography.titleMedium,
-                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                         
