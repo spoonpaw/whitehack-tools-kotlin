@@ -132,19 +132,25 @@ private fun AttunementDetailCard(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                // Status
+                // Lost Status
                 AttunementFieldCard(
-                    label = "Status",
-                    value = when {
-                        attunement.isLost -> "Lost"
-                        attunement.isActive -> "Active"
-                        else -> "Inactive"
-                    },
-                    color = when {
-                        attunement.isLost -> MaterialTheme.colorScheme.error
-                        attunement.isActive -> MaterialTheme.colorScheme.primary
-                        else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                    },
+                    label = "Lost Status",
+                    value = if (attunement.isLost) "Lost" else "Not Lost",
+                    color = if (attunement.isLost) 
+                        MaterialTheme.colorScheme.error 
+                    else 
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Active Status
+                AttunementFieldCard(
+                    label = "Active Status",
+                    value = if (attunement.isActive) "Active" else "Inactive",
+                    color = if (attunement.isActive) 
+                        MaterialTheme.colorScheme.primary 
+                    else 
+                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
