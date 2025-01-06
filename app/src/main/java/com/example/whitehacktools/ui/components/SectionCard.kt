@@ -155,7 +155,7 @@ fun SectionCard(
     content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
-        modifier = modifier.padding(bottom = 16.dp),
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -177,8 +177,7 @@ fun SectionCard(
                         color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
                     ),
                     shape = RoundedCornerShape(16.dp)
-                )
-                .padding(16.dp),
+                ),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             content()
