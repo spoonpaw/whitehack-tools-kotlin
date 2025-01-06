@@ -84,34 +84,48 @@ fun CleverDetailCard(
                         fontWeight = FontWeight.SemiBold
                     )
 
-                    character.cleverAbilities.knackSlots.forEachIndexed { index, slot ->
-                        slot.knack?.let { knack ->
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(8.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                                )
+                    val availableSlots = when {
+                        character.level < 4 -> 1
+                        character.level < 7 -> 2
+                        character.level < 10 -> 3
+                        else -> 4
+                    }
+
+                    repeat(availableSlots) { index ->
+                        Card(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(12.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(12.dp),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
+                                Text(
+                                    text = "Knack ${index + 1}",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.Medium
+                                )
+
+                                val slot = character.cleverAbilities.knackSlots.getOrNull(index)
+                                if (slot?.knack != null) {
                                     Text(
-                                        text = knack.displayName,
-                                        style = MaterialTheme.typography.titleSmall,
+                                        text = slot.knack.displayName,
+                                        style = MaterialTheme.typography.bodyMedium,
                                         fontWeight = FontWeight.Medium
                                     )
                                     
                                     Text(
-                                        text = knack.description,
+                                        text = slot.knack.description,
                                         style = MaterialTheme.typography.bodySmall
                                     )
 
                                     // Combat Exploiter Status
-                                    if (knack == CleverKnack.COMBAT_EXPLOITER) {
+                                    if (slot.knack == CleverKnack.COMBAT_EXPLOITER) {
                                         Row(
                                             modifier = Modifier
                                                 .fillMaxWidth()
@@ -125,6 +139,12 @@ fun CleverDetailCard(
                                             )
                                         }
                                     }
+                                } else {
+                                    Text(
+                                        text = "No Knack Selected",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                    )
                                 }
                             }
                         }
