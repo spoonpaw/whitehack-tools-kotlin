@@ -211,7 +211,7 @@ private fun AttunementSlotCard(
                         // QUATERNARY FIELD
                         if (slot.hasQuaternaryAttunement) {
                             AttunementField(
-                                title = "Attunement Slot 4",
+                                title = "Quaternary Attunement",
                                 titleColor = MaterialTheme.colorScheme.error,
                                 attunement = slot.quaternaryAttunement,
                                 onAttunementChange = { updatedAttunement ->
