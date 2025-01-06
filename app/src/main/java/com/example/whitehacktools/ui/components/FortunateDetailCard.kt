@@ -54,9 +54,9 @@ fun FortunateDetailCard(
                         
                         Text(
                             text = """
-                                Fortunate characters are born with the advantages of nobility, fame, destiny, wealth, or a combination thereof. They can be royal heirs, rich and influential merchants, star performers, or religious icons. Once per game session, they may use their good fortune in a major way, like hiring a large ship, performing the will of a god, getting a personal audience with the queen, or being hailed as a friend by a hostile tribe.
-
-                                The Fortunate may use any weapon or armor without penalty. They have +4 to charisma when checking retainer morale, +2 in reaction rolls, and +6 in any reputation roll. They also get a single signature object with plot immunity.
+                                Fortunate characters are born with the advantages of nobility, fame, destiny, wealth, or a combination thereof. They can be royal heirs, rich and influential merchants, star performers, or religious icons.
+                                
+                                The Fortunate may use any weapon or armor without penalty. They have +4 to charisma when checking retainer morale, +2 in reaction rolls, and +6 in any reputation roll.
                             """.trimIndent(),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -78,7 +78,7 @@ fun FortunateDetailCard(
                     }
                 }
 
-                // Fortune Power Card
+                // Good Fortune Card
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
@@ -93,21 +93,20 @@ fun FortunateDetailCard(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Text(
-                            text = "Fortune Power",
+                            text = "Good Fortune",
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Medium
                         )
                         
                         Text(
                             text = """
-                                Once per game session, the Fortunate may use their good fortune in a major way, such as:
-
-                                • Hiring a large ship.
-                                • Performing the will of a god.
-                                • Getting a personal audience with the queen.
-                                • Being hailed as a friend by a hostile tribe.
-
-                                Note: The Fortunate may not use their fortune power to purchase experience or fund XP for others.
+                                Once per game session, they may use their good fortune in a major way, such as:
+                                • Hiring a large ship
+                                • Performing the will of a god
+                                • Getting a personal audience with the queen
+                                • Being hailed as a friend by a hostile tribe
+                                
+                                Important: The Fortunate may not use their good fortune class power to purchase experience or fund XP for others.
                             """.trimIndent(),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -115,9 +114,9 @@ fun FortunateDetailCard(
 
                         Text(
                             text = if (character.fortunateOptions.hasUsedFortune) 
-                                "Fortune power has been used this session" 
+                                "Good fortune has been used this session" 
                             else 
-                                "Fortune power is available",
+                                "Good fortune is available",
                             style = MaterialTheme.typography.bodyMedium,
                             color = if (character.fortunateOptions.hasUsedFortune) 
                                 MaterialTheme.colorScheme.error 
@@ -147,22 +146,28 @@ fun FortunateDetailCard(
                     ) {
                         Text(
                             text = "Standing",
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Medium
                         )
                         
+                        Text(
+                            text = """
+                                Fortunate characters have a defining standing noted in the Identity section that works as an occasional group booster. For example, a Fortunate Flower Monk with a "Reincarnated Master" standing might have unique tattoos, training, and physical traits that boost the role of their groups.
+
+                                When the Referee thinks the standing is relevant:
+                                • Affiliated factions are considerably more helpful and their enemies more vengeful. Others may distance themselves or show interest
+                                • The character's species gives any applicable benefits regardless of attribute
+                                • If standing and vocation align for a task, and the vocation is marked next to the applicable attribute, the character gets a +6 bonus
+                            """.trimIndent(),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
                         if (character.fortunateOptions.standing.isNotEmpty()) {
                             Text(
                                 text = character.fortunateOptions.standing,
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-
-                            Text(
-                                text = "When the referee thinks that the standing is relevant:",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                fontWeight = FontWeight.Medium
                             )
 
                             Column(
@@ -194,6 +199,60 @@ fun FortunateDetailCard(
                     }
                 }
 
+                // Retainers Card
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    ),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text = "Retainers",
+                            style = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Medium
+                        )
+                        
+                        Text(
+                            text = """
+                                As the only class, the Fortunate are allowed to have retainers that can grow in strength, like a chambermaid, cook, apprentice, or squire. They start with one retainer and gain slots for additional ones.
+
+                                Retainer Details:
+                                • Have HD, DF, MV, and keywords as per monster rules
+                                • DF and AV (HD+10) may be reconsidered if equipment changes
+                                • HD increases at the Fortunate's even levels
+                                • First retainer can reach HD 6 by level 10
+                                
+                                At the Referee's discretion, retainers:
+                                • Work within established contracts
+                                • Have unique personalities (devout, rebellious, loving, etc.)
+                                • Players may temporarily control retainers during adventures
+                            """.trimIndent(),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            character.fortunateOptions.retainers.forEachIndexed { index, retainer ->
+                                RetainerCard(
+                                    retainer = retainer,
+                                    index = index,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+                        }
+                    }
+                }
+
                 // Signature Object Card
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -210,9 +269,23 @@ fun FortunateDetailCard(
                     ) {
                         Text(
                             text = "Signature Object",
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Medium
                         )
+                        
+                        Text(
+                            text = """
+                                The Fortunate get a single signature object. At the Referee's discretion it may be:
+                                • Special material
+                                • Superior quality
+                                • Magical
+                                
+                                Plot Immunity: The object can never be lost, destroyed, or made irretrievable by the Referee unless the player wishes it to happen.
+                            """.trimIndent(),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
                         if (character.fortunateOptions.signatureObject.name.isNotEmpty()) {
                             Text(
                                 text = character.fortunateOptions.signatureObject.name,
@@ -227,48 +300,6 @@ fun FortunateDetailCard(
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.fillMaxWidth()
                             )
-                        }
-                    }
-                }
-
-                // Retainers Card
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    ),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Retainers",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                        
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            character.fortunateOptions.retainers.forEachIndexed { index, retainer ->
-                                RetainerCard(
-                                    retainer = retainer,
-                                    index = index,
-                                    modifier = Modifier.fillMaxWidth()
-                                )
-                            }
                         }
                     }
                 }
