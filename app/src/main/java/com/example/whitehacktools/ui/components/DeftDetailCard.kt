@@ -216,7 +216,7 @@ fun DeftDetailCard(
                         )
                         
                         Text(
-                            text = "Masters of technique and skill who rely on superior training and expertise. Whether as thieves, wandering monks, spies, marksmen, rangers, or assassins, they excel through precision and finesse.",
+                            text = "Masters of technique and skill who rely on superior training and expertise. At level 1, must choose a vocation group without marking it next to an attribute. Whether as thieves, wandering monks, spies, marksmen, rangers, or assassins, they excel through precision and finesse.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -249,23 +249,23 @@ fun DeftDetailCard(
                         ) {
                             DeftFeatureRow(
                                 title = "Double Roll",
-                                description = "Always use positive double roll for tasks and attacks in line with vocation when properly equipped"
+                                description = "When properly equipped, gain positive double roll for tasks and attacks matching your vocation"
                             )
                             DeftFeatureRow(
                                 title = "Combat Advantage",
-                                description = "Can swap combat advantage for double damage if vocation is relevant"
+                                description = "May swap combat advantage for double damage when vocation is relevant (e.g. trader defending cargo, assassin striking from shadows)"
                             )
                             DeftFeatureRow(
                                 title = "Weapon Proficiency",
-                                description = "-2 AV with non-attuned two-handed melee weapons. Combat vocations get +1 damage and df from off-hand weapons"
+                                description = "Combat vocation: +1 damage and Defense from off-hand weapon. All: -2 Attack Value with non-attuned two-handed melee weapons"
                             )
                             DeftFeatureRow(
                                 title = "Light Armor",
-                                description = "Cannot use slot abilities or swap for double damage when using shield or armor heavier than studded leather"
+                                description = "Must use light armor (studded leather or lighter) and no shield to maintain expertise. Required for slot abilities and double damage"
                             )
                             DeftFeatureRow(
                                 title = "Non-Combat Vocation",
-                                description = "Once per session, can save to turn a successful task roll into a critical success"
+                                description = "Once per session, may turn a successful task roll into a critical success"
                             )
                         }
                     }
@@ -286,7 +286,7 @@ fun DeftDetailCard(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Text(
-                            text = "Attunement Rules",
+                            text = "Attunements",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -295,6 +295,11 @@ fun DeftDetailCard(
                             modifier = Modifier.fillMaxWidth(),
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
+                            Text(
+                                text = "Each slot holds two attunements (teacher, item, vehicle, pet, or place). Only one can be active at a time.",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                             Text(
                                 text = "• Switching attunements takes a day of practice",
                                 style = MaterialTheme.typography.bodyMedium,
@@ -306,7 +311,17 @@ fun DeftDetailCard(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = "• Hard tasks succeed automatically",
+                                text = "• Hard tasks succeed automatically, nigh impossible tasks become regular rolls",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = "• Lost attunements become keywords with +1 to related tasks when active",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = "Examples: Ranger with trained dog or ancestral lands, Monk with master or special bow",
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
