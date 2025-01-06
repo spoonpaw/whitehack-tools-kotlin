@@ -1,5 +1,6 @@
 package com.example.whitehacktools.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -98,122 +99,135 @@ fun CleverFormCard(
                 }
 
                 // Knacks Section
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "Knacks",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.SemiBold
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
                     )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text = "Knacks",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold
+                        )
 
-                    // Get all currently selected knacks
-                    val selectedKnacks = cleverAbilities.knackSlots.mapNotNull { it.knack }.toSet()
+                        // Get all currently selected knacks
+                        val selectedKnacks = cleverAbilities.knackSlots.mapNotNull { it.knack }.toSet()
 
-                    repeat(availableSlots) { index ->
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(8.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant
-                            )
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(12.dp),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
-                            ) {
-                                Text(
-                                    text = "Knack ${index + 1}",
-                                    style = MaterialTheme.typography.titleSmall,
-                                    fontWeight = FontWeight.Medium
+                        repeat(availableSlots) { index ->
+                            Card(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(8.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
                                 )
-
-                                val currentKnack = cleverAbilities.knackSlots.getOrNull(index)?.knack
-                                var expanded by remember { mutableStateOf(false) }
-                                
-                                ExposedDropdownMenuBox(
-                                    expanded = expanded,
-                                    onExpandedChange = { newExpanded -> 
-                                        // If it's already expanded and we click it again, close it
-                                        expanded = if (expanded && newExpanded) false else newExpanded
-                                    },
-                                    modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(12.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    OutlinedTextField(
-                                        value = currentKnack?.displayName ?: "",
-                                        onValueChange = { },
-                                        readOnly = true,
-                                        label = { Text("Select a Knack") },
-                                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .menuAnchor()
+                                    Text(
+                                        text = "Knack ${index + 1}",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Medium
                                     )
 
-                                    ExposedDropdownMenu(
+                                    val currentKnack = cleverAbilities.knackSlots.getOrNull(index)?.knack
+                                    var expanded by remember { mutableStateOf(false) }
+                                    
+                                    ExposedDropdownMenuBox(
                                         expanded = expanded,
-                                        onDismissRequest = { expanded = false }
+                                        onExpandedChange = { newExpanded -> 
+                                            // If it's already expanded and we click it again, close it
+                                            expanded = if (expanded && newExpanded) false else newExpanded
+                                        },
+                                        modifier = Modifier.fillMaxWidth()
                                     ) {
-                                        CleverKnack.values().filter { knack ->
-                                            // Include if it's either the current knack for this slot or not used in any slot
-                                            knack == currentKnack || !selectedKnacks.contains(knack)
-                                        }.forEach { knack ->
-                                            DropdownMenuItem(
-                                                text = { 
-                                                    Column {
-                                                        Text(knack.displayName)
-                                                        Text(
-                                                            text = knack.description,
-                                                            style = MaterialTheme.typography.bodySmall
-                                                        )
+                                        OutlinedTextField(
+                                            value = currentKnack?.displayName ?: "",
+                                            onValueChange = { },
+                                            readOnly = true,
+                                            label = { Text("Select a Knack") },
+                                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .menuAnchor()
+                                        )
+
+                                        ExposedDropdownMenu(
+                                            expanded = expanded,
+                                            onDismissRequest = { expanded = false }
+                                        ) {
+                                            CleverKnack.values().filter { knack ->
+                                                // Include if it's either the current knack for this slot or not used in any slot
+                                                knack == currentKnack || !selectedKnacks.contains(knack)
+                                            }.forEach { knack ->
+                                                DropdownMenuItem(
+                                                    text = { 
+                                                        Column {
+                                                            Text(knack.displayName)
+                                                            Text(
+                                                                text = knack.description,
+                                                                style = MaterialTheme.typography.bodySmall
+                                                            )
+                                                        }
+                                                    },
+                                                    onClick = {
+                                                        onCleverAbilitiesChanged(cleverAbilities.setKnack(knack, index))
+                                                        expanded = false
                                                     }
-                                                },
-                                                onClick = {
-                                                    onCleverAbilitiesChanged(cleverAbilities.setKnack(knack, index))
-                                                    expanded = false
-                                                }
-                                            )
+                                                )
+                                            }
                                         }
                                     }
-                                }
 
-                                // Show description if a knack is selected
-                                currentKnack?.let { knack ->
-                                    Text(
-                                        text = knack.description,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        modifier = Modifier.padding(top = 8.dp)
-                                    )
-                                }
+                                    // Show description if a knack is selected
+                                    currentKnack?.let { knack ->
+                                        Text(
+                                            text = knack.description,
+                                            style = MaterialTheme.typography.bodySmall,
+                                            modifier = Modifier.padding(top = 8.dp)
+                                        )
+                                    }
 
-                                // Combat Exploiter Switch
-                                if (currentKnack == CleverKnack.COMBAT_EXPLOITER) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(top = 8.dp),
-                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(
-                                            text = "Combat Die",
-                                            style = MaterialTheme.typography.bodyMedium
-                                        )
-                                        
-                                        Switch(
-                                            checked = !cleverAbilities.knackSlots[index].hasUsedCombatDie,
-                                            onCheckedChange = { isAvailable ->
-                                                onCleverAbilitiesChanged(cleverAbilities.setHasUsedCombatDie(!isAvailable, index))
-                                            }
-                                        )
-                                        
-                                        Text(
-                                            text = if (!cleverAbilities.knackSlots[index].hasUsedCombatDie) "Available" else "Used",
-                                            style = MaterialTheme.typography.bodyMedium
-                                        )
+                                    // Combat Exploiter Switch
+                                    if (currentKnack == CleverKnack.COMBAT_EXPLOITER) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(top = 8.dp),
+                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = "Combat Die",
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                            
+                                            Switch(
+                                                checked = !cleverAbilities.knackSlots[index].hasUsedCombatDie,
+                                                onCheckedChange = { isAvailable ->
+                                                    onCleverAbilitiesChanged(cleverAbilities.setHasUsedCombatDie(!isAvailable, index))
+                                                }
+                                            )
+                                            
+                                            Text(
+                                                text = if (!cleverAbilities.knackSlots[index].hasUsedCombatDie) "Available" else "Used",
+                                                style = MaterialTheme.typography.bodyMedium
+                                            )
+                                        }
                                     }
                                 }
                             }
