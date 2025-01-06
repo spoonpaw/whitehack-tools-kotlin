@@ -10,6 +10,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.whitehacktools.model.CleverAbilities
 import com.example.whitehacktools.model.CleverKnack
+import com.example.whitehacktools.model.CleverKnackSlot
 import com.example.whitehacktools.utilities.AdvancementTables
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -22,14 +23,27 @@ fun CleverFormCard(
     modifier: Modifier = Modifier
 ) {
     if (characterClass == "Clever") {
-        val availableSlots by remember(level) {
-            mutableStateOf(AdvancementTables.stats("Clever", level).slots)
+        val availableSlots = remember(level) {
+            when {
+                level < 4 -> 1
+                level < 7 -> 2
+                level < 10 -> 3
+                else -> 4
+            }
         }
 
-        // Only update for level if we don't have any knacks yet or if we have too many knacks
-        LaunchedEffect(level) {
-            if (cleverAbilities.knackSlots.isEmpty() || cleverAbilities.knackSlots.size > availableSlots) {
-                onCleverAbilitiesChanged(cleverAbilities.updateForLevel(level))
+        // Initialize or resize knacks list if needed
+        LaunchedEffect(availableSlots) {
+            if (cleverAbilities.knackSlots.size < 4) {
+                // Create a new list with 4 slots, copying over existing values
+                val newKnacks = List(4) { index ->
+                    if (index < cleverAbilities.knackSlots.size) {
+                        cleverAbilities.knackSlots[index]
+                    } else {
+                        CleverKnackSlot(null, false)
+                    }
+                }
+                onCleverAbilitiesChanged(cleverAbilities.copy(knackSlots = newKnacks))
             }
         }
 
