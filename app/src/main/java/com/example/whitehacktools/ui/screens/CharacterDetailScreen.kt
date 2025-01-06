@@ -133,6 +133,9 @@ fun CharacterDetailScreen(
                                 stashedGold = character.stashedGold,
                                 modifier = Modifier.fillMaxWidth()
                             )
+                            EncumbranceDetailCard(
+                                modifier = Modifier.fillMaxWidth()
+                            )
                         }
                     }
                 }
