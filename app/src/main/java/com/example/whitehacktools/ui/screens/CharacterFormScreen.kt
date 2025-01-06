@@ -415,6 +415,24 @@ fun CharacterFormScreen(
                         )
                     }
                     CharacterTab.Equipment -> {
+                        WeaponFormCard(
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        ArmorFormCard(
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        EquipmentFormCard(
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
                         GoldFormCard(
                             goldOnHand = goldOnHand,
                             onGoldOnHandChange = { goldOnHand = it },

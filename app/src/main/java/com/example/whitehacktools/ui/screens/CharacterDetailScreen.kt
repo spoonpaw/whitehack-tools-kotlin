@@ -115,6 +115,15 @@ fun CharacterDetailScreen(
                             )
                         }
                         CharacterTab.Equipment -> {
+                            WeaponDetailCard(
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            ArmorDetailCard(
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            EquipmentDetailCard(
+                                modifier = Modifier.fillMaxWidth()
+                            )
                             GoldDetailCard(
                                 goldOnHand = character.goldOnHand,
                                 stashedGold = character.stashedGold,
