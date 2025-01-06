@@ -1,6 +1,8 @@
 package com.example.whitehacktools.ui.components
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -23,44 +25,8 @@ fun DeftFormCard(
     val stats = AdvancementTables.stats("Deft", character.level)
     val availableSlots = stats.slots
 
-    SectionCard(
-        title = "The Deft",
-        modifier = modifier
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            character.attunementSlots.take(availableSlots).forEachIndexed { index, slot ->
-                AttunementSlotCard(
-                    slot = slot,
-                    index = index,
-                    isFirstSlot = index == 0,
-                    onSlotChange = { updatedSlot ->
-                        val updatedSlots = character.attunementSlots.toMutableList()
-                        updatedSlots[index] = updatedSlot
-                        onCharacterChange(character.copy(attunementSlots = updatedSlots))
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun AttunementSlotCard(
-    slot: AttunementSlot,
-    index: Int,
-    isFirstSlot: Boolean,
-    onSlotChange: (AttunementSlot) -> Unit,
-    modifier: Modifier = Modifier
-) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.05f)
         )
@@ -69,216 +35,246 @@ private fun AttunementSlotCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            Text(
-                text = "Attunement Slot ${index + 1}",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
-            )
-            
-            AttunementField(
-                title = "Primary Attunement",
-                titleColor = MaterialTheme.colorScheme.primary,
-                attunement = slot.primaryAttunement,
-                onAttunementChange = { updatedAttunement ->
-                    var updatedSlot = slot.copy(primaryAttunement = updatedAttunement)
-                    if (updatedAttunement.isActive) {
-                        // Deactivate all other attunements
-                        updatedSlot = updatedSlot.copy(
-                            secondaryAttunement = updatedSlot.secondaryAttunement.copy(isActive = false),
-                            tertiaryAttunement = updatedSlot.tertiaryAttunement.copy(isActive = false),
-                            quaternaryAttunement = updatedSlot.quaternaryAttunement.copy(isActive = false)
-                        )
-                    }
-                    onSlotChange(updatedSlot)
-                }
-            )
-            
-            AttunementField(
-                title = "Secondary Attunement",
-                titleColor = MaterialTheme.colorScheme.secondary,
-                attunement = slot.secondaryAttunement,
-                onAttunementChange = { updatedAttunement ->
-                    var updatedSlot = slot.copy(secondaryAttunement = updatedAttunement)
-                    if (updatedAttunement.isActive) {
-                        // Deactivate all other attunements
-                        updatedSlot = updatedSlot.copy(
-                            primaryAttunement = updatedSlot.primaryAttunement.copy(isActive = false),
-                            tertiaryAttunement = updatedSlot.tertiaryAttunement.copy(isActive = false),
-                            quaternaryAttunement = updatedSlot.quaternaryAttunement.copy(isActive = false)
-                        )
-                    }
-                    onSlotChange(updatedSlot)
-                }
-            )
-
-            if (isFirstSlot) {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    // TERTIARY SWITCH
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+            character.attunementSlots.take(availableSlots).forEachIndexed { index, slot ->
+                // Each slot gets its own card
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    ),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         Text(
-                            text = "Tertiary Attunement",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.tertiary
-                        )
-                        Switch(
-                            checked = slot.hasTertiaryAttunement,
-                            onCheckedChange = { 
-                                Log.d("DEFTFORM", "TERTIARY SWITCH - Changing to: $it")
-                                // When enabling tertiary, RESET quaternary completely
-                                onSlotChange(slot.copy(
-                                    hasTertiaryAttunement = it,
-                                    // Reset quaternary when enabling tertiary
-                                    quaternaryAttunement = Attunement(),
-                                    hasQuaternaryAttunement = false
-                                ))
-                            },
-                            colors = SwitchDefaults.colors(
-                                checkedTrackColor = MaterialTheme.colorScheme.tertiary
-                            )
-                        )
-                    }
-
-                    // TERTIARY FIELD
-                    if (slot.hasTertiaryAttunement) {
-                        AttunementField(
-                            title = "Tertiary Attunement",
-                            titleColor = MaterialTheme.colorScheme.tertiary,
-                            attunement = slot.tertiaryAttunement,
-                            onAttunementChange = { updatedAttunement ->
-                                Log.d("DEFTFORM", "========= TERTIARY ATTUNEMENT CHANGE =========")
-                                Log.d("DEFTFORM", "BEFORE - Tertiary active: ${slot.tertiaryAttunement.isActive}")
-                                Log.d("DEFTFORM", "CHANGING TO - Tertiary active: ${updatedAttunement.isActive}")
-
-                                var updatedSlot = slot.copy(tertiaryAttunement = updatedAttunement)
-                                
-                                if (updatedAttunement.isActive) {
-                                    // When tertiary becomes active, deactivate primary/secondary
-                                    updatedSlot = updatedSlot.copy(
-                                        primaryAttunement = slot.primaryAttunement.copy(isActive = false),
-                                        secondaryAttunement = slot.secondaryAttunement.copy(isActive = false)
-                                    )
-                                } else {
-                                    // When tertiary becomes inactive, reset quaternary
-                                    updatedSlot = updatedSlot.copy(
-                                        quaternaryAttunement = Attunement(),
-                                        hasQuaternaryAttunement = false
-                                    )
-                                }
-                                
-                                onSlotChange(updatedSlot)
-                            }
+                            text = "Attunement Slot ${index + 1}",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.padding(bottom = 8.dp)
                         )
 
-                        // QUATERNARY SECTION - Show when tertiary is enabled
-                        Spacer(modifier = Modifier.height(12.dp))
-                        
-                        // QUATERNARY SWITCH
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Quaternary Attunement",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.error
-                            )
-                            Switch(
-                                checked = slot.hasQuaternaryAttunement,
-                                onCheckedChange = { 
-                                    Log.d("DEFTFORM", "QUATERNARY SWITCH - Changing to: $it")
-                                    onSlotChange(slot.copy(
-                                        hasQuaternaryAttunement = it,
-                                        // Reset quaternary when enabling
-                                        quaternaryAttunement = if (it) Attunement() else slot.quaternaryAttunement
-                                    ))
-                                },
-                                colors = SwitchDefaults.colors(
-                                    checkedTrackColor = MaterialTheme.colorScheme.error
-                                )
-                            )
+                        // Function to update the slot
+                        fun onSlotChange(updatedSlot: AttunementSlot) {
+                            val updatedSlots = character.attunementSlots.toMutableList()
+                            updatedSlots[index] = updatedSlot
+                            onCharacterChange(character.copy(attunementSlots = updatedSlots))
                         }
 
-                        // QUATERNARY FIELD
-                        if (slot.hasQuaternaryAttunement) {
+                        // Daily Power Section
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .border(
+                                    BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.2f)),
+                                    RoundedCornerShape(8.dp)
+                                )
+                                .padding(12.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "Daily Power",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                                    Text(
+                                        text = if (slot.hasUsedDailyPower) 
+                                            "Used for today"
+                                        else 
+                                            "Available",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                Switch(
+                                    checked = slot.hasUsedDailyPower,
+                                    onCheckedChange = { onSlotChange(slot.copy(hasUsedDailyPower = it)) },
+                                    colors = SwitchDefaults.colors(
+                                        checkedTrackColor = MaterialTheme.colorScheme.error
+                                    )
+                                )
+                            }
+                        }
+
+                        // Primary Attunement Section
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .border(
+                                    BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)),
+                                    RoundedCornerShape(8.dp)
+                                )
+                                .padding(12.dp)
+                        ) {
                             AttunementField(
-                                title = "Quaternary Attunement",
-                                titleColor = MaterialTheme.colorScheme.error,
-                                attunement = slot.quaternaryAttunement,
+                                title = "Primary Attunement",
+                                titleColor = MaterialTheme.colorScheme.primary,
+                                attunement = slot.primaryAttunement,
                                 onAttunementChange = { updatedAttunement ->
-                                    Log.d("DEFTFORM", "QUATERNARY FIELD - Changing active to: ${updatedAttunement.isActive}")
-                                    var updatedSlot = slot.copy(quaternaryAttunement = updatedAttunement)
+                                    var updatedSlot = slot.copy(primaryAttunement = updatedAttunement)
                                     if (updatedAttunement.isActive) {
-                                        // When quaternary becomes active, deactivate all others
                                         updatedSlot = updatedSlot.copy(
-                                            primaryAttunement = slot.primaryAttunement.copy(isActive = false),
-                                            secondaryAttunement = slot.secondaryAttunement.copy(isActive = false),
-                                            tertiaryAttunement = slot.tertiaryAttunement.copy(isActive = false)
+                                            secondaryAttunement = updatedSlot.secondaryAttunement.copy(isActive = false),
+                                            tertiaryAttunement = updatedSlot.tertiaryAttunement.copy(isActive = false),
+                                            quaternaryAttunement = updatedSlot.quaternaryAttunement.copy(isActive = false)
                                         )
                                     }
                                     onSlotChange(updatedSlot)
                                 }
                             )
                         }
-                    }
-                }
-            }
 
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(
-                    text = "Daily Power",
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.error
-                )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    // Left box with title and status
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(12.dp)
-                    ) {
-                        Text(
-                            text = "Daily Power Status",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = if (slot.hasUsedDailyPower) {
-                                "This slot's daily power has been used and cannot be used again until tomorrow"
-                            } else {
-                                "This slot's daily power is available to use"
-                            },
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
-                    }
-                    
-                    // Right box with switch
-                    Box(
-                        modifier = Modifier
-                            .padding(12.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Switch(
-                            checked = slot.hasUsedDailyPower,
-                            onCheckedChange = { onSlotChange(slot.copy(hasUsedDailyPower = it)) }
-                        )
+                        // Secondary Attunement Section
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .border(
+                                    BorderStroke(1.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f)),
+                                    RoundedCornerShape(8.dp)
+                                )
+                                .padding(12.dp)
+                        ) {
+                            AttunementField(
+                                title = "Secondary Attunement",
+                                titleColor = MaterialTheme.colorScheme.secondary,
+                                attunement = slot.secondaryAttunement,
+                                onAttunementChange = { updatedAttunement ->
+                                    var updatedSlot = slot.copy(secondaryAttunement = updatedAttunement)
+                                    if (updatedAttunement.isActive) {
+                                        updatedSlot = updatedSlot.copy(
+                                            primaryAttunement = updatedSlot.primaryAttunement.copy(isActive = false),
+                                            tertiaryAttunement = updatedSlot.tertiaryAttunement.copy(isActive = false),
+                                            quaternaryAttunement = updatedSlot.quaternaryAttunement.copy(isActive = false)
+                                        )
+                                    }
+                                    onSlotChange(updatedSlot)
+                                }
+                            )
+                        }
+
+                        if (index == 0) {
+                            // Tertiary Section
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .border(
+                                        BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f)),
+                                        RoundedCornerShape(8.dp)
+                                    )
+                                    .padding(12.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "Tertiary Attunement",
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.tertiary
+                                    )
+                                    Switch(
+                                        checked = slot.hasTertiaryAttunement,
+                                        onCheckedChange = { 
+                                            onSlotChange(slot.copy(
+                                                hasTertiaryAttunement = it,
+                                                quaternaryAttunement = Attunement(),
+                                                hasQuaternaryAttunement = false
+                                            ))
+                                        },
+                                        colors = SwitchDefaults.colors(
+                                            checkedTrackColor = MaterialTheme.colorScheme.tertiary
+                                        )
+                                    )
+                                }
+
+                                if (slot.hasTertiaryAttunement) {
+                                    AttunementField(
+                                        title = "Tertiary Attunement",
+                                        titleColor = MaterialTheme.colorScheme.tertiary,
+                                        attunement = slot.tertiaryAttunement,
+                                        onAttunementChange = { updatedAttunement ->
+                                            var updatedSlot = slot.copy(tertiaryAttunement = updatedAttunement)
+                                            if (updatedAttunement.isActive) {
+                                                updatedSlot = updatedSlot.copy(
+                                                    primaryAttunement = slot.primaryAttunement.copy(isActive = false),
+                                                    secondaryAttunement = slot.secondaryAttunement.copy(isActive = false)
+                                                )
+                                            }
+                                            onSlotChange(updatedSlot)
+                                        }
+                                    )
+                                }
+                            }
+
+                            // Quaternary Section (only if tertiary is enabled)
+                            if (slot.hasTertiaryAttunement) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .border(
+                                            BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.2f)),
+                                            RoundedCornerShape(8.dp)
+                                        )
+                                        .padding(12.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "Quaternary Attunement",
+                                            style = MaterialTheme.typography.titleSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.error
+                                        )
+                                        Switch(
+                                            checked = slot.hasQuaternaryAttunement,
+                                            onCheckedChange = { 
+                                                onSlotChange(slot.copy(
+                                                    hasQuaternaryAttunement = it,
+                                                    quaternaryAttunement = if (it) Attunement() else slot.quaternaryAttunement
+                                                ))
+                                            },
+                                            colors = SwitchDefaults.colors(
+                                                checkedTrackColor = MaterialTheme.colorScheme.error
+                                            )
+                                        )
+                                    }
+
+                                    if (slot.hasQuaternaryAttunement) {
+                                        AttunementField(
+                                            title = "Quaternary Attunement",
+                                            titleColor = MaterialTheme.colorScheme.error,
+                                            attunement = slot.quaternaryAttunement,
+                                            onAttunementChange = { updatedAttunement ->
+                                                var updatedSlot = slot.copy(quaternaryAttunement = updatedAttunement)
+                                                if (updatedAttunement.isActive) {
+                                                    updatedSlot = updatedSlot.copy(
+                                                        primaryAttunement = slot.primaryAttunement.copy(isActive = false),
+                                                        secondaryAttunement = slot.secondaryAttunement.copy(isActive = false),
+                                                        tertiaryAttunement = slot.tertiaryAttunement.copy(isActive = false)
+                                                    )
+                                                }
+                                                onSlotChange(updatedSlot)
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -386,25 +382,25 @@ private fun AttunementField(
             }
 
             AttunementToggleRow(
-                title = "Active",
-                isChecked = attunement.isActive,
-                onCheckedChange = { isActive ->
-                    println("TOGGLE ROW - Changing active state to: $isActive")
-                    var updated = attunement.copy(isActive = isActive)
-                    if (isActive) {
-                        updated = updated.copy(isLost = false)
+                title = if (attunement.isLost) "Lost" else "Not Lost",
+                isChecked = attunement.isLost,
+                onCheckedChange = { isLost ->
+                    var updated = attunement.copy(isLost = isLost)
+                    if (isLost) {
+                        updated = updated.copy(isActive = false)
                     }
                     onAttunementChange(updated)
                 }
             )
 
             AttunementToggleRow(
-                title = "Lost",
-                isChecked = attunement.isLost,
-                onCheckedChange = { isLost ->
-                    var updated = attunement.copy(isLost = isLost)
-                    if (isLost) {
-                        updated = updated.copy(isActive = false)
+                title = if (attunement.isActive) "Active" else "Inactive",
+                isChecked = attunement.isActive,
+                onCheckedChange = { isActive ->
+                    println("TOGGLE ROW - Changing active state to: $isActive")
+                    var updated = attunement.copy(isActive = isActive)
+                    if (isActive) {
+                        updated = updated.copy(isLost = false)
                     }
                     onAttunementChange(updated)
                 }
@@ -436,10 +432,10 @@ private fun AttunementToggleRow(
                 fontWeight = FontWeight.Medium
             )
             Text(
-                text = if (isChecked) {
-                    "This attunement is active"
+                text = if (title.contains("Lost")) {
+                    if (isChecked) "This attunement is lost" else "This attunement is not lost"
                 } else {
-                    "This attunement is not active"
+                    if (isChecked) "This attunement is active" else "This attunement is not active"
                 },
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
