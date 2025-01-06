@@ -128,7 +128,7 @@ private fun AttunementDetailCard(
                 // Type
                 AttunementFieldCard(
                     label = "Type",
-                    value = attunement.type.name,
+                    value = attunement.type.name.lowercase().replaceFirstChar { it.uppercase() },
                     modifier = Modifier.fillMaxWidth()
                 )
 
