@@ -28,12 +28,7 @@ fun StrongFormCard(
 ) {
     if (characterClass == "Strong") {
         val availableSlots = remember(level) {
-            when {
-                level < 4 -> 1
-                level < 7 -> 2
-                level < 10 -> 3
-                else -> 4
-            }
+            AdvancementTables.stats("Strong", level).slots
         }
 
         // Initialize or resize options list if needed

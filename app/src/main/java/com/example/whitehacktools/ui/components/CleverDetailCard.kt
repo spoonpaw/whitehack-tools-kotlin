@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.example.whitehacktools.model.CleverAbilities
 import com.example.whitehacktools.model.CleverKnack
 import com.example.whitehacktools.model.PlayerCharacter
+import com.example.whitehacktools.utilities.AdvancementTables
 
 @Composable
 fun CleverDetailCard(
@@ -302,11 +303,8 @@ fun CleverDetailCard(
                         fontWeight = FontWeight.SemiBold
                     )
 
-                    val availableSlots = when {
-                        character.level < 4 -> 1
-                        character.level < 7 -> 2
-                        character.level < 10 -> 3
-                        else -> 4
+                    val availableSlots = remember(character.level) {
+                        AdvancementTables.stats("Clever", character.level).slots
                     }
 
                     repeat(availableSlots) { index ->
