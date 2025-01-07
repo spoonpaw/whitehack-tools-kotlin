@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.example.whitehacktools.model.PlayerCharacter
 import com.example.whitehacktools.ui.components.*
 import com.example.whitehacktools.ui.models.CharacterTab
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -22,6 +23,12 @@ fun CharacterDetailScreen(
     onEdit: (CharacterTab) -> Unit = {}
 ) {
     var selectedTab by remember { mutableStateOf(initialTab) }
+    val scrollState = rememberScrollState()
+
+    // Scroll to top when tab changes or when screen is shown with new character
+    LaunchedEffect(selectedTab, character.id) {
+        scrollState.scrollTo(0)
+    }
 
     DisposableEffect(selectedTab) {
         onDispose { }
@@ -68,7 +75,7 @@ fun CharacterDetailScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .verticalScroll(rememberScrollState())
+                        .verticalScroll(scrollState)
                         .padding(vertical = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {

@@ -73,6 +73,12 @@ fun CharacterFormScreen(
     var affiliations by remember { mutableStateOf(initialAffiliations) }
     var languages by remember { mutableStateOf(initialLanguages) }
     var selectedTab by remember { mutableStateOf(initialTab) }
+    val scrollState = rememberScrollState()
+
+    // Scroll to top when tab changes or when screen is shown with new character
+    LaunchedEffect(selectedTab, initialName) {
+        scrollState.scrollTo(0)
+    }
     
     // Combat stats
     var currentHP by remember { mutableStateOf(initialCurrentHP.toString()) }
@@ -274,7 +280,7 @@ fun CharacterFormScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(scrollState)
                     .padding(16.dp)
             ) {
                 when (selectedTab) {
