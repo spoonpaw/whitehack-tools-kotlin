@@ -100,20 +100,20 @@ fun WeaponDetailRow(
                 }
                 
                 // Bonus/Penalty
-                if (weapon.bonus != 0 && weapon.isMagical) {
+                if (weapon.bonus != 0) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Modifier:",
+                            text = if (weapon.bonus < 0) "Penalty:" else "Bonus:",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = if (weapon.bonus > 0) "+${weapon.bonus}" else weapon.bonus.toString(),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = if (weapon.bonus > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }

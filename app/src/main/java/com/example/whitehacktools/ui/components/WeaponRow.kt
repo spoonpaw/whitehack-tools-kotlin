@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import com.example.whitehacktools.model.Weapon
+import android.util.Log
 
 @Composable
 fun WeaponRow(
@@ -16,6 +17,9 @@ fun WeaponRow(
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    Log.d("WeaponRow", "Rendering weapon: ${weapon.name}")
+    Log.d("WeaponRow", "Weapon details - bonus: ${weapon.bonus}, magical: ${weapon.isMagical}, cursed: ${weapon.isCursed}")
+
     Card(
         modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -95,6 +99,9 @@ fun WeaponRow(
             Column(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
+                Log.d("WeaponRow", "Combat stats section for ${weapon.name}")
+                Log.d("WeaponRow", "Checking bonus condition: bonus=${weapon.bonus}")
+                
                 // Magical Status
                 if (weapon.isMagical) {
                     Row(
@@ -133,21 +140,22 @@ fun WeaponRow(
                     }
                 }
                 
+                Log.d("WeaponRow", "Weapon ${weapon.name} has bonus: ${weapon.bonus}")
                 // Bonus/Penalty
-                if (weapon.bonus != 0 && weapon.isMagical) {
+                if (weapon.bonus != 0) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(4.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "Modifier:",
+                            text = if (weapon.bonus < 0) "Penalty:" else "Bonus:",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = if (weapon.bonus > 0) "+${weapon.bonus}" else weapon.bonus.toString(),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = if (weapon.bonus > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
