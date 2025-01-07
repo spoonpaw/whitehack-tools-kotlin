@@ -131,6 +131,7 @@ fun CharacterDetailScreen(
                                 modifier = Modifier.fillMaxWidth()
                             )
                             ArmorDetailCard(
+                                character = character,
                                 modifier = Modifier.fillMaxWidth()
                             )
                             EquipmentDetailCard(

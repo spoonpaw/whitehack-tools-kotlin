@@ -60,6 +60,8 @@ data class PlayerCharacter(
     val stashedGold: Int = 0,
     @Contextual
     val weapons: List<Weapon> = emptyList(),
+    @Contextual
+    val armor: List<Armor> = emptyList(),
     // Additional Info
     val experience: Int = 0,
     val corruption: Int = 0,
@@ -95,6 +97,11 @@ data class PlayerCharacter(
             "Willpower",
             "Charisma"
         )
+    }
+
+    // Calculate defense value from equipped armor
+    fun calculateDefenseValue(): Int {
+        return armor.filter { it.isEquipped }.sumOf { it.df + it.bonus }
     }
 
     fun getAttributeValue(name: String): Int {

@@ -9,31 +9,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import com.example.whitehacktools.model.Weapon
+import com.example.whitehacktools.model.Armor
 import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WeaponEditRow(
-    weapon: Weapon,
-    onSave: (Weapon) -> Unit,
+fun ArmorEditRow(
+    armor: Armor,
+    onSave: (Armor) -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var name by remember { mutableStateOf(weapon.name) }
-    var quantityString by remember { mutableStateOf(weapon.quantity.toString()) }
-    var damage by remember { mutableStateOf(weapon.damage) }
-    var weight by remember { mutableStateOf(weapon.weight) }
-    var range by remember { mutableStateOf(weapon.range) }
-    var rateOfFire by remember { mutableStateOf(weapon.rateOfFire) }
-    var special by remember { mutableStateOf(weapon.special) }
-    var isEquipped by remember { mutableStateOf(weapon.isEquipped) }
-    var isStashed by remember { mutableStateOf(weapon.isStashed) }
-    var isMagical by remember { mutableStateOf(weapon.isMagical) }
-    var isCursed by remember { mutableStateOf(weapon.isCursed) }
-    var modifierString by remember { mutableStateOf(weapon.bonus.toString()) }
+    var name by remember { mutableStateOf(armor.name) }
+    var quantityString by remember { mutableStateOf(armor.quantity.toString()) }
+    var df by remember { mutableStateOf(armor.df.toString()) }
+    var weight by remember { mutableStateOf(armor.weight.toString()) }
+    var special by remember { mutableStateOf(armor.special) }
+    var isShield by remember { mutableStateOf(armor.isShield) }
+    var isEquipped by remember { mutableStateOf(armor.isEquipped) }
+    var isStashed by remember { mutableStateOf(armor.isStashed) }
+    var isMagical by remember { mutableStateOf(armor.isMagical) }
+    var isCursed by remember { mutableStateOf(armor.isCursed) }
+    var modifierString by remember { mutableStateOf(armor.bonus.toString()) }
     var modifierFieldFocused by remember { mutableStateOf(false) }
-    var weightExpanded by remember { mutableStateOf(false) }
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -77,64 +75,33 @@ fun WeaponEditRow(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Damage
+                // Defense
                 OutlinedTextField(
-                    value = damage,
-                    onValueChange = { damage = it },
-                    label = { Text("Damage") },
+                    value = df,
+                    onValueChange = { input ->
+                        if (input.isEmpty() || input.all { it.isDigit() }) {
+                            df = input
+                        }
+                    },
+                    label = { Text("Defense") },
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
-                )
-
-                // Range
-                OutlinedTextField(
-                    value = range,
-                    onValueChange = { range = it },
-                    label = { Text("Range") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
-                )
-
-                // Rate of Fire
-                OutlinedTextField(
-                    value = rateOfFire,
-                    onValueChange = { rateOfFire = it },
-                    label = { Text("Rate of Fire") },
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
 
                 // Weight
-                ExposedDropdownMenuBox(
-                    expanded = weightExpanded,
-                    onExpandedChange = { weightExpanded = it }
-                ) {
-                    OutlinedTextField(
-                        value = weight,
-                        onValueChange = { },
-                        readOnly = true,
-                        label = { Text("Weight") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = weightExpanded) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor()
-                    )
-
-                    ExposedDropdownMenu(
-                        expanded = weightExpanded,
-                        onDismissRequest = { weightExpanded = false }
-                    ) {
-                        listOf("No size", "Minor", "Regular", "Heavy").forEach { option ->
-                            DropdownMenuItem(
-                                text = { Text(option) },
-                                onClick = {
-                                    weight = option
-                                    weightExpanded = false
-                                }
-                            )
+                OutlinedTextField(
+                    value = weight,
+                    onValueChange = { input ->
+                        if (input.isEmpty() || input.all { it.isDigit() }) {
+                            weight = input
                         }
-                    }
-                }
+                    },
+                    label = { Text("Weight") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
 
                 // Modifier
                 OutlinedTextField(
@@ -148,11 +115,10 @@ fun WeaponEditRow(
                     modifier = Modifier
                         .fillMaxWidth()
                         .onFocusChanged { focusState ->
-                            val wasFocused = modifierFieldFocused
-                            modifierFieldFocused = focusState.isFocused
-                            if (wasFocused && !focusState.isFocused && (modifierString.isEmpty() || modifierString == "-")) {
+                            if (!focusState.isFocused && modifierString == "-") {
                                 modifierString = "0"
                             }
+                            modifierFieldFocused = focusState.isFocused
                         },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
@@ -248,6 +214,30 @@ fun WeaponEditRow(
                         }
                     }
                 }
+
+                // Third row
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    // Left cell (Shield)
+                    Box(
+                        modifier = Modifier.weight(1f),
+                        contentAlignment = Alignment.CenterStart
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Checkbox(
+                                checked = isShield,
+                                onCheckedChange = { isShield = it }
+                            )
+                            Text("Shield")
+                        }
+                    }
+                    
+                    // Empty right cell
+                    Box(
+                        modifier = Modifier.weight(1f)
+                    ) { }
+                }
             }
 
             // Action buttons
@@ -264,27 +254,20 @@ fun WeaponEditRow(
 
                 Button(
                     onClick = {
-                        // Ensure we have a valid number before saving
-                        if (modifierString.isEmpty() || modifierString == "-") {
-                            modifierString = "0"
-                        }
-                        
-                        onSave(
-                            weapon.copy(
-                                name = name,
-                                quantity = quantityString.toIntOrNull() ?: 1,
-                                damage = damage,
-                                weight = weight,
-                                range = range,
-                                rateOfFire = rateOfFire,
-                                special = special,
-                                isEquipped = isEquipped,
-                                isStashed = isStashed,
-                                isMagical = isMagical,
-                                isCursed = isCursed,
-                                bonus = modifierString.toIntOrNull() ?: 0
-                            )
-                        )
+                        val bonus = modifierString.toIntOrNull() ?: 0
+                        onSave(armor.copy(
+                            name = name,
+                            quantity = quantityString.toIntOrNull() ?: 1,
+                            df = df.toIntOrNull() ?: 0,
+                            weight = weight.toIntOrNull() ?: 1,
+                            special = special,
+                            isShield = isShield,
+                            isEquipped = isEquipped,
+                            isStashed = isStashed,
+                            isMagical = isMagical,
+                            isCursed = isCursed,
+                            bonus = bonus
+                        ))
                     },
                     modifier = Modifier.weight(1f)
                 ) {
