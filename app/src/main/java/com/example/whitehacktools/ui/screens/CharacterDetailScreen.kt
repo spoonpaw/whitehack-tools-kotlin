@@ -127,6 +127,7 @@ fun CharacterDetailScreen(
                         }
                         CharacterTab.Equipment -> {
                             WeaponDetailCard(
+                                character = character,
                                 modifier = Modifier.fillMaxWidth()
                             )
                             ArmorDetailCard(

@@ -60,6 +60,7 @@ fun CharacterFormScreen(
     initialBraveAbilities: BraveAbilities = BraveAbilities(),
     initialCleverAbilities: CleverAbilities = CleverAbilities(),
     initialFortunateOptions: FortunateOptions = FortunateOptions(),
+    initialWeapons: List<Weapon> = emptyList(),
     initialTab: CharacterTab = CharacterTab.Info,
     onNavigateBack: (CharacterTab) -> Unit = {},
     onSave: (PlayerCharacter, CharacterTab) -> Unit = { _, _ -> }
@@ -73,6 +74,7 @@ fun CharacterFormScreen(
     var affiliations by remember { mutableStateOf(initialAffiliations) }
     var languages by remember { mutableStateOf(initialLanguages) }
     var selectedTab by remember { mutableStateOf(initialTab) }
+    var weapons by remember { mutableStateOf(initialWeapons) }
     val scrollState = rememberScrollState()
 
     // Scroll to top when tab changes or when screen is shown with new character
@@ -154,7 +156,8 @@ fun CharacterFormScreen(
             wiseMiracles = wiseMiracles,
             braveAbilities = braveAbilities,
             cleverAbilities = cleverAbilities,
-            fortunateOptions = fortunateOptions
+            fortunateOptions = fortunateOptions,
+            weapons = weapons
         )
     ) }
 
@@ -166,7 +169,7 @@ fun CharacterFormScreen(
         useDefaultAttributes, strength, agility, toughness, intelligence,
         willpower, charisma, customAttributeArray, attributeGroupPairs, attunementSlots,
         strongCombatOptions, conflictLoot, wiseMiracles, braveAbilities, cleverAbilities,
-        fortunateOptions
+        fortunateOptions, weapons
     ) {
         tempCharacter = PlayerCharacter(
             name = name,
@@ -195,13 +198,14 @@ fun CharacterFormScreen(
             charisma = charisma.toIntOrNull() ?: 10,
             customAttributeArray = customAttributeArray,
             attributeGroupPairs = attributeGroupPairs,
-            attunementSlots = attunementSlots,
+            attunementSlots = tempCharacter.attunementSlots,
             strongCombatOptions = strongCombatOptions,
             conflictLoot = conflictLoot,
             wiseMiracles = wiseMiracles,
             braveAbilities = braveAbilities,
             cleverAbilities = cleverAbilities,
-            fortunateOptions = fortunateOptions
+            fortunateOptions = fortunateOptions.updateForLevel(level.toIntOrNull() ?: 1),
+            weapons = weapons
         )
     }
 
@@ -252,7 +256,8 @@ fun CharacterFormScreen(
                                     wiseMiracles = wiseMiracles,
                                     braveAbilities = braveAbilities,
                                     cleverAbilities = cleverAbilities,
-                                    fortunateOptions = fortunateOptions.updateForLevel(level.toIntOrNull() ?: 1)
+                                    fortunateOptions = fortunateOptions.updateForLevel(level.toIntOrNull() ?: 1),
+                                    weapons = weapons
                                 ),
                                 selectedTab
                             )
@@ -427,6 +432,8 @@ fun CharacterFormScreen(
                     }
                     CharacterTab.Equipment -> {
                         WeaponFormCard(
+                            weapons = weapons,
+                            onWeaponsChange = { weapons = it },
                             modifier = Modifier.fillMaxWidth()
                         )
                         

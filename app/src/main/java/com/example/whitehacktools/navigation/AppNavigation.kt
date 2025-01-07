@@ -138,6 +138,7 @@ fun AppNavigation(
                 initialBraveAbilities = character?.braveAbilities ?: BraveAbilities(),
                 initialCleverAbilities = character?.cleverAbilities ?: CleverAbilities(),
                 initialFortunateOptions = character?.fortunateOptions ?: FortunateOptions(),
+                initialWeapons = character?.weapons ?: emptyList(),
                 initialTab = selectedTab,
                 onNavigateBack = { tab -> 
                     if (characterId == "new") {

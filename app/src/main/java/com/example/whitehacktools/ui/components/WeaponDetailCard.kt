@@ -1,14 +1,17 @@
 package com.example.whitehacktools.ui.components
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.whitehacktools.model.PlayerCharacter
+import com.example.whitehacktools.model.Weapon
 
 @Composable
 fun WeaponDetailCard(
+    character: PlayerCharacter,
     modifier: Modifier = Modifier
 ) {
     SectionCard(
@@ -16,12 +19,27 @@ fun WeaponDetailCard(
         modifier = modifier
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(text = "Placeholder for weapon details")
-            Text(text = "• Weapon name: Longsword")
-            Text(text = "• Damage: 1d8")
-            Text(text = "• Properties: Versatile")
+            if (character.weapons.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "No weapons",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            } else {
+                character.weapons.forEach { weapon ->
+                    WeaponDetailRow(weapon = weapon)
+                }
+            }
         }
     }
 }

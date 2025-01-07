@@ -58,6 +58,8 @@ data class PlayerCharacter(
     // Equipment
     val goldOnHand: Int = 0,
     val stashedGold: Int = 0,
+    @Contextual
+    val weapons: List<Weapon> = emptyList(),
     // Additional Info
     val experience: Int = 0,
     val corruption: Int = 0,
