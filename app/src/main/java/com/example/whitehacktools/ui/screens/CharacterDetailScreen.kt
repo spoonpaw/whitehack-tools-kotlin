@@ -102,7 +102,7 @@ fun CharacterDetailScreen(
                             when (character.characterClass) {
                                 "Deft" -> DeftDetailCard(
                                     character = character,
-                                    onCharacterChange = {},  // This is a detail view, so no changes needed
+                                    onCharacterChange = { /* no-op */ },  // This is a detail view, so no changes needed
                                     modifier = Modifier.fillMaxWidth()
                                 )
                                 "Strong" -> StrongDetailCard(character = character, modifier = Modifier.fillMaxWidth())
@@ -144,6 +144,7 @@ fun CharacterDetailScreen(
                                 modifier = Modifier.fillMaxWidth()
                             )
                             EncumbranceDetailCard(
+                                character = character,
                                 modifier = Modifier.fillMaxWidth()
                             )
                         }
