@@ -21,7 +21,9 @@ class CharacterStore(private val context: Context) {
         .map { preferences ->
             val charactersJson = preferences[CHARACTERS_KEY] ?: "[]"
             try {
-                Json.decodeFromString<List<PlayerCharacter>>(charactersJson).map { it.fixOutOfRangeAttributes() }
+                Json.decodeFromString<List<PlayerCharacter>>(charactersJson)
+                    .map { it.fixOutOfRangeAttributes() }
+                    .map { it.validateWiseMiracles() }
             } catch (e: Exception) {
                 emptyList()
             }
@@ -29,7 +31,49 @@ class CharacterStore(private val context: Context) {
 
     suspend fun saveCharacters(characters: List<PlayerCharacter>) {
         context.dataStore.edit { preferences ->
-            preferences[CHARACTERS_KEY] = Json.encodeToString(characters.map { it.fixOutOfRangeAttributes() })
+            preferences[CHARACTERS_KEY] = Json.encodeToString(
+                characters
+                    .map { it.fixOutOfRangeAttributes() }
+                    .map { it.validateWiseMiracles() }
+            )
         }
     }
+}
+
+private fun PlayerCharacter.validateWiseMiracles(): PlayerCharacter {
+    val validatedSlots = wiseMiracleSlots.map { slot ->
+        if (!slot.isMagicItemSlot) {
+            var activeFound = false
+            val validatedBaseMiracles = slot.baseMiracles.map { miracle ->
+                if (miracle.isActive) {
+                    if (activeFound) {
+                        miracle.copy(isActive = false)
+                    } else {
+                        activeFound = true
+                        miracle
+                    }
+                } else miracle
+            }
+
+            val validatedAdditionalMiracles = slot.additionalMiracles.map { miracle ->
+                if (miracle.isActive) {
+                    if (activeFound) {
+                        miracle.copy(isActive = false)
+                    } else {
+                        activeFound = true
+                        miracle
+                    }
+                } else miracle
+            }
+
+            slot.copy(
+                baseMiracles = validatedBaseMiracles,
+                additionalMiracles = validatedAdditionalMiracles
+            )
+        } else slot
+    }
+
+    return if (validatedSlots != wiseMiracleSlots) {
+        copy(wiseMiracleSlots = validatedSlots)
+    } else this
 }

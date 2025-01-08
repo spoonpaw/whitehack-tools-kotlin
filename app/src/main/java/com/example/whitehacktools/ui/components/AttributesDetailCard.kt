@@ -63,7 +63,7 @@ fun AttributesDetailCard(
                         AttributeCard(
                             name = name,
                             value = value.toString(),
-                            groups = character.attributeGroupPairs.filter { it.attributeName == name },
+                            groups = character.attributeGroupPairs.filter { it.effectiveAttributeName == name },
                             character = character,
                             modifier = Modifier
                                 .weight(1f)
@@ -114,20 +114,24 @@ private fun AttributeCard(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     groups.forEach { pair ->
-                        Surface(
-                            shape = RoundedCornerShape(8.dp),
-                            color = getGroupColor(pair.groupType, character).copy(alpha = 0.1f),
-                            border = BorderStroke(
-                                width = 1.dp,
-                                color = getGroupColor(pair.groupType, character).copy(alpha = 0.5f)
-                            )
-                        ) {
-                            Text(
-                                text = pair.groupName,
-                                style = MaterialTheme.typography.labelMedium,
-                                color = getGroupColor(pair.groupType, character),
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                            )
+                        val groupType = pair.groupType ?: GroupType.Vocation // Default to Vocation if null
+                        val groupName = pair.groupName ?: pair.group ?: "" // Use Swift format if Kotlin format is null
+                        if (groupName.isNotEmpty()) {
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = getGroupColor(groupType, character).copy(alpha = 0.1f),
+                                border = BorderStroke(
+                                    width = 1.dp,
+                                    color = getGroupColor(groupType, character).copy(alpha = 0.5f)
+                                )
+                            ) {
+                                Text(
+                                    text = groupName,
+                                    style = MaterialTheme.typography.labelMedium,
+                                    color = getGroupColor(groupType, character),
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                )
+                            }
                         }
                     }
                 }

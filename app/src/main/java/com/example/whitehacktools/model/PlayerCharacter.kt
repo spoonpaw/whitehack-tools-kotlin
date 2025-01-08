@@ -3,6 +3,26 @@ package com.example.whitehacktools.model
 import java.util.UUID
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Contextual
+import com.example.whitehacktools.model.Weapon
+import com.example.whitehacktools.model.Armor
+import com.example.whitehacktools.model.Gear
+import com.example.whitehacktools.model.AttunementSlot
+import com.example.whitehacktools.model.StrongCombatOptions
+import com.example.whitehacktools.model.ConflictLoot
+import com.example.whitehacktools.model.Attunement
+import com.example.whitehacktools.model.BraveAbilities
+import com.example.whitehacktools.model.CleverAbilities
+import com.example.whitehacktools.model.FortunateOptions
+import com.example.whitehacktools.model.WiseMiracle
+import com.example.whitehacktools.model.WiseMiracles
+import com.example.whitehacktools.model.WiseMiracleSlot
+
+@Serializable
+enum class GroupType {
+    Vocation,
+    Species,
+    Affiliation
+}
 
 @Serializable
 data class AttributeArray(
@@ -12,17 +32,27 @@ data class AttributeArray(
 
 @Serializable
 data class AttributeGroupPair(
-    val attributeName: String,
-    val groupType: GroupType,
-    val groupName: String
-)
+    val attribute: String? = null,  // Swift format
+    val group: String? = null,      // Swift format
+    val attributeName: String? = null, // Kotlin format
+    val groupType: GroupType? = null,  // Kotlin format
+    val groupName: String? = null,     // Kotlin format
+    val id: String = UUID.randomUUID().toString()
+) {
+    val effectiveAttributeName: String
+        get() = attribute ?: attributeName ?: ""
+        
+    val effectiveGroupName: String
+        get() = group ?: groupName ?: ""
+}
 
 @Serializable
-enum class GroupType {
-    Vocation,
-    Species,
-    Affiliation
-}
+data class Miracle(
+    val id: String = UUID.randomUUID().toString(),
+    val name: String,
+    val isActive: Boolean = false,
+    val isAdditional: Boolean = false
+)
 
 @Serializable
 data class PlayerCharacter(
@@ -34,30 +64,39 @@ data class PlayerCharacter(
     // Groups
     val vocation: String = "",
     val species: String = "",
-    val affiliations: List<String> = emptyList(),
+    val vocationGroup: String? = null,  // Swift format
+    val speciesGroup: String? = null,   // Swift format
+    val affiliationGroups: List<String>? = null, // Swift format
+    val affiliations: List<String> = emptyList(), // Kotlin format
     val languages: List<String> = emptyList(),
     // Attributes
     val useDefaultAttributes: Boolean = true,
+    val useCustomAttributes: Boolean? = null, // Swift format
     val strength: Int = 10,
     val agility: Int = 10,
     val toughness: Int = 10,
     val intelligence: Int = 10,
     val willpower: Int = 10,
     val charisma: Int = 10,
+    @Contextual
     val customAttributeArray: AttributeArray? = null,
     val attributeGroupPairs: List<AttributeGroupPair> = emptyList(),
     // Combat Stats
     val currentHP: Int = 10,
     val maxHP: Int = 10,
     val attackValue: Int = 10,
+    val _attackValue: Int? = null,  // Swift format
     val defenseValue: Int = 10,
     val movement: Int = 30,
     val initiativeBonus: Int = 0,
     val savingValue: Int = 7,
+    val _saveValue: Int? = null,    // Swift format
     val saveColor: String = "",
     // Equipment
     val goldOnHand: Int = 0,
     val stashedGold: Int = 0,
+    val coinsOnHand: Int? = null,   // Swift format
+    val stashedCoins: Int? = null,  // Swift format
     @Contextual
     val weapons: List<Weapon> = emptyList(),
     @Contextual
@@ -82,8 +121,7 @@ data class PlayerCharacter(
     // Deft Features
     val attunements: List<Attunement> = emptyList(),
     // Wise Features
-    val miracles: List<String> = emptyList(),
-    val wiseMiracles: WiseMiracles = WiseMiracles(),
+    val wiseMiracleSlots: List<WiseMiracleSlot> = emptyList(),
     // Brave Features
     val braveAbilities: BraveAbilities = BraveAbilities(),
     val cleverAbilities: CleverAbilities = CleverAbilities(),
@@ -91,6 +129,8 @@ data class PlayerCharacter(
     val fortunateOptions: FortunateOptions = FortunateOptions()
 ) {
     companion object {
+        private const val TAG = "PlayerCharacter"
+        
         val DEFAULT_ATTRIBUTES = listOf(
             "Strength",
             "Agility",
@@ -102,6 +142,9 @@ data class PlayerCharacter(
 
         fun clampAttribute(value: Int): Int = value.coerceIn(1..20)
     }
+
+    val wiseMiracles: WiseMiracles
+        get() = WiseMiracles(slots = wiseMiracleSlots)
 
     fun calculateInitiativeBonus(): Int {
         if (!useDefaultAttributes) return 0
@@ -168,5 +211,19 @@ data class PlayerCharacter(
             armor = armor.map { it.copy(id = UUID.randomUUID().toString()) },
             gear = gear.map { it.copy(id = UUID.randomUUID().toString()) }
         )
+    }
+
+    fun getAllMiracles(): List<String> {
+        android.util.Log.d(TAG, "Getting all miracles from ${wiseMiracleSlots.size} slots")
+        wiseMiracleSlots.forEachIndexed { index, slot ->
+            android.util.Log.d(TAG, "Slot $index:")
+            android.util.Log.d(TAG, "  Base miracles: ${slot.baseMiracles.map { it.name }}")
+            android.util.Log.d(TAG, "  Additional miracles: ${slot.additionalMiracles.map { it.name }}")
+        }
+        
+        return wiseMiracleSlots.flatMap { slot ->
+            slot.miracles.filter { miracle -> miracle.name.isNotEmpty() }
+                .map { miracle -> miracle.name }
+        }
     }
 }

@@ -21,13 +21,26 @@ class CharacterImportViewModel : ViewModel() {
     private val json = Json { 
         prettyPrint = true 
         ignoreUnknownKeys = true
+        isLenient = true
     }
 
     fun importCharacter(uri: Uri): PlayerCharacter? {
         return try {
+            android.util.Log.d("Import", "Starting character import")
             val jsonString = uri.toString()
-            json.decodeFromString<PlayerCharacter>(jsonString)
+            android.util.Log.d("Import", "JSON: $jsonString")
+            
+            val character = json.decodeFromString<PlayerCharacter>(jsonString)
+            android.util.Log.d("Import", "Character imported successfully")
+            android.util.Log.d("Import", "Wise miracles: ${character.wiseMiracleSlots.size} slots")
+            character.wiseMiracleSlots.forEachIndexed { index, slot ->
+                android.util.Log.d("Import", "Slot $index:")
+                android.util.Log.d("Import", "  Base miracles: ${slot.baseMiracles.map { it.name }}")
+                android.util.Log.d("Import", "  Additional miracles: ${slot.additionalMiracles.map { it.name }}")
+            }
+            character
         } catch (e: Exception) {
+            android.util.Log.e("Import", "Failed to import character", e)
             _importError.value = "Failed to import character: ${e.message}"
             null
         }

@@ -13,7 +13,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.whitehacktools.model.WiseMiracle
 import com.example.whitehacktools.model.WiseMiracleSlot
-import com.example.whitehacktools.model.WiseMiracles
 import com.example.whitehacktools.utilities.AdvancementTables
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -23,8 +22,8 @@ fun WiseFormCard(
     level: Int,
     willpower: Int,
     useCustomAttributes: Boolean,
-    wiseMiracles: WiseMiracles,
-    onWiseMiraclesChanged: (WiseMiracles) -> Unit,
+    wiseMiracleSlots: List<WiseMiracleSlot>,
+    onWiseMiracleSlotsChanged: (List<WiseMiracleSlot>) -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (characterClass == "Wise") {
@@ -44,17 +43,64 @@ fun WiseFormCard(
             }
         }
 
-        // Initialize slots if needed
-        LaunchedEffect(availableSlots) {
-            val newSlots = wiseMiracles.slots.toMutableList()
+        // Initialize slots if needed and validate active miracles
+        LaunchedEffect(availableSlots, wiseMiracleSlots) {
+            var needsUpdate = false
+            val newSlots = wiseMiracleSlots.toMutableList()
+
+            // Initialize slots if needed
             while (newSlots.size < availableSlots) {
-                // Create a new slot with the appropriate number of miracles
                 val slotIndex = newSlots.size
-                val miracleCount = if (slotIndex == 0) 2 + extraInactiveMiracles else 2
-                val miracles = List(miracleCount) { WiseMiracle() }
-                newSlots.add(WiseMiracleSlot(miracles = miracles))
+                val baseMiracles = List(2) { WiseMiracle() }
+                val additionalMiracles = if (slotIndex == 0) List(extraInactiveMiracles) { WiseMiracle(isAdditional = true) } else emptyList()
+                newSlots.add(WiseMiracleSlot(
+                    baseMiracles = baseMiracles,
+                    additionalMiracles = additionalMiracles,
+                    additionalMiracleCount = if (slotIndex == 0) extraInactiveMiracles else 0
+                ))
+                needsUpdate = true
             }
-            onWiseMiraclesChanged(wiseMiracles.copy(slots = newSlots))
+
+            // Validate each slot to ensure only one miracle is active
+            newSlots.forEachIndexed { index, slot ->
+                if (!slot.isMagicItemSlot) {
+                    var activeFound = false
+                    val updatedBaseMiracles = slot.baseMiracles.map { miracle ->
+                        if (miracle.isActive) {
+                            if (activeFound) {
+                                needsUpdate = true
+                                miracle.copy(isActive = false)
+                            } else {
+                                activeFound = true
+                                miracle
+                            }
+                        } else miracle
+                    }
+
+                    val updatedAdditionalMiracles = slot.additionalMiracles.map { miracle ->
+                        if (miracle.isActive) {
+                            if (activeFound) {
+                                needsUpdate = true
+                                miracle.copy(isActive = false)
+                            } else {
+                                activeFound = true
+                                miracle
+                            }
+                        } else miracle
+                    }
+
+                    if (updatedBaseMiracles != slot.baseMiracles || updatedAdditionalMiracles != slot.additionalMiracles) {
+                        newSlots[index] = slot.copy(
+                            baseMiracles = updatedBaseMiracles,
+                            additionalMiracles = updatedAdditionalMiracles
+                        )
+                    }
+                }
+            }
+
+            if (needsUpdate) {
+                onWiseMiracleSlotsChanged(newSlots)
+            }
         }
 
         SectionCard(
@@ -65,18 +111,12 @@ fun WiseFormCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text(
-                    text = "Miracles",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold
-                )
-
-                repeat(availableSlots) { index ->
+                wiseMiracleSlots.take(availableSlots).forEachIndexed { index, slot ->
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(8.dp),
+                        shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
@@ -85,17 +125,16 @@ fun WiseFormCard(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(12.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
+                            // Slot Header
                             Text(
                                 text = "Slot ${index + 1}",
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Medium
                             )
 
-                            val slot = wiseMiracles.slots.getOrNull(index) ?: WiseMiracleSlot()
-                            
-                            // Add toggle switch for second slot
+                            // Magic Item Toggle for second slot
                             if (index == 1) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
@@ -109,140 +148,71 @@ fun WiseFormCard(
                                     Switch(
                                         checked = slot.isMagicItemSlot,
                                         onCheckedChange = { isChecked ->
-                                            val updatedSlots = wiseMiracles.slots.toMutableList()
+                                            val updatedSlots = wiseMiracleSlots.toMutableList()
                                             val updatedSlot = slot.copy(isMagicItemSlot = isChecked)
                                             updatedSlots[index] = updatedSlot
-                                            onWiseMiraclesChanged(wiseMiracles.copy(slots = updatedSlots))
+                                            onWiseMiracleSlotsChanged(updatedSlots)
                                         }
                                     )
                                 }
 
                                 if (slot.isMagicItemSlot) {
-                                    Card(
+                                    OutlinedTextField(
+                                        value = slot.magicItemName,
+                                        onValueChange = { newValue ->
+                                            val updatedSlots = wiseMiracleSlots.toMutableList()
+                                            val updatedSlot = slot.copy(magicItemName = newValue)
+                                            updatedSlots[index] = updatedSlot
+                                            onWiseMiracleSlotsChanged(updatedSlots)
+                                        },
                                         modifier = Modifier.fillMaxWidth(),
-                                        shape = RoundedCornerShape(8.dp),
-                                        colors = CardDefaults.cardColors(
-                                            containerColor = MaterialTheme.colorScheme.surface
-                                        )
-                                    ) {
-                                        Column(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(12.dp),
-                                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                                        ) {
-                                            OutlinedTextField(
-                                                value = slot.magicItemName,
-                                                onValueChange = { newValue ->
-                                                    val updatedSlots = wiseMiracles.slots.toMutableList()
-                                                    val updatedSlot = slot.copy(magicItemName = newValue)
-                                                    updatedSlots[index] = updatedSlot
-                                                    onWiseMiraclesChanged(wiseMiracles.copy(slots = updatedSlots))
-                                                },
-                                                modifier = Modifier.fillMaxWidth(),
-                                                label = { Text("Magic Item Name") },
-                                                singleLine = true
-                                            )
-                                        }
-                                    }
+                                        label = { Text("Magic Item Name") },
+                                        singleLine = true
+                                    )
                                 }
                             }
 
-                            // Display miracle inputs if not magic item slot
-                            if (index != 1 || !slot.isMagicItemSlot) {
-                                val miracleCount = if (index == 0) 2 + extraInactiveMiracles else 2
-                                repeat(miracleCount) { miracleIndex ->
-                                    val miracle = slot.miracles.getOrNull(miracleIndex) ?: WiseMiracle()
-                                    Card(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        shape = RoundedCornerShape(8.dp),
-                                        colors = CardDefaults.cardColors(
-                                            containerColor = MaterialTheme.colorScheme.surface
-                                        )
-                                    ) {
-                                        Column(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(12.dp),
-                                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                                        ) {
-                                            OutlinedTextField(
-                                                value = miracle.name,
-                                                onValueChange = { newName ->
-                                                    val newMiracles = slot.miracles.toMutableList()
-                                                    while (newMiracles.size <= miracleIndex) {
-                                                        newMiracles.add(WiseMiracle())
-                                                    }
-                                                    newMiracles[miracleIndex] = miracle.copy(name = newName)
-                                                    
-                                                    val newSlots = wiseMiracles.slots.toMutableList()
-                                                    while (newSlots.size <= index) {
-                                                        val slotIndex = newSlots.size
-                                                        val slotMiracleCount = if (slotIndex == 0) 2 + extraInactiveMiracles else 2
-                                                        val slotMiracles = List(slotMiracleCount) { WiseMiracle() }
-                                                        newSlots.add(WiseMiracleSlot(miracles = slotMiracles))
-                                                    }
-                                                    newSlots[index] = slot.copy(miracles = newMiracles)
-                                                    
-                                                    onWiseMiraclesChanged(wiseMiracles.copy(slots = newSlots))
-                                                },
-                                                label = { Text("Miracle Name") },
-                                                modifier = Modifier.fillMaxWidth()
-                                            )
-
-                                            Row(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                                verticalAlignment = Alignment.CenterVertically
-                                            ) {
-                                                Switch(
-                                                    checked = miracle.isActive,
-                                                    onCheckedChange = { isActive ->
-                                                        val newMiracles = slot.miracles.toMutableList()
-                                                        while (newMiracles.size <= miracleIndex) {
-                                                            newMiracles.add(WiseMiracle())
-                                                        }
-                                                        
-                                                        if (isActive) {
-                                                            for (i in newMiracles.indices) {
-                                                                newMiracles[i] = newMiracles[i].copy(isActive = i == miracleIndex)
-                                                            }
-                                                        } else {
-                                                            newMiracles[miracleIndex] = miracle.copy(isActive = false)
-                                                        }
-                                                        
-                                                        val newSlots = wiseMiracles.slots.toMutableList()
-                                                        while (newSlots.size <= index) {
-                                                            val slotIndex = newSlots.size
-                                                            val slotMiracleCount = if (slotIndex == 0) 2 + extraInactiveMiracles else 2
-                                                            val slotMiracles = List(slotMiracleCount) { WiseMiracle() }
-                                                            newSlots.add(WiseMiracleSlot(miracles = slotMiracles))
-                                                        }
-                                                        newSlots[index] = slot.copy(miracles = newMiracles)
-                                                        
-                                                        onWiseMiraclesChanged(wiseMiracles.copy(slots = newSlots))
-                                                    }
+                            // Base Miracles
+                            if (!slot.isMagicItemSlot) {
+                                slot.baseMiracles.forEachIndexed { miracleIndex, miracle ->
+                                    MiracleRow(
+                                        miracle = miracle,
+                                        onMiracleChanged = { updatedMiracle ->
+                                            val updatedSlots = wiseMiracleSlots.toMutableList()
+                                            val updatedSlot = if (updatedMiracle.isActive) {
+                                                // If activating this miracle, deactivate all others in this slot
+                                                slot.copy(
+                                                    baseMiracles = slot.baseMiracles.mapIndexed { i, m ->
+                                                        if (i == miracleIndex) updatedMiracle else m.copy(isActive = false)
+                                                    },
+                                                    additionalMiracles = slot.additionalMiracles.map { it.copy(isActive = false) }
                                                 )
-                                                Text(
-                                                    text = if (miracle.isActive) "Active" else "Inactive",
-                                                    style = MaterialTheme.typography.bodyMedium
+                                            } else {
+                                                slot.copy(
+                                                    baseMiracles = slot.baseMiracles.toMutableList().also {
+                                                        it[miracleIndex] = updatedMiracle
+                                                    }
                                                 )
                                             }
+                                            updatedSlots[index] = updatedSlot
+                                            onWiseMiracleSlotsChanged(updatedSlots)
                                         }
-                                    }
+                                    )
                                 }
 
-                                // Additional miracles section for first slot
+                                // Additional Miracles for first slot
                                 if (index == 0) {
                                     Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .border(
-                                                BorderStroke(1.dp, MaterialTheme.colorScheme.tertiary.copy(alpha = 0.2f)),
-                                                RoundedCornerShape(8.dp)
-                                            )
-                                            .padding(12.dp)
+                                        modifier = Modifier.fillMaxWidth(),
+                                        verticalArrangement = Arrangement.spacedBy(8.dp)
                                     ) {
+                                        Text(
+                                            text = "Additional Miracles",
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                                        )
+
+                                        // First Additional Miracle Toggle
                                         Row(
                                             modifier = Modifier.fillMaxWidth(),
                                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -250,101 +220,47 @@ fun WiseFormCard(
                                         ) {
                                             Text(
                                                 text = "First Additional Miracle",
-                                                style = MaterialTheme.typography.titleSmall,
-                                                fontWeight = FontWeight.Bold,
-                                                color = MaterialTheme.colorScheme.tertiary
+                                                style = MaterialTheme.typography.bodyMedium
                                             )
                                             Switch(
-                                                checked = slot.miracles.size > 2,
-                                                onCheckedChange = { hasAdditional ->
-                                                    val newMiracles = slot.miracles.toMutableList()
-                                                    if (hasAdditional && newMiracles.size == 2) {
-                                                        newMiracles.add(WiseMiracle())
-                                                    } else if (!hasAdditional) {
-                                                        while (newMiracles.size > 2) {
-                                                            newMiracles.removeLast()
-                                                        }
-                                                    }
-                                                    val newSlots = wiseMiracles.slots.toMutableList()
-                                                    newSlots[index] = slot.copy(miracles = newMiracles)
-                                                    onWiseMiraclesChanged(wiseMiracles.copy(slots = newSlots))
-                                                },
-                                                colors = SwitchDefaults.colors(
-                                                    checkedTrackColor = MaterialTheme.colorScheme.tertiary
-                                                )
+                                                checked = slot.additionalMiracleCount >= 1,
+                                                onCheckedChange = { isChecked ->
+                                                    val updatedSlots = wiseMiracleSlots.toMutableList()
+                                                    val updatedSlot = slot.copy(
+                                                        additionalMiracleCount = if (isChecked) 1 else 0
+                                                    )
+                                                    updatedSlots[index] = updatedSlot
+                                                    onWiseMiracleSlotsChanged(updatedSlots)
+                                                }
                                             )
                                         }
 
-                                        if (slot.miracles.size > 2) {
-                                            Card(
-                                                modifier = Modifier.fillMaxWidth(),
-                                                shape = RoundedCornerShape(8.dp),
-                                                colors = CardDefaults.cardColors(
-                                                    containerColor = MaterialTheme.colorScheme.surface
-                                                )
-                                            ) {
-                                                Column(
-                                                    modifier = Modifier
-                                                        .fillMaxWidth()
-                                                        .padding(12.dp),
-                                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                                ) {
-                                                    val additionalMiracle = slot.miracles.getOrNull(2) ?: WiseMiracle()
-                                                    OutlinedTextField(
-                                                        value = additionalMiracle.name,
-                                                        onValueChange = { newName ->
-                                                            val newMiracles = slot.miracles.toMutableList()
-                                                            newMiracles[2] = additionalMiracle.copy(name = newName)
-                                                            val newSlots = wiseMiracles.slots.toMutableList()
-                                                            newSlots[index] = slot.copy(miracles = newMiracles)
-                                                            onWiseMiraclesChanged(wiseMiracles.copy(slots = newSlots))
-                                                        },
-                                                        label = { Text("Additional Miracle Name") },
-                                                        modifier = Modifier.fillMaxWidth()
-                                                    )
-
-                                                    Row(
-                                                        modifier = Modifier.fillMaxWidth(),
-                                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                                        verticalAlignment = Alignment.CenterVertically
-                                                    ) {
-                                                        Switch(
-                                                            checked = additionalMiracle.isActive,
-                                                            onCheckedChange = { isActive ->
-                                                                val newMiracles = slot.miracles.toMutableList()
-                                                                if (isActive) {
-                                                                    for (i in newMiracles.indices) {
-                                                                        newMiracles[i] = newMiracles[i].copy(isActive = i == 2)
-                                                                    }
-                                                                } else {
-                                                                    newMiracles[2] = additionalMiracle.copy(isActive = false)
-                                                                }
-                                                                val newSlots = wiseMiracles.slots.toMutableList()
-                                                                newSlots[index] = slot.copy(miracles = newMiracles)
-                                                                onWiseMiraclesChanged(wiseMiracles.copy(slots = newSlots))
+                                        if (slot.additionalMiracleCount >= 1 && slot.additionalMiracles.isNotEmpty()) {
+                                            MiracleRow(
+                                                miracle = slot.additionalMiracles[0],
+                                                onMiracleChanged = { updatedMiracle ->
+                                                    val updatedSlots = wiseMiracleSlots.toMutableList()
+                                                    val updatedSlot = if (updatedMiracle.isActive) {
+                                                        // If activating this miracle, deactivate all others in this slot
+                                                        slot.copy(
+                                                            baseMiracles = slot.baseMiracles.map { it.copy(isActive = false) },
+                                                            additionalMiracles = slot.additionalMiracles.mapIndexed { i, m ->
+                                                                if (i == 0) updatedMiracle else m.copy(isActive = false)
                                                             }
                                                         )
-                                                        Text(
-                                                            text = if (additionalMiracle.isActive) "Active" else "Inactive",
-                                                            style = MaterialTheme.typography.bodyMedium
+                                                    } else {
+                                                        slot.copy(
+                                                            additionalMiracles = slot.additionalMiracles.toMutableList().also {
+                                                                it[0] = updatedMiracle
+                                                            }
                                                         )
                                                     }
+                                                    updatedSlots[index] = updatedSlot
+                                                    onWiseMiracleSlotsChanged(updatedSlots)
                                                 }
-                                            }
-                                        }
-                                    }
+                                            )
 
-                                    // Second Additional Miracle (only if first additional is enabled)
-                                    if (slot.miracles.size > 2) {
-                                        Column(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .border(
-                                                    BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.2f)),
-                                                    RoundedCornerShape(8.dp)
-                                                )
-                                                .padding(12.dp)
-                                        ) {
+                                            // Second Additional Miracle Toggle
                                             Row(
                                                 modifier = Modifier.fillMaxWidth(),
                                                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -352,87 +268,45 @@ fun WiseFormCard(
                                             ) {
                                                 Text(
                                                     text = "Second Additional Miracle",
-                                                    style = MaterialTheme.typography.titleSmall,
-                                                    fontWeight = FontWeight.Bold,
-                                                    color = MaterialTheme.colorScheme.error
+                                                    style = MaterialTheme.typography.bodyMedium
                                                 )
                                                 Switch(
-                                                    checked = slot.miracles.size > 3,
-                                                    onCheckedChange = { hasSecondAdditional ->
-                                                        val newMiracles = slot.miracles.toMutableList()
-                                                        if (hasSecondAdditional && newMiracles.size == 3) {
-                                                            newMiracles.add(WiseMiracle())
-                                                        } else if (!hasSecondAdditional) {
-                                                            while (newMiracles.size > 3) {
-                                                                newMiracles.removeLast()
-                                                            }
-                                                        }
-                                                        val newSlots = wiseMiracles.slots.toMutableList()
-                                                        newSlots[index] = slot.copy(miracles = newMiracles)
-                                                        onWiseMiraclesChanged(wiseMiracles.copy(slots = newSlots))
-                                                    },
-                                                    colors = SwitchDefaults.colors(
-                                                        checkedTrackColor = MaterialTheme.colorScheme.error
-                                                    )
+                                                    checked = slot.additionalMiracleCount == 2,
+                                                    onCheckedChange = { isChecked ->
+                                                        val updatedSlots = wiseMiracleSlots.toMutableList()
+                                                        val updatedSlot = slot.copy(
+                                                            additionalMiracleCount = if (isChecked) 2 else 1
+                                                        )
+                                                        updatedSlots[index] = updatedSlot
+                                                        onWiseMiracleSlotsChanged(updatedSlots)
+                                                    }
                                                 )
                                             }
 
-                                            if (slot.miracles.size > 3) {
-                                                Card(
-                                                    modifier = Modifier.fillMaxWidth(),
-                                                    shape = RoundedCornerShape(8.dp),
-                                                    colors = CardDefaults.cardColors(
-                                                        containerColor = MaterialTheme.colorScheme.surface
-                                                    )
-                                                ) {
-                                                    Column(
-                                                        modifier = Modifier
-                                                            .fillMaxWidth()
-                                                            .padding(12.dp),
-                                                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                                                    ) {
-                                                        val secondAdditionalMiracle = slot.miracles.getOrNull(3) ?: WiseMiracle()
-                                                        OutlinedTextField(
-                                                            value = secondAdditionalMiracle.name,
-                                                            onValueChange = { newName ->
-                                                                val newMiracles = slot.miracles.toMutableList()
-                                                                newMiracles[3] = secondAdditionalMiracle.copy(name = newName)
-                                                                val newSlots = wiseMiracles.slots.toMutableList()
-                                                                newSlots[index] = slot.copy(miracles = newMiracles)
-                                                                onWiseMiraclesChanged(wiseMiracles.copy(slots = newSlots))
-                                                            },
-                                                            label = { Text("Additional Miracle Name") },
-                                                            modifier = Modifier.fillMaxWidth()
-                                                        )
-
-                                                        Row(
-                                                            modifier = Modifier.fillMaxWidth(),
-                                                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                                            verticalAlignment = Alignment.CenterVertically
-                                                        ) {
-                                                            Switch(
-                                                                checked = secondAdditionalMiracle.isActive,
-                                                                onCheckedChange = { isActive ->
-                                                                    val newMiracles = slot.miracles.toMutableList()
-                                                                    if (isActive) {
-                                                                        for (i in newMiracles.indices) {
-                                                                            newMiracles[i] = newMiracles[i].copy(isActive = i == 3)
-                                                                        }
-                                                                    } else {
-                                                                        newMiracles[3] = secondAdditionalMiracle.copy(isActive = false)
-                                                                    }
-                                                                    val newSlots = wiseMiracles.slots.toMutableList()
-                                                                    newSlots[index] = slot.copy(miracles = newMiracles)
-                                                                    onWiseMiraclesChanged(wiseMiracles.copy(slots = newSlots))
+                                            if (slot.additionalMiracleCount == 2 && slot.additionalMiracles.size > 1) {
+                                                MiracleRow(
+                                                    miracle = slot.additionalMiracles[1],
+                                                    onMiracleChanged = { updatedMiracle ->
+                                                        val updatedSlots = wiseMiracleSlots.toMutableList()
+                                                        val updatedSlot = if (updatedMiracle.isActive) {
+                                                            // If activating this miracle, deactivate all others in this slot
+                                                            slot.copy(
+                                                                baseMiracles = slot.baseMiracles.map { it.copy(isActive = false) },
+                                                                additionalMiracles = slot.additionalMiracles.mapIndexed { i, m ->
+                                                                    if (i == 1) updatedMiracle else m.copy(isActive = false)
                                                                 }
                                                             )
-                                                            Text(
-                                                                text = if (secondAdditionalMiracle.isActive) "Active" else "Inactive",
-                                                                style = MaterialTheme.typography.bodyMedium
+                                                        } else {
+                                                            slot.copy(
+                                                                additionalMiracles = slot.additionalMiracles.toMutableList().also {
+                                                                    it[1] = updatedMiracle
+                                                                }
                                                             )
                                                         }
+                                                        updatedSlots[index] = updatedSlot
+                                                        onWiseMiracleSlotsChanged(updatedSlots)
                                                     }
-                                                }
+                                                )
                                             }
                                         }
                                     }
@@ -442,6 +316,44 @@ fun WiseFormCard(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun MiracleRow(
+    miracle: WiseMiracle,
+    onMiracleChanged: (WiseMiracle) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        OutlinedTextField(
+            value = miracle.name,
+            onValueChange = { onMiracleChanged(miracle.copy(name = it)) },
+            modifier = Modifier.weight(1f),
+            label = { Text(if (miracle.isAdditional) "Additional Miracle" else "Base Miracle") },
+            singleLine = true
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Active",
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (miracle.isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Switch(
+                checked = miracle.isActive,
+                onCheckedChange = { onMiracleChanged(miracle.copy(isActive = it)) }
+            )
         }
     }
 }

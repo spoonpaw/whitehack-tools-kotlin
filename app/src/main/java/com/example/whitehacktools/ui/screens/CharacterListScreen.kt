@@ -47,19 +47,33 @@ fun CharacterListScreen(
     var importedCharacters by remember { mutableStateOf<List<PlayerCharacter>>(emptyList()) }
     var showImportSelectionDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    val json = Json { prettyPrint = true; ignoreUnknownKeys = true }
+    val json = Json { 
+        prettyPrint = true 
+        ignoreUnknownKeys = true
+        isLenient = true
+        coerceInputValues = true
+    }
 
     fun parseCharactersFromJson(jsonString: String): List<PlayerCharacter> {
         return try {
-            // Parse and generate new IDs for each character
-            json.decodeFromString<List<PlayerCharacter>>(jsonString).map { it.copyWithNewId() }
-        } catch (e: Exception) {
+            Log.d("Import", "Attempting to parse as list...")
             try {
-                // Try parsing as single character and generate new ID
-                listOf(json.decodeFromString<PlayerCharacter>(jsonString).copyWithNewId())
+                // Parse and generate new IDs for each character
+                json.decodeFromString<List<PlayerCharacter>>(jsonString).map { it.copyWithNewId() }
             } catch (e: Exception) {
-                throw Exception("Invalid character data format")
+                Log.e("Import", "Failed to parse as list: ${e.message}", e)
+                Log.d("Import", "Attempting to parse as single character...")
+                try {
+                    // Try parsing as single character and generate new ID
+                    listOf(json.decodeFromString<PlayerCharacter>(jsonString).copyWithNewId())
+                } catch (e: Exception) {
+                    Log.e("Import", "Failed to parse as single character: ${e.message}", e)
+                    throw Exception("Invalid character data format: ${e.message}")
+                }
             }
+        } catch (e: Exception) {
+            Log.e("Import", "Failed to parse characters: ${e.message}", e)
+            throw e
         }
     }
 

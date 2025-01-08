@@ -20,7 +20,8 @@ fun CharacterDetailScreen(
     character: PlayerCharacter,
     initialTab: CharacterTab = CharacterTab.Info,
     onNavigateBack: () -> Unit = {},
-    onEdit: (CharacterTab) -> Unit = {}
+    onEdit: (CharacterTab) -> Unit = {},
+    onCharacterChanged: (PlayerCharacter) -> Unit = {}
 ) {
     var selectedTab by remember { mutableStateOf(initialTab) }
     val scrollState = rememberScrollState()
@@ -32,6 +33,52 @@ fun CharacterDetailScreen(
 
     DisposableEffect(selectedTab) {
         onDispose { }
+    }
+
+    LaunchedEffect(character) {
+        // Validate wise miracle slots to ensure only one miracle per slot is active
+        val wiseMiracleSlots = character.wiseMiracleSlots.toMutableList()
+        var needsUpdate = false
+
+        wiseMiracleSlots.forEachIndexed { index, slot ->
+            if (!slot.isMagicItemSlot) {
+                var activeFound = false
+                val updatedBaseMiracles = slot.baseMiracles.map { miracle ->
+                    if (miracle.isActive) {
+                        if (activeFound) {
+                            needsUpdate = true
+                            miracle.copy(isActive = false)
+                        } else {
+                            activeFound = true
+                            miracle
+                        }
+                    } else miracle
+                }
+
+                val updatedAdditionalMiracles = slot.additionalMiracles.map { miracle ->
+                    if (miracle.isActive) {
+                        if (activeFound) {
+                            needsUpdate = true
+                            miracle.copy(isActive = false)
+                        } else {
+                            activeFound = true
+                            miracle
+                        }
+                    } else miracle
+                }
+
+                if (updatedBaseMiracles != slot.baseMiracles || updatedAdditionalMiracles != slot.additionalMiracles) {
+                    wiseMiracleSlots[index] = slot.copy(
+                        baseMiracles = updatedBaseMiracles,
+                        additionalMiracles = updatedAdditionalMiracles
+                    )
+                }
+            }
+        }
+
+        if (needsUpdate) {
+            onCharacterChanged(character.copy(wiseMiracleSlots = wiseMiracleSlots))
+        }
     }
 
     Scaffold(
@@ -106,7 +153,11 @@ fun CharacterDetailScreen(
                                     modifier = Modifier.fillMaxWidth()
                                 )
                                 "Strong" -> StrongDetailCard(character = character, modifier = Modifier.fillMaxWidth())
-                                "Wise" -> WiseDetailCard(character = character, modifier = Modifier.fillMaxWidth())
+                                "Wise" -> WiseDetailCard(
+                                    character = character,
+                                    onCharacterChanged = onCharacterChanged,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
                                 "Brave" -> BraveDetailCard(character = character, modifier = Modifier.fillMaxWidth())
                                 "Clever" -> CleverDetailCard(character = character, modifier = Modifier.fillMaxWidth())
                                 "Fortunate" -> FortunateDetailCard(character = character, modifier = Modifier.fillMaxWidth())

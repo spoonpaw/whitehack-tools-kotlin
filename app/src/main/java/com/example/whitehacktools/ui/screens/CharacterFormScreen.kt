@@ -56,7 +56,7 @@ fun CharacterFormScreen(
     initialAttunementSlots: List<AttunementSlot> = emptyList(),
     initialStrongCombatOptions: StrongCombatOptions? = null,
     initialConflictLoot: ConflictLoot? = null,
-    initialWiseMiracles: WiseMiracles = WiseMiracles(),
+    initialWiseMiracleSlots: List<WiseMiracleSlot> = emptyList(),
     initialBraveAbilities: BraveAbilities = BraveAbilities(),
     initialCleverAbilities: CleverAbilities = CleverAbilities(),
     initialFortunateOptions: FortunateOptions = FortunateOptions(),
@@ -114,7 +114,7 @@ fun CharacterFormScreen(
     var conflictLoot by remember { mutableStateOf(initialConflictLoot) }
 
     // Wise Features
-    var wiseMiracles by remember { mutableStateOf(initialWiseMiracles) }
+    var wiseMiracleSlots by remember { mutableStateOf(initialWiseMiracleSlots) }
 
     // Brave Features
     var braveAbilities by remember { mutableStateOf(initialBraveAbilities) }
@@ -157,7 +157,7 @@ fun CharacterFormScreen(
             attunementSlots = attunementSlots,
             strongCombatOptions = strongCombatOptions,
             conflictLoot = conflictLoot,
-            wiseMiracles = wiseMiracles,
+            wiseMiracleSlots = wiseMiracleSlots,
             braveAbilities = braveAbilities,
             cleverAbilities = cleverAbilities,
             fortunateOptions = fortunateOptions,
@@ -174,7 +174,7 @@ fun CharacterFormScreen(
         goldOnHand, stashedGold, experience, corruption, notes,
         useDefaultAttributes, strength, agility, toughness, intelligence,
         willpower, charisma, customAttributeArray, attributeGroupPairs, attunementSlots,
-        strongCombatOptions, conflictLoot, wiseMiracles, braveAbilities, cleverAbilities,
+        strongCombatOptions, conflictLoot, wiseMiracleSlots, braveAbilities, cleverAbilities,
         fortunateOptions, weapons, armor, gear
     ) {
         tempCharacter = PlayerCharacter(
@@ -204,13 +204,13 @@ fun CharacterFormScreen(
             charisma = charisma.toIntOrNull() ?: 10,
             customAttributeArray = customAttributeArray,
             attributeGroupPairs = attributeGroupPairs,
-            attunementSlots = tempCharacter.attunementSlots,
+            attunementSlots = attunementSlots,
             strongCombatOptions = strongCombatOptions,
             conflictLoot = conflictLoot,
-            wiseMiracles = wiseMiracles,
+            wiseMiracleSlots = wiseMiracleSlots,
             braveAbilities = braveAbilities,
             cleverAbilities = cleverAbilities,
-            fortunateOptions = fortunateOptions.updateForLevel(level.toIntOrNull() ?: 1),
+            fortunateOptions = fortunateOptions,
             weapons = weapons,
             armor = armor,
             gear = gear
@@ -261,7 +261,7 @@ fun CharacterFormScreen(
                                     attunementSlots = tempCharacter.attunementSlots,
                                     strongCombatOptions = strongCombatOptions,
                                     conflictLoot = conflictLoot,
-                                    wiseMiracles = wiseMiracles,
+                                    wiseMiracleSlots = wiseMiracleSlots,
                                     braveAbilities = braveAbilities,
                                     cleverAbilities = cleverAbilities,
                                     fortunateOptions = fortunateOptions.updateForLevel(level.toIntOrNull() ?: 1),
@@ -389,8 +389,8 @@ fun CharacterFormScreen(
                                 level = level.toIntOrNull() ?: 1,
                                 willpower = willpower.toIntOrNull() ?: 10,
                                 useCustomAttributes = !useDefaultAttributes,
-                                wiseMiracles = wiseMiracles,
-                                onWiseMiraclesChanged = { wiseMiracles = it },
+                                wiseMiracleSlots = wiseMiracleSlots,
+                                onWiseMiracleSlotsChanged = { wiseMiracleSlots = it },
                                 modifier = Modifier.fillMaxWidth()
                             )
                             "Brave" -> BraveFormCard(

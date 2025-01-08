@@ -136,7 +136,7 @@ fun AppNavigation(
                 initialAttunementSlots = character?.attunementSlots ?: emptyList(),
                 initialStrongCombatOptions = character?.strongCombatOptions,
                 initialConflictLoot = character?.conflictLoot,
-                initialWiseMiracles = character?.wiseMiracles ?: WiseMiracles(),
+                initialWiseMiracleSlots = character?.wiseMiracleSlots ?: emptyList(),
                 initialBraveAbilities = character?.braveAbilities ?: BraveAbilities(),
                 initialCleverAbilities = character?.cleverAbilities ?: CleverAbilities(),
                 initialFortunateOptions = character?.fortunateOptions ?: FortunateOptions(),
