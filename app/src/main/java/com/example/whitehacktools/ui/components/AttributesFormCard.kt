@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -11,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -200,25 +202,48 @@ fun AttributesFormCard(
                 }
 
                 customAttributeArray?.attributes?.forEach { (name, value) ->
-                    FormField(
-                        value = value.toString(),
+                    var isFieldFocused by remember { mutableStateOf(false) }
+                    var textValue by remember(value) { mutableStateOf(value.toString()) }
+                    
+                    OutlinedTextField(
+                        value = textValue,
                         onValueChange = { newValue ->
+                            // Allow empty values and valid numbers between 1-20
                             val intValue = newValue.toIntOrNull()
                             if (newValue.isEmpty() || (intValue != null && intValue in 1..20)) {
+                                textValue = newValue
                                 val updatedAttributes = customAttributeArray.attributes.toMutableMap()
-                                updatedAttributes[name] = intValue ?: 10
+                                updatedAttributes[name] = intValue ?: value
                                 onCustomAttributeArrayChange(
                                     customAttributeArray.copy(attributes = updatedAttributes)
                                 )
-                            } else {
-                                // Show error message if value is not between 1 and 20
-                                // TODO: Implement error message display
                             }
                         },
-                        label = name,
-                        keyboardType = KeyboardType.Number,
-                        numberOnly = true,
-                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text(name) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .onFocusChanged { focusState ->
+                                if (!focusState.isFocused && isFieldFocused) {
+                                    // When losing focus, if empty or invalid, set to default
+                                    if (textValue.isEmpty() || textValue.toIntOrNull() !in 1..20) {
+                                        textValue = "10"
+                                        val updatedAttributes = customAttributeArray.attributes.toMutableMap()
+                                        updatedAttributes[name] = 10
+                                        onCustomAttributeArrayChange(
+                                            customAttributeArray.copy(attributes = updatedAttributes)
+                                        )
+                                    }
+                                }
+                                isFieldFocused = focusState.isFocused
+                            },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
+                            unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        ),
+                        shape = RoundedCornerShape(12.dp),
                         trailingIcon = {
                             IconButton(
                                 onClick = {
@@ -256,6 +281,7 @@ fun AttributesFormCard(
     }
 
     if (showAddAttributeDialog) {
+        var isValueFieldFocused by remember { mutableStateOf(false) }
         AlertDialog(
             onDismissRequest = { showAddAttributeDialog = false },
             title = { Text("Add Attribute") },
@@ -266,20 +292,36 @@ fun AttributesFormCard(
                         onValueChange = { newAttributeName = it },
                         label = "Attribute Name"
                     )
-                    FormField(
+                    OutlinedTextField(
                         value = newAttributeValue,
                         onValueChange = { newValue ->
+                            // Allow empty values and valid numbers between 1-20
                             val intValue = newValue.toIntOrNull()
                             if (newValue.isEmpty() || (intValue != null && intValue in 1..20)) {
                                 newAttributeValue = newValue
-                            } else {
-                                // Show error message if value is not between 1 and 20
-                                // TODO: Implement error message display
                             }
                         },
-                        label = "Value",
-                        keyboardType = KeyboardType.Number,
-                        numberOnly = true
+                        label = { Text("Value") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .onFocusChanged { focusState ->
+                                if (!focusState.isFocused && isValueFieldFocused) {
+                                    // When losing focus, if empty or invalid, set to default
+                                    val currentValue = newAttributeValue.toIntOrNull()
+                                    if (currentValue == null || currentValue !in 1..20) {
+                                        newAttributeValue = "10"
+                                    }
+                                }
+                                isValueFieldFocused = focusState.isFocused
+                            },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                            focusedLabelColor = MaterialTheme.colorScheme.primary,
+                            unfocusedLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        ),
+                        shape = RoundedCornerShape(12.dp)
                     )
                 }
             },
