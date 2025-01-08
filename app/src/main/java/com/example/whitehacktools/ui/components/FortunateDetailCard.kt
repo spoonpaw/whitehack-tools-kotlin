@@ -164,11 +164,26 @@ fun FortunateDetailCard(
                         )
 
                         if (character.fortunateOptions.standing.isNotEmpty()) {
-                            Text(
-                                text = character.fortunateOptions.standing,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surface
+                                ),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+                            ) {
+                                Text(
+                                    text = character.fortunateOptions.standing,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(12.dp),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
 
                             Column(
                                 modifier = Modifier.fillMaxWidth(),
@@ -287,11 +302,26 @@ fun FortunateDetailCard(
                         )
 
                         if (character.fortunateOptions.signatureObject.name.isNotEmpty()) {
-                            Text(
-                                text = character.fortunateOptions.signatureObject.name,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surface
+                                ),
+                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary)
+                            ) {
+                                Text(
+                                    text = character.fortunateOptions.signatureObject.name,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Medium,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(12.dp),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
                         } else {
                             Text(
                                 text = "Empty",
