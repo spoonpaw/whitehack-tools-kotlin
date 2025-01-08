@@ -27,30 +27,31 @@ private val characterClasses = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharacterFormScreen(
-    initialName: String = "",
-    initialPlayerName: String = "",
-    initialLevel: Int = 1,
-    initialCharacterClass: String = "Deft",
-    initialVocation: String = "",
-    initialSpecies: String = "",
-    initialAffiliations: List<String> = emptyList(),
-    initialLanguages: List<String> = emptyList(),
-    initialCurrentHP: Int = 10,
-    initialMaxHP: Int = 10,
-    initialMovement: Int = 30,
-    initialSaveColor: String = "",
-    initialGoldOnHand: Int = 0,
-    initialStashedGold: Int = 0,
-    initialExperience: Int = 0,
-    initialCorruption: Int = 0,
-    initialNotes: String = "",
-    initialStrength: Int = 10,
-    initialAgility: Int = 10,
-    initialToughness: Int = 10,
-    initialIntelligence: Int = 10,
-    initialWillpower: Int = 10,
-    initialCharisma: Int = 10,
-    initialUseDefaultAttributes: Boolean = true,
+    id: String = "",
+    initialName: String,
+    initialPlayerName: String,
+    initialCharacterClass: String,
+    initialLevel: Int,
+    initialVocation: String,
+    initialSpecies: String,
+    initialAffiliations: List<String>,
+    initialLanguages: List<String>,
+    initialUseDefaultAttributes: Boolean,
+    initialStrength: Int,
+    initialAgility: Int,
+    initialToughness: Int,
+    initialIntelligence: Int,
+    initialWillpower: Int,
+    initialCharisma: Int,
+    initialCurrentHP: Int,
+    initialMaxHP: Int,
+    initialMovement: Int,
+    initialSaveColor: String,
+    initialCoinsOnHand: Int,
+    initialStashedCoins: Int,
+    initialExperience: Int,
+    initialCorruption: Int,
+    initialNotes: String,
     initialCustomAttributeArray: AttributeArray? = null,
     initialAttributeGroupPairs: List<AttributeGroupPair> = emptyList(),
     initialAttunementSlots: List<AttunementSlot> = emptyList(),
@@ -91,8 +92,8 @@ fun CharacterFormScreen(
     var maxHP by remember { mutableStateOf(initialMaxHP.toString()) }
     var movement by remember { mutableStateOf(initialMovement.toString()) }
     var saveColor by remember { mutableStateOf(initialSaveColor) }
-    var goldOnHand by remember { mutableStateOf(initialGoldOnHand.toString()) }
-    var stashedGold by remember { mutableStateOf(initialStashedGold.toString()) }
+    var coinsOnHand by remember { mutableStateOf(initialCoinsOnHand.toString()) }
+    var stashedCoins by remember { mutableStateOf(initialStashedCoins.toString()) }
     var experience by remember { mutableStateOf(initialExperience.toString()) }
     var corruption by remember { mutableStateOf(initialCorruption.toString()) }
     var notes by remember { mutableStateOf(initialNotes) }
@@ -128,6 +129,7 @@ fun CharacterFormScreen(
     // Create a temporary character for class-specific forms
     var tempCharacter by remember { mutableStateOf(
         PlayerCharacter(
+            id = id,
             name = name,
             playerName = playerName,
             characterClass = characterClass,
@@ -140,8 +142,8 @@ fun CharacterFormScreen(
             maxHP = maxHP.toIntOrNull() ?: 10,
             movement = movement.toIntOrNull() ?: 30,
             saveColor = saveColor,
-            goldOnHand = goldOnHand.toIntOrNull() ?: 0,
-            stashedGold = stashedGold.toIntOrNull() ?: 0,
+            coinsOnHand = coinsOnHand.toIntOrNull() ?: 0,
+            stashedCoins = stashedCoins.toIntOrNull() ?: 0,
             experience = experience.toIntOrNull() ?: 0,
             corruption = corruption.toIntOrNull() ?: 0,
             notes = notes,
@@ -171,13 +173,14 @@ fun CharacterFormScreen(
     LaunchedEffect(
         name, playerName, characterClass, level, vocation, species,
         affiliations, languages, currentHP, maxHP, movement, saveColor,
-        goldOnHand, stashedGold, experience, corruption, notes,
+        coinsOnHand, stashedCoins, experience, corruption, notes,
         useDefaultAttributes, strength, agility, toughness, intelligence,
         willpower, charisma, customAttributeArray, attributeGroupPairs, attunementSlots,
         strongCombatOptions, conflictLoot, wiseMiracleSlots, braveAbilities, cleverAbilities,
         fortunateOptions, weapons, armor, gear
     ) {
         tempCharacter = PlayerCharacter(
+            id = id,
             name = name,
             playerName = playerName,
             characterClass = characterClass,
@@ -190,8 +193,8 @@ fun CharacterFormScreen(
             maxHP = maxHP.toIntOrNull() ?: 10,
             movement = movement.toIntOrNull() ?: 30,
             saveColor = saveColor,
-            goldOnHand = goldOnHand.toIntOrNull() ?: 0,
-            stashedGold = stashedGold.toIntOrNull() ?: 0,
+            coinsOnHand = coinsOnHand.toIntOrNull() ?: 0,
+            stashedCoins = stashedCoins.toIntOrNull() ?: 0,
             experience = experience.toIntOrNull() ?: 0,
             corruption = corruption.toIntOrNull() ?: 0,
             notes = notes,
@@ -232,6 +235,7 @@ fun CharacterFormScreen(
                         onClick = {
                             onSave(
                                 PlayerCharacter(
+                                    id = id,
                                     name = name,
                                     playerName = playerName,
                                     characterClass = characterClass,
@@ -244,8 +248,8 @@ fun CharacterFormScreen(
                                     maxHP = maxHP.toIntOrNull() ?: 10,
                                     movement = movement.toIntOrNull() ?: 30,
                                     saveColor = saveColor,
-                                    goldOnHand = goldOnHand.toIntOrNull() ?: 0,
-                                    stashedGold = stashedGold.toIntOrNull() ?: 0,
+                                    coinsOnHand = coinsOnHand.toIntOrNull() ?: 0,
+                                    stashedCoins = stashedCoins.toIntOrNull() ?: 0,
                                     experience = experience.toIntOrNull() ?: 0,
                                     corruption = corruption.toIntOrNull() ?: 0,
                                     notes = notes,
@@ -468,10 +472,10 @@ fun CharacterFormScreen(
                         Spacer(modifier = Modifier.height(16.dp))
                         
                         GoldFormCard(
-                            goldOnHand = goldOnHand,
-                            onGoldOnHandChange = { goldOnHand = it },
-                            stashedGold = stashedGold,
-                            onStashedGoldChange = { stashedGold = it },
+                            coinsOnHand = coinsOnHand,
+                            onCoinsOnHandChange = { coinsOnHand = it },
+                            stashedCoins = stashedCoins,
+                            onStashedCoinsChange = { stashedCoins = it },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }

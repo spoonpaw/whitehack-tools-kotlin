@@ -107,76 +107,153 @@ fun AppNavigation(
             val characterId = backStackEntry.arguments?.getString("characterId") ?: return@composable
             val tabName = backStackEntry.arguments?.getString("tab") ?: CharacterTab.Info.name
             val selectedTab = CharacterTab.valueOf(tabName)
-            val character = if (characterId != "new") characters.value.find { it.id == characterId } else null
-
-            CharacterFormScreen(
-                initialName = character?.name ?: "",
-                initialPlayerName = character?.playerName ?: "",
-                initialLevel = character?.level ?: 1,
-                initialCharacterClass = character?.characterClass ?: "Deft",
-                initialVocation = character?.vocation ?: "",
-                initialSpecies = character?.species ?: "",
-                initialAffiliations = character?.affiliations ?: emptyList(),
-                initialLanguages = character?.languages ?: emptyList(),
-                initialCurrentHP = character?.currentHP ?: 10,
-                initialMaxHP = character?.maxHP ?: 10,
-                initialMovement = character?.movement ?: 30,
-                initialSaveColor = character?.saveColor ?: "",
-                initialGoldOnHand = character?.goldOnHand ?: 0,
-                initialStashedGold = character?.stashedGold ?: 0,
-                initialStrength = character?.strength ?: 10,
-                initialAgility = character?.agility ?: 10,
-                initialToughness = character?.toughness ?: 10,
-                initialIntelligence = character?.intelligence ?: 10,
-                initialWillpower = character?.willpower ?: 10,
-                initialCharisma = character?.charisma ?: 10,
-                initialUseDefaultAttributes = character?.useDefaultAttributes ?: true,
-                initialCustomAttributeArray = character?.customAttributeArray,
-                initialAttributeGroupPairs = character?.attributeGroupPairs ?: emptyList(),
-                initialAttunementSlots = character?.attunementSlots ?: emptyList(),
-                initialStrongCombatOptions = character?.strongCombatOptions,
-                initialConflictLoot = character?.conflictLoot,
-                initialWiseMiracleSlots = character?.wiseMiracleSlots ?: emptyList(),
-                initialBraveAbilities = character?.braveAbilities ?: BraveAbilities(),
-                initialCleverAbilities = character?.cleverAbilities ?: CleverAbilities(),
-                initialFortunateOptions = character?.fortunateOptions ?: FortunateOptions(),
-                initialWeapons = character?.weapons ?: emptyList(),
-                initialArmor = character?.armor ?: emptyList(),
-                initialGear = character?.gear ?: emptyList(),
-                initialTab = selectedTab,
-                onNavigateBack = { tab -> 
-                    if (characterId == "new") {
-                        navController.navigate(Screen.CharacterList.route) {
-                            popUpTo(Screen.CharacterList.route) { inclusive = true }
-                        }
-                    } else {
-                        navController.navigate(Screen.CharacterDetail.createRoute(characterId, tab)) {
-                            popUpTo(Screen.CharacterList.route)
-                        }
-                    }
-                },
-                onSave = { newCharacterData, tab ->
-                    scope.launch {
-                        if (characterId != "new") {
-                            // Update existing character
-                            val updatedCharacters = characters.value.map { existingChar ->
-                                if (existingChar.id == characterId) newCharacterData.copy(id = characterId) else existingChar
+            navController.previousBackStackEntry?.savedStateHandle?.get<PlayerCharacter>("character")?.let { character ->
+                CharacterFormScreen(
+                    id = character.id,
+                    initialName = character.name,
+                    initialPlayerName = character.playerName,
+                    initialCharacterClass = character.characterClass,
+                    initialLevel = character.level,
+                    initialVocation = character.vocation,
+                    initialSpecies = character.species,
+                    initialAffiliations = character.affiliations,
+                    initialLanguages = character.languages,
+                    initialUseDefaultAttributes = character.useDefaultAttributes,
+                    initialStrength = character.strength,
+                    initialAgility = character.agility,
+                    initialToughness = character.toughness,
+                    initialIntelligence = character.intelligence,
+                    initialWillpower = character.willpower,
+                    initialCharisma = character.charisma,
+                    initialCurrentHP = character.currentHP,
+                    initialMaxHP = character.maxHP,
+                    initialMovement = character.movement,
+                    initialSaveColor = character.saveColor,
+                    initialCoinsOnHand = character.coinsOnHand,
+                    initialStashedCoins = character.stashedCoins,
+                    initialExperience = character.experience,
+                    initialCorruption = character.corruption,
+                    initialNotes = character.notes,
+                    initialAttributeGroupPairs = character.attributeGroupPairs ?: emptyList(),
+                    initialAttunementSlots = character.attunementSlots ?: emptyList(),
+                    initialStrongCombatOptions = character.strongCombatOptions,
+                    initialConflictLoot = character.conflictLoot,
+                    initialWiseMiracleSlots = character.wiseMiracleSlots ?: emptyList(),
+                    initialBraveAbilities = character.braveAbilities ?: BraveAbilities(),
+                    initialCleverAbilities = character.cleverAbilities ?: CleverAbilities(),
+                    initialFortunateOptions = character.fortunateOptions ?: FortunateOptions(),
+                    initialWeapons = character.weapons ?: emptyList(),
+                    initialArmor = character.armor ?: emptyList(),
+                    initialGear = character.gear ?: emptyList(),
+                    initialTab = selectedTab,
+                    onNavigateBack = { tab -> 
+                        if (characterId == "new") {
+                            navController.navigate(Screen.CharacterList.route) {
+                                popUpTo(Screen.CharacterList.route) { inclusive = true }
                             }
-                            characterStore.saveCharacters(updatedCharacters)
+                        } else {
                             navController.navigate(Screen.CharacterDetail.createRoute(characterId, tab)) {
                                 popUpTo(Screen.CharacterList.route)
                             }
-                        } else {
-                            // Create new character
-                            val newCharacter = newCharacterData.copy(id = UUID.randomUUID().toString())
-                            characterStore.saveCharacters(characters.value + newCharacter)
-                            navController.navigate(Screen.CharacterDetail.createRoute(newCharacter.id, tab)) {
-                                popUpTo(Screen.CharacterList.route)
+                        }
+                    },
+                    onSave = { newCharacterData, tab ->
+                        scope.launch {
+                            if (characterId != "new") {
+                                // Update existing character
+                                val updatedCharacters = characters.value.map { existingChar ->
+                                    if (existingChar.id == characterId) newCharacterData.copy(id = characterId) else existingChar
+                                }
+                                characterStore.saveCharacters(updatedCharacters)
+                                navController.navigate(Screen.CharacterDetail.createRoute(characterId, tab)) {
+                                    popUpTo(Screen.CharacterList.route)
+                                }
+                            } else {
+                                // Create new character
+                                val newCharacter = newCharacterData.copy(id = UUID.randomUUID().toString())
+                                characterStore.saveCharacters(characters.value + newCharacter)
+                                navController.navigate(Screen.CharacterDetail.createRoute(newCharacter.id, tab)) {
+                                    popUpTo(Screen.CharacterList.route)
+                                }
                             }
                         }
                     }
-                }
-            )
+                )
+            } ?: run {
+                val character = if (characterId != "new") characters.value.find { it.id == characterId } else null
+
+                CharacterFormScreen(
+                    id = character?.id ?: "",
+                    initialName = character?.name ?: "",
+                    initialPlayerName = character?.playerName ?: "",
+                    initialCharacterClass = character?.characterClass ?: "Deft",
+                    initialLevel = character?.level ?: 1,
+                    initialVocation = character?.vocation ?: "",
+                    initialSpecies = character?.species ?: "",
+                    initialAffiliations = character?.affiliations ?: emptyList(),
+                    initialLanguages = character?.languages ?: emptyList(),
+                    initialUseDefaultAttributes = character?.useDefaultAttributes ?: true,
+                    initialStrength = character?.strength ?: 10,
+                    initialAgility = character?.agility ?: 10,
+                    initialToughness = character?.toughness ?: 10,
+                    initialIntelligence = character?.intelligence ?: 10,
+                    initialWillpower = character?.willpower ?: 10,
+                    initialCharisma = character?.charisma ?: 10,
+                    initialCurrentHP = character?.currentHP ?: 10,
+                    initialMaxHP = character?.maxHP ?: 10,
+                    initialMovement = character?.movement ?: 30,
+                    initialSaveColor = character?.saveColor ?: "",
+                    initialCoinsOnHand = character?.coinsOnHand ?: 0,
+                    initialStashedCoins = character?.stashedCoins ?: 0,
+                    initialExperience = character?.experience ?: 0,
+                    initialCorruption = character?.corruption ?: 0,
+                    initialNotes = character?.notes ?: "",
+                    initialAttributeGroupPairs = character?.attributeGroupPairs ?: emptyList(),
+                    initialAttunementSlots = character?.attunementSlots ?: emptyList(),
+                    initialStrongCombatOptions = character?.strongCombatOptions,
+                    initialConflictLoot = character?.conflictLoot,
+                    initialWiseMiracleSlots = character?.wiseMiracleSlots ?: emptyList(),
+                    initialBraveAbilities = character?.braveAbilities ?: BraveAbilities(),
+                    initialCleverAbilities = character?.cleverAbilities ?: CleverAbilities(),
+                    initialFortunateOptions = character?.fortunateOptions ?: FortunateOptions(),
+                    initialWeapons = character?.weapons ?: emptyList(),
+                    initialArmor = character?.armor ?: emptyList(),
+                    initialGear = character?.gear ?: emptyList(),
+                    initialTab = selectedTab,
+                    onNavigateBack = { tab -> 
+                        if (characterId == "new") {
+                            navController.navigate(Screen.CharacterList.route) {
+                                popUpTo(Screen.CharacterList.route) { inclusive = true }
+                            }
+                        } else {
+                            navController.navigate(Screen.CharacterDetail.createRoute(characterId, tab)) {
+                                popUpTo(Screen.CharacterList.route)
+                            }
+                        }
+                    },
+                    onSave = { newCharacterData, tab ->
+                        scope.launch {
+                            if (characterId != "new") {
+                                // Update existing character
+                                val updatedCharacters = characters.value.map { existingChar ->
+                                    if (existingChar.id == characterId) newCharacterData.copy(id = characterId) else existingChar
+                                }
+                                characterStore.saveCharacters(updatedCharacters)
+                                navController.navigate(Screen.CharacterDetail.createRoute(characterId, tab)) {
+                                    popUpTo(Screen.CharacterList.route)
+                                }
+                            } else {
+                                // Create new character
+                                val newCharacter = newCharacterData.copy(id = UUID.randomUUID().toString())
+                                characterStore.saveCharacters(characters.value + newCharacter)
+                                navController.navigate(Screen.CharacterDetail.createRoute(newCharacter.id, tab)) {
+                                    popUpTo(Screen.CharacterList.route)
+                                }
+                            }
+                        }
+                    }
+                )
+            }
         }
     }
 }

@@ -13,37 +13,38 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GoldFormCard(
-    goldOnHand: String,
-    onGoldOnHandChange: (String) -> Unit,
-    stashedGold: String,
-    onStashedGoldChange: (String) -> Unit,
+    coinsOnHand: String,
+    onCoinsOnHandChange: (String) -> Unit,
+    stashedCoins: String,
+    onStashedCoinsChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val totalGold = (goldOnHand.toIntOrNull() ?: 0) + (stashedGold.toIntOrNull() ?: 0)
+    val totalGold = (coinsOnHand.toIntOrNull() ?: 0) + (stashedCoins.toIntOrNull() ?: 0)
 
     SectionCard(
         title = "Gold",
         modifier = modifier
     ) {
-        FormField(
-            value = goldOnHand,
-            onValueChange = onGoldOnHandChange,
-            label = "Gold on Hand",
-            keyboardType = KeyboardType.Number,
-            numberOnly = true
-        )
-        
-        FormField(
-            value = stashedGold,
-            onValueChange = onStashedGoldChange,
-            label = "Stashed Gold",
-            keyboardType = KeyboardType.Number,
-            numberOnly = true
-        )
-        
-        DetailItem(
-            label = "Total Gold",
-            value = totalGold.toString()
-        )
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            FormField(
+                value = coinsOnHand,
+                onValueChange = onCoinsOnHandChange,
+                label = "Gold on Hand",
+                keyboardType = KeyboardType.Number
+            )
+            FormField(
+                value = stashedCoins,
+                onValueChange = onStashedCoinsChange,
+                label = "Stashed Gold",
+                keyboardType = KeyboardType.Number
+            )
+            DetailItem(
+                label = "Total Gold",
+                value = totalGold.toString()
+            )
+        }
     }
 }

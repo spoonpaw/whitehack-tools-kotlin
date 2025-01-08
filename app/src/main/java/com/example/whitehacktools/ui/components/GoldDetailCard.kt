@@ -2,32 +2,28 @@ package com.example.whitehacktools.ui.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.example.whitehacktools.model.PlayerCharacter
 
 @Composable
 fun GoldDetailCard(
-    goldOnHand: Int,
-    stashedGold: Int,
+    character: PlayerCharacter,
     modifier: Modifier = Modifier
 ) {
-    val totalGold = goldOnHand + stashedGold
-
     SectionCard(
         title = "Gold",
         modifier = modifier
     ) {
         DetailItem(
             label = "Gold on Hand",
-            value = goldOnHand.toString()
+            value = character.coinsOnHand.toString()
         )
-        
         DetailItem(
             label = "Stashed Gold",
-            value = stashedGold.toString()
+            value = character.stashedCoins.toString()
         )
-        
         DetailItem(
             label = "Total Gold",
-            value = totalGold.toString()
+            value = (character.coinsOnHand + character.stashedCoins).toString()
         )
     }
 }

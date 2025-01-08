@@ -190,8 +190,7 @@ fun CharacterDetailScreen(
                                 modifier = Modifier.fillMaxWidth()
                             )
                             GoldDetailCard(
-                                goldOnHand = character.goldOnHand,
-                                stashedGold = character.stashedGold,
+                                character = character,
                                 modifier = Modifier.fillMaxWidth()
                             )
                             EncumbranceDetailCard(

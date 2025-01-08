@@ -285,6 +285,10 @@ fun EncumbranceDetailCard(
                     )
                 }
             }
+            DetailItem(
+                label = "Total Gold",
+                value = (character.coinsOnHand + character.stashedCoins).toString()
+            )
         }
     }
 }
@@ -345,8 +349,8 @@ private fun calculateUsedSlots(character: PlayerCharacter): Double {
     }
     
     // Add coins (100 coins = 1 slot)
-    val coinSlots = character.goldOnHand.toDouble() / 100.0
-    Log.d("Encumbrance", "Coins: ${character.goldOnHand} coins = $coinSlots slots")
+    val coinSlots = character.coinsOnHand.toDouble() / 100.0
+    Log.d("Encumbrance", "Coins: ${character.coinsOnHand} coins = $coinSlots slots")
     total += coinSlots
     
     Log.d("Encumbrance", "Total used slots: $total")

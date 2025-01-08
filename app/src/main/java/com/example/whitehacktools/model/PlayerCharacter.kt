@@ -94,13 +94,10 @@ data class PlayerCharacter(
     val movement: Int = 30,
     val initiativeBonus: Int = 0,
     val savingValue: Int = 7,
-    val _saveValue: Int? = null,    // Swift format
     val saveColor: String = "",
     // Equipment
-    val goldOnHand: Int = 0,
-    val stashedGold: Int = 0,
-    val coinsOnHand: Int? = null,   // Swift format
-    val stashedCoins: Int? = null,  // Swift format
+    val coinsOnHand: Int = 0,
+    val stashedCoins: Int = 0,
     @Contextual
     val weapons: List<Weapon> = emptyList(),
     @Contextual
