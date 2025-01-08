@@ -61,7 +61,7 @@ fun CharacterFormScreen(
     initialBraveQuirkOptions: BraveQuirkOptions = BraveQuirkOptions(),
     initialComebackDice: Int = 0,
     initialHasUsedSayNo: Boolean = false,
-    initialCleverAbilities: CleverAbilities = CleverAbilities(),
+    initialCleverKnackOptions: CleverKnackOptions = CleverKnackOptions(),
     initialFortunateOptions: FortunateOptions = FortunateOptions(),
     initialWeapons: List<Weapon> = emptyList(),
     initialArmor: List<Armor> = emptyList(),
@@ -125,7 +125,7 @@ fun CharacterFormScreen(
     var hasUsedSayNo by remember { mutableStateOf(initialHasUsedSayNo) }
 
     // Clever Features
-    var cleverAbilities by remember { mutableStateOf(initialCleverAbilities) }
+    var cleverKnackOptions by remember { mutableStateOf(initialCleverKnackOptions) }
 
     // Fortunate Features
     var fortunateOptions by remember { mutableStateOf(initialFortunateOptions) }
@@ -167,7 +167,7 @@ fun CharacterFormScreen(
             braveQuirkOptions = braveQuirkOptions,
             comebackDice = comebackDice,
             hasUsedSayNo = hasUsedSayNo,
-            cleverAbilities = cleverAbilities,
+            cleverKnackOptions = cleverKnackOptions,
             fortunateOptions = fortunateOptions,
             weapons = weapons,
             armor = armor,
@@ -182,7 +182,7 @@ fun CharacterFormScreen(
         coinsOnHand, stashedCoins, experience, corruption, notes,
         useDefaultAttributes, strength, agility, toughness, intelligence,
         willpower, charisma, customAttributeArray, attributeGroupPairs, attunementSlots,
-        strongCombatOptions, conflictLoot, wiseMiracleSlots, braveQuirkOptions, comebackDice, hasUsedSayNo, cleverAbilities, fortunateOptions, weapons, armor, gear
+        strongCombatOptions, conflictLoot, wiseMiracleSlots, braveQuirkOptions, comebackDice, hasUsedSayNo, cleverKnackOptions, fortunateOptions, weapons, armor, gear
     ) {
         tempCharacter = PlayerCharacter(
             id = id,
@@ -219,7 +219,7 @@ fun CharacterFormScreen(
             braveQuirkOptions = braveQuirkOptions,
             comebackDice = comebackDice,
             hasUsedSayNo = hasUsedSayNo,
-            cleverAbilities = cleverAbilities,
+            cleverKnackOptions = cleverKnackOptions,
             fortunateOptions = fortunateOptions,
             weapons = weapons,
             armor = armor,
@@ -276,7 +276,7 @@ fun CharacterFormScreen(
                                     braveQuirkOptions = braveQuirkOptions,
                                     comebackDice = comebackDice,
                                     hasUsedSayNo = hasUsedSayNo,
-                                    cleverAbilities = cleverAbilities,
+                                    cleverKnackOptions = cleverKnackOptions,
                                     fortunateOptions = fortunateOptions.updateForLevel(level.toIntOrNull() ?: 1),
                                     weapons = weapons,
                                     armor = armor,
@@ -420,8 +420,10 @@ fun CharacterFormScreen(
                             "Clever" -> CleverFormCard(
                                 characterClass = characterClass,
                                 level = level.toIntOrNull() ?: 1,
-                                cleverAbilities = cleverAbilities,
-                                onCleverAbilitiesChanged = { cleverAbilities = it },
+                                cleverKnackOptions = cleverKnackOptions,
+                                onCleverKnackOptionsChanged = { newOptions ->
+                                    cleverKnackOptions = newOptions
+                                },
                                 modifier = Modifier.fillMaxWidth()
                             )
                             "Fortunate" -> FortunateFormCard(

@@ -159,7 +159,10 @@ fun CharacterDetailScreen(
                                     modifier = Modifier.fillMaxWidth()
                                 )
                                 "Brave" -> BraveDetailCard(character = character, modifier = Modifier.fillMaxWidth())
-                                "Clever" -> CleverDetailCard(character = character, modifier = Modifier.fillMaxWidth())
+                                "Clever" -> CleverDetailCard(
+                                    character = character,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
                                 "Fortunate" -> FortunateDetailCard(character = character, modifier = Modifier.fillMaxWidth())
                             }
                             
