@@ -3,7 +3,13 @@ package com.example.whitehacktools.ui.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -15,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.example.whitehacktools.model.GroupType
 import com.example.whitehacktools.model.PlayerCharacter
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AttributesDetailCard(
     character: PlayerCharacter,
@@ -54,21 +60,33 @@ fun AttributesDetailCard(
                 )
             } else {
                 val attributesList = attributes.toList()
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    maxItemsInEachRow = 2
-                ) {
-                    attributesList.forEach { (name, value) ->
-                        AttributeCard(
-                            name = name,
-                            value = value.toString(),
-                            groups = character.attributeGroupPairs.filter { it.effectiveAttributeName == name },
-                            character = character,
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(4.dp)
-                        )
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    attributesList.chunked(2).forEach { rowPair ->
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .let { if (rowPair.size == 1) it.width(180.dp) else it.fillMaxWidth() }
+                                    .height(IntrinsicSize.Min),
+                                horizontalArrangement = Arrangement.SpaceEvenly
+                            ) {
+                                rowPair.forEach { (name, value) ->
+                                    AttributeCard(
+                                        name = name,
+                                        value = value.toString(),
+                                        groups = character.attributeGroupPairs.filter { it.effectiveAttributeName == name },
+                                        character = character,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(4.dp)
+                                            .fillMaxHeight()
+                                    )
+                                }
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
             }
