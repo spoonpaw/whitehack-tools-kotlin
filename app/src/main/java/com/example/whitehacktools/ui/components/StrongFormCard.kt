@@ -31,18 +31,18 @@ fun StrongFormCard(
             AdvancementTables.stats("Strong", level).slots
         }
 
-        // Initialize or resize options list if needed
+        // Initialize or resize slots list if needed
         LaunchedEffect(availableSlots) {
-            if (strongCombatOptions.options.size < 4) {
+            if (strongCombatOptions.slots.size < 4) {
                 // Create a new list with 4 slots, copying over existing values
-                val newOptions = List(4) { index ->
-                    if (index < strongCombatOptions.options.size) {
-                        strongCombatOptions.options[index]
+                val newSlots = List(4) { index ->
+                    if (index < strongCombatOptions.slots.size) {
+                        strongCombatOptions.slots[index]
                     } else {
                         null
                     }
                 }
-                onStrongCombatOptionsChanged(strongCombatOptions.copy(options = newOptions))
+                onStrongCombatOptionsChanged(StrongCombatOptions(_slots = newSlots))
             }
         }
 
@@ -88,12 +88,12 @@ fun StrongFormCard(
                                 verticalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 Text(
-                                    text = "Option ${index + 1}",
+                                    text = "Slot ${index + 1}",
                                     style = MaterialTheme.typography.titleSmall,
                                     fontWeight = FontWeight.Medium
                                 )
 
-                                val currentOption = strongCombatOptions.getOption(index)
+                                val currentSlot = strongCombatOptions.slots[index]
                                 var expanded by remember { mutableStateOf(false) }
                                 
                                 ExposedDropdownMenuBox(
@@ -102,7 +102,7 @@ fun StrongFormCard(
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     OutlinedTextField(
-                                        value = currentOption?.toString() ?: "Select a Combat Option",
+                                        value = currentSlot?.toString() ?: "Select a Slot",
                                         onValueChange = { },
                                         readOnly = true,
                                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -115,14 +115,7 @@ fun StrongFormCard(
                                         expanded = expanded,
                                         onDismissRequest = { expanded = false }
                                     ) {
-                                        StrongCombatOption.values().filter { option ->
-                                            // Only filter out options that are selected in visible slots
-                                            val selectedInVisibleSlots = strongCombatOptions.options
-                                                .take(availableSlots)
-                                                .filterIndexed { i, _ -> i != index }
-                                                .contains(option)
-                                            !selectedInVisibleSlots || option == currentOption
-                                        }.forEach { option ->
+                                        StrongCombatOption.values().forEach { option ->
                                             DropdownMenuItem(
                                                 text = {
                                                     Column {
@@ -135,20 +128,20 @@ fun StrongFormCard(
                                                     }
                                                 },
                                                 onClick = {
-                                                    var updatedOptions = strongCombatOptions.options.toMutableList()
+                                                    val updatedSlots = strongCombatOptions.slots.toMutableList()
                                                     
                                                     // If this option is selected in a hidden slot, clear that slot
-                                                    val hiddenIndex = updatedOptions
+                                                    val hiddenIndex = updatedSlots
                                                         .drop(availableSlots)
                                                         .indexOfFirst { it == option }
                                                     if (hiddenIndex != -1) {
-                                                        updatedOptions[hiddenIndex + availableSlots] = null
+                                                        updatedSlots[hiddenIndex + availableSlots] = null
                                                     }
                                                     
                                                     // Set the new option for this slot
-                                                    updatedOptions[index] = option
+                                                    updatedSlots[index] = option
                                                     
-                                                    onStrongCombatOptionsChanged(strongCombatOptions.copy(options = updatedOptions))
+                                                    onStrongCombatOptionsChanged(StrongCombatOptions(_slots = updatedSlots))
                                                     expanded = false
                                                 }
                                             )
@@ -156,9 +149,9 @@ fun StrongFormCard(
                                     }
                                 }
 
-                                if (currentOption != null) {
+                                if (currentSlot != null) {
                                     Text(
-                                        text = currentOption.description,
+                                        text = currentSlot.description,
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                                     )

@@ -115,9 +115,9 @@ data class PlayerCharacter(
         AttunementSlot()
     ),
     // Strong Features
-    @Serializable
-    val strongCombatOptions: StrongCombatOptions? = null,
-    @Serializable
+    @SerialName("strongCombatOptions")
+    val strongCombatOptions: StrongCombatOptions = StrongCombatOptions(),
+    @SerialName("currentConflictLoot")
     val conflictLoot: ConflictLoot? = null,
     // Deft Features
     val attunements: List<Attunement> = emptyList(),

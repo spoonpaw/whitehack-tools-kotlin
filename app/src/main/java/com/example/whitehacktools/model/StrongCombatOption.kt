@@ -1,16 +1,25 @@
 package com.example.whitehacktools.model
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName
 
 @Serializable
 enum class StrongCombatOption {
+    @SerialName("0")
     PROTECT_ALLY,
+    @SerialName("1")
     FORCE_MOVEMENT,
+    @SerialName("2")
     CLIMB_OPPONENTS,
+    @SerialName("3")
     SPECIAL_ATTACKS,
+    @SerialName("4")
     GRANT_ADVANTAGE,
+    @SerialName("5")
     ENCOURAGE_FRIGHTEN,
+    @SerialName("6")
     DUAL_ATTACK,
+    @SerialName("7")
     PARRY_WAIT;
 
     override fun toString(): String = when(this) {
@@ -47,32 +56,41 @@ enum class StrongCombatOption {
 
 @Serializable
 data class StrongCombatOptions(
-    val options: List<StrongCombatOption?> = List(10) { null }
+    @SerialName("slots")
+    private val _slots: List<StrongCombatOption?> = List(10) { null }
 ) {
+    // For Swift compatibility
+    val slots: List<StrongCombatOption?>
+        get() = _slots
+        
+    // For Kotlin UI backward compatibility
+    val options: List<StrongCombatOption?>
+        get() = _slots
+
     val activeOptions: List<StrongCombatOption> 
-        get() = options.filterNotNull()
+        get() = _slots.filterNotNull()
 
     fun getOption(at: Int): StrongCombatOption? = 
-        if (at < options.size) options[at] else null
+        if (at < _slots.size) _slots[at] else null
 
     fun setOption(option: StrongCombatOption?, at: Int): StrongCombatOptions {
         // Create a new list with enough capacity
-        val newOptions = options.toMutableList()
-        while (newOptions.size <= at) {
-            newOptions.add(null)
+        val newSlots = _slots.toMutableList()
+        while (newSlots.size <= at) {
+            newSlots.add(null)
         }
-        newOptions[at] = option
-        return copy(options = newOptions)
+        newSlots[at] = option
+        return copy(_slots = newSlots)
     }
 
     fun isActive(option: StrongCombatOption): Boolean =
-        options.contains(option)
+        _slots.contains(option)
 
     fun isSlotFilled(at: Int): Boolean =
-        at < options.size && options[at] != null
+        at < _slots.size && _slots[at] != null
 
     val count: Int
-        get() = options.count { it != null }
+        get() = _slots.count { it != null }
 }
 
 @Serializable
@@ -81,13 +99,6 @@ enum class ConflictLootType {
     Substance,
     Supernatural;
 
-    override fun toString(): String =
-        name.lowercase().replaceFirstChar { it.uppercase() }
+    override fun toString(): String = name.split('_')
+        .joinToString(" ") { it.lowercase().replaceFirstChar { char -> char.uppercase() } }
 }
-
-@Serializable
-data class ConflictLoot(
-    var keyword: String = "",
-    var type: ConflictLootType = ConflictLootType.Substance,
-    var usesRemaining: Int = 1
-)
