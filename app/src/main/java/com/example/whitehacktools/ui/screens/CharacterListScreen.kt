@@ -526,6 +526,16 @@ private fun CharacterListItem(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+                if (character.species.isNotBlank() || character.vocation.isNotBlank()) {
+                    Text(
+                        text = listOfNotNull(
+                            character.species.takeIf { it.isNotBlank() },
+                            character.vocation.takeIf { it.isNotBlank() }
+                        ).joinToString(" • "),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
             IconButton(onClick = onDelete) {
                 Icon(
