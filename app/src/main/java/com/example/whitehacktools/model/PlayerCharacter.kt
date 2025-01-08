@@ -99,6 +99,8 @@ data class PlayerCharacter(
             "Willpower",
             "Charisma"
         )
+
+        fun clampAttribute(value: Int): Int = value.coerceIn(1..20)
     }
 
     fun calculateInitiativeBonus(): Int {
@@ -136,6 +138,26 @@ data class PlayerCharacter(
             DEFAULT_ATTRIBUTES
         } else {
             customAttributeArray?.attributes?.keys?.toList() ?: DEFAULT_ATTRIBUTES
+        }
+    }
+
+    fun fixOutOfRangeAttributes(): PlayerCharacter {
+        return if (useDefaultAttributes) {
+            copy(
+                strength = clampAttribute(strength),
+                agility = clampAttribute(agility),
+                toughness = clampAttribute(toughness),
+                intelligence = clampAttribute(intelligence),
+                willpower = clampAttribute(willpower),
+                charisma = clampAttribute(charisma)
+            )
+        } else {
+            customAttributeArray?.let { attrArray ->
+                val fixedAttributes = attrArray.attributes.mapValues { (_, value) ->
+                    clampAttribute(value)
+                }
+                copy(customAttributeArray = attrArray.copy(attributes = fixedAttributes))
+            } ?: this
         }
     }
 }

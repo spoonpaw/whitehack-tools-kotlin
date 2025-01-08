@@ -21,7 +21,7 @@ class CharacterStore(private val context: Context) {
         .map { preferences ->
             val charactersJson = preferences[CHARACTERS_KEY] ?: "[]"
             try {
-                Json.decodeFromString<List<PlayerCharacter>>(charactersJson)
+                Json.decodeFromString<List<PlayerCharacter>>(charactersJson).map { it.fixOutOfRangeAttributes() }
             } catch (e: Exception) {
                 emptyList()
             }
@@ -29,7 +29,7 @@ class CharacterStore(private val context: Context) {
 
     suspend fun saveCharacters(characters: List<PlayerCharacter>) {
         context.dataStore.edit { preferences ->
-            preferences[CHARACTERS_KEY] = Json.encodeToString(characters)
+            preferences[CHARACTERS_KEY] = Json.encodeToString(characters.map { it.fixOutOfRangeAttributes() })
         }
     }
 }

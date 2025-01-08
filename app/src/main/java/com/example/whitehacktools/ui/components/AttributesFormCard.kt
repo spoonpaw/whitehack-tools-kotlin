@@ -111,42 +111,72 @@ fun AttributesFormCard(
             // Default attributes form
             FormField(
                 value = strength,
-                onValueChange = onStrengthChange,
+                onValueChange = { newValue ->
+                    val intValue = newValue.toIntOrNull()
+                    if (newValue.isEmpty() || (intValue != null && intValue in 1..20)) {
+                        onStrengthChange(newValue)
+                    }
+                },
                 label = "Strength",
                 keyboardType = KeyboardType.Number,
                 numberOnly = true
             )
             FormField(
                 value = agility,
-                onValueChange = onAgilityChange,
+                onValueChange = { newValue ->
+                    val intValue = newValue.toIntOrNull()
+                    if (newValue.isEmpty() || (intValue != null && intValue in 1..20)) {
+                        onAgilityChange(newValue)
+                    }
+                },
                 label = "Agility",
                 keyboardType = KeyboardType.Number,
                 numberOnly = true
             )
             FormField(
                 value = toughness,
-                onValueChange = onToughnessChange,
+                onValueChange = { newValue ->
+                    val intValue = newValue.toIntOrNull()
+                    if (newValue.isEmpty() || (intValue != null && intValue in 1..20)) {
+                        onToughnessChange(newValue)
+                    }
+                },
                 label = "Toughness",
                 keyboardType = KeyboardType.Number,
                 numberOnly = true
             )
             FormField(
                 value = intelligence,
-                onValueChange = onIntelligenceChange,
+                onValueChange = { newValue ->
+                    val intValue = newValue.toIntOrNull()
+                    if (newValue.isEmpty() || (intValue != null && intValue in 1..20)) {
+                        onIntelligenceChange(newValue)
+                    }
+                },
                 label = "Intelligence",
                 keyboardType = KeyboardType.Number,
                 numberOnly = true
             )
             FormField(
                 value = willpower,
-                onValueChange = onWillpowerChange,
+                onValueChange = { newValue ->
+                    val intValue = newValue.toIntOrNull()
+                    if (newValue.isEmpty() || (intValue != null && intValue in 1..20)) {
+                        onWillpowerChange(newValue)
+                    }
+                },
                 label = "Willpower",
                 keyboardType = KeyboardType.Number,
                 numberOnly = true
             )
             FormField(
                 value = charisma,
-                onValueChange = onCharismaChange,
+                onValueChange = { newValue ->
+                    val intValue = newValue.toIntOrNull()
+                    if (newValue.isEmpty() || (intValue != null && intValue in 1..20)) {
+                        onCharismaChange(newValue)
+                    }
+                },
                 label = "Charisma",
                 keyboardType = KeyboardType.Number,
                 numberOnly = true
@@ -173,11 +203,17 @@ fun AttributesFormCard(
                     FormField(
                         value = value.toString(),
                         onValueChange = { newValue ->
-                            val updatedAttributes = customAttributeArray.attributes.toMutableMap()
-                            updatedAttributes[name] = newValue.toIntOrNull() ?: 10
-                            onCustomAttributeArrayChange(
-                                customAttributeArray.copy(attributes = updatedAttributes)
-                            )
+                            val intValue = newValue.toIntOrNull()
+                            if (newValue.isEmpty() || (intValue != null && intValue in 1..20)) {
+                                val updatedAttributes = customAttributeArray.attributes.toMutableMap()
+                                updatedAttributes[name] = intValue ?: 10
+                                onCustomAttributeArrayChange(
+                                    customAttributeArray.copy(attributes = updatedAttributes)
+                                )
+                            } else {
+                                // Show error message if value is not between 1 and 20
+                                // TODO: Implement error message display
+                            }
                         },
                         label = name,
                         keyboardType = KeyboardType.Number,
@@ -232,7 +268,15 @@ fun AttributesFormCard(
                     )
                     FormField(
                         value = newAttributeValue,
-                        onValueChange = { newAttributeValue = it },
+                        onValueChange = { newValue ->
+                            val intValue = newValue.toIntOrNull()
+                            if (newValue.isEmpty() || (intValue != null && intValue in 1..20)) {
+                                newAttributeValue = newValue
+                            } else {
+                                // Show error message if value is not between 1 and 20
+                                // TODO: Implement error message display
+                            }
+                        },
                         label = "Value",
                         keyboardType = KeyboardType.Number,
                         numberOnly = true
