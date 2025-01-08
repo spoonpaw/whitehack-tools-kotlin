@@ -8,6 +8,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.whitehacktools.model.Gear
 
+private fun getWeightWithSlots(weight: String): String {
+    return when (weight) {
+        "No size" -> "No size (0/slot)"
+        "Minor" -> "Minor (2/slot)"
+        "Regular" -> "Regular (4/slot)"
+        "Heavy" -> "Heavy (6/slot)"
+        else -> weight
+    }
+}
+
 @Composable
 fun GearRow(
     gear: Gear,
@@ -43,7 +53,7 @@ fun GearRow(
                 )
             }
             
-            // Status
+            // Status Section
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -72,7 +82,7 @@ fun GearRow(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = gear.weight,
+                    text = getWeightWithSlots(gear.weight),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

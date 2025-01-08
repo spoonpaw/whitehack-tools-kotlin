@@ -89,7 +89,7 @@ fun ArmorRow(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "${armor.weight}",
+                    text = "${armor.weight} slots",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
