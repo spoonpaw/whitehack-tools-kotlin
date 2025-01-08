@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 
 @Composable
 fun AdditionalInfoDetailCard(
@@ -27,7 +28,8 @@ fun AdditionalInfoDetailCard(
         )
         
         if (notes.isNotBlank()) {
-            DetailItem(
+            Spacer(modifier = Modifier.height(8.dp))
+            DetailTextArea(
                 label = "Notes",
                 value = notes
             )

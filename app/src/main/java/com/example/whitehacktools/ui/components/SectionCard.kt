@@ -148,6 +148,38 @@ fun DetailItem(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun DetailTextArea(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+    valueColor: Color = MaterialTheme.colorScheme.onSurface
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = {},
+        readOnly = true,
+        label = { 
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium
+            )
+        },
+        modifier = modifier.fillMaxWidth(),
+        enabled = false,
+        colors = OutlinedTextFieldDefaults.colors(
+            disabledTextColor = valueColor,
+            disabledBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+            disabledLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+        ),
+        shape = RoundedCornerShape(12.dp),
+        minLines = 1,
+        maxLines = Int.MAX_VALUE
+    )
+}
+
 @Composable
 fun SectionCard(
     title: String,
