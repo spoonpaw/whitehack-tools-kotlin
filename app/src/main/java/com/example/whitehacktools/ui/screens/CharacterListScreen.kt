@@ -532,7 +532,7 @@ private fun CharacterListItem(
                             character.species.takeIf { it.isNotBlank() },
                             character.vocation.takeIf { it.isNotBlank() }
                         ).joinToString(" • "),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
