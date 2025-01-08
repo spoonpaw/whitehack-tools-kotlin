@@ -10,12 +10,22 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.whitehacktools.model.PlayerCharacter
-import com.example.whitehacktools.model.GroupType
 import com.example.whitehacktools.ui.components.TopBarAction
 import com.example.whitehacktools.ui.components.WhitehackTopAppBar
+import android.content.Context
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import com.example.whitehacktools.data.CharacterStore
+import kotlinx.coroutines.launch
+import android.util.Log
+import android.widget.Toast
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,11 +34,371 @@ fun CharacterListScreen(
     characters: List<PlayerCharacter> = emptyList(),
     onAddCharacter: () -> Unit = {},
     onSelectCharacter: (PlayerCharacter) -> Unit = {},
-    onImportCharacter: () -> Unit = {},
-    onExportCharacter: () -> Unit = {},
-    onDeleteCharacter: (PlayerCharacter) -> Unit = {}
+    onDeleteCharacter: (PlayerCharacter) -> Unit = {},
+    characterStore: CharacterStore
 ) {
+    val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
     var characterToDelete by remember { mutableStateOf<PlayerCharacter?>(null) }
+    var showImportDialog by remember { mutableStateOf(false) }
+    var importError by remember { mutableStateOf<String?>(null) }
+    var showExportDialog by remember { mutableStateOf(false) }
+    var selectedCharacters by remember { mutableStateOf(setOf<PlayerCharacter>()) }
+    var importedCharacters by remember { mutableStateOf<List<PlayerCharacter>>(emptyList()) }
+    var showImportSelectionDialog by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val json = Json { prettyPrint = true; ignoreUnknownKeys = true }
+
+    fun parseCharactersFromJson(jsonString: String): List<PlayerCharacter> {
+        return try {
+            // Parse and generate new IDs for each character
+            json.decodeFromString<List<PlayerCharacter>>(jsonString).map { it.copyWithNewId() }
+        } catch (e: Exception) {
+            try {
+                // Try parsing as single character and generate new ID
+                listOf(json.decodeFromString<PlayerCharacter>(jsonString).copyWithNewId())
+            } catch (e: Exception) {
+                throw Exception("Invalid character data format")
+            }
+        }
+    }
+
+    val exportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("application/json")
+    ) { uri ->
+        uri?.let { 
+            try {
+                val jsonString = json.encodeToString(selectedCharacters.toList())
+                context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                    outputStream.write(jsonString.toByteArray())
+                }
+            } catch (e: Exception) {
+                Toast.makeText(context, "Failed to export: ${e.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let {
+            try {
+                Log.d("Import", "URI selected: $uri")
+                context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                    val jsonString = inputStream.bufferedReader().readText()
+                    Log.d("Import", "JSON read: $jsonString")
+                    try {
+                        importedCharacters = parseCharactersFromJson(jsonString)
+                        Log.d("Import", "Characters parsed: ${importedCharacters.size}")
+                        showImportDialog = false
+                        showImportSelectionDialog = true
+                        selectedCharacters = emptySet()
+                        importError = null
+                    } catch (e: Exception) {
+                        Log.e("Import", "Failed to parse characters", e)
+                        importError = "Failed to parse characters: ${e.message}"
+                        Toast.makeText(context, "Failed to parse characters: ${e.message}", Toast.LENGTH_LONG).show()
+                        showImportDialog = true
+                    }
+                } ?: run {
+                    Log.e("Import", "Failed to open input stream")
+                    importError = "Failed to read file"
+                    Toast.makeText(context, "Failed to read file", Toast.LENGTH_LONG).show()
+                    showImportDialog = true
+                }
+            } catch (e: Exception) {
+                Log.e("Import", "Failed to import", e)
+                importError = "Failed to import: ${e.message}"
+                Toast.makeText(context, "Failed to import: ${e.message}", Toast.LENGTH_LONG).show()
+                showImportDialog = true
+            }
+        } ?: run {
+            Log.e("Import", "No URI selected")
+            importError = "No file selected"
+            Toast.makeText(context, "No file selected", Toast.LENGTH_LONG).show()
+            showImportDialog = true
+        }
+    }
+
+    if (showImportSelectionDialog) {
+        AlertDialog(
+            onDismissRequest = { 
+                showImportSelectionDialog = false
+                selectedCharacters = emptySet()
+                importedCharacters = emptyList()
+            },
+            title = { 
+                Text(
+                    text = "Select Characters to Import",
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        TextButton(
+                            onClick = { selectedCharacters = importedCharacters.toSet() },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Select All")
+                        }
+                        TextButton(
+                            onClick = { selectedCharacters = emptySet() },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Deselect All")
+                        }
+                    }
+                    
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 300.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        items(importedCharacters) { character ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Checkbox(
+                                    checked = character in selectedCharacters,
+                                    onCheckedChange = { checked ->
+                                        selectedCharacters = if (checked) {
+                                            selectedCharacters + character
+                                        } else {
+                                            selectedCharacters - character
+                                        }
+                                    }
+                                )
+                                Text(
+                                    text = character.name,
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (selectedCharacters.isNotEmpty()) {
+                            scope.launch {
+                                // Merge selected characters with existing ones
+                                val updatedCharacters = characters + selectedCharacters.toList()
+                                characterStore.saveCharacters(updatedCharacters)
+                                showImportSelectionDialog = false
+                                selectedCharacters = emptySet()
+                                importedCharacters = emptyList()
+                            }
+                        }
+                    },
+                    enabled = selectedCharacters.isNotEmpty()
+                ) {
+                    Text("Import")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { 
+                        showImportSelectionDialog = false
+                        selectedCharacters = emptySet()
+                        importedCharacters = emptyList()
+                    }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    if (showImportDialog) {
+        AlertDialog(
+            onDismissRequest = { 
+                showImportDialog = false
+                importError = null 
+            },
+            title = { 
+                Text(
+                    text = "Import Character",
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = "Choose how to import your character:",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                    importError?.let { error ->
+                        Text(
+                            text = error,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        FilledTonalButton(
+                            onClick = { 
+                                importLauncher.launch(arrayOf("application/json"))
+                                Log.d("Import", "Launching file picker")
+                            },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("From File")
+                        }
+                        FilledTonalButton(
+                            onClick = {
+                                clipboardManager.getText()?.text?.let { clipboardText ->
+                                    try {
+                                        importedCharacters = parseCharactersFromJson(clipboardText)
+                                        showImportDialog = false
+                                        showImportSelectionDialog = true
+                                        selectedCharacters = emptySet()
+                                        importError = null
+                                    } catch (e: Exception) {
+                                        importError = e.message ?: "Failed to import character"
+                                    }
+                                } ?: run {
+                                    importError = "No text found in clipboard"
+                                }
+                            },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("From Clipboard")
+                        }
+                    }
+                }
+            },
+            confirmButton = { },
+            dismissButton = {
+                TextButton(
+                    onClick = { 
+                        showImportDialog = false
+                        importError = null 
+                    }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+    if (showExportDialog) {
+        AlertDialog(
+            onDismissRequest = { 
+                showExportDialog = false
+                selectedCharacters = emptySet()
+            },
+            title = { 
+                Text(
+                    text = "Export Characters",
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        TextButton(
+                            onClick = { selectedCharacters = characters.toSet() },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Select All")
+                        }
+                        TextButton(
+                            onClick = { selectedCharacters = emptySet() },
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text("Deselect All")
+                        }
+                    }
+                    
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 300.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        items(characters) { character ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Checkbox(
+                                    checked = character in selectedCharacters,
+                                    onCheckedChange = { checked ->
+                                        selectedCharacters = if (checked) {
+                                            selectedCharacters + character
+                                        } else {
+                                            selectedCharacters - character
+                                        }
+                                    }
+                                )
+                                Text(
+                                    text = character.name,
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (selectedCharacters.isNotEmpty()) {
+                            exportLauncher.launch("characters.json")
+                        }
+                        showExportDialog = false
+                    },
+                    enabled = selectedCharacters.isNotEmpty()
+                ) {
+                    Text("Export")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { 
+                        showExportDialog = false
+                        selectedCharacters = emptySet()
+                    }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 
     characterToDelete?.let { character ->
         AlertDialog(
@@ -60,11 +430,15 @@ fun CharacterListScreen(
                 actions = listOf(
                     TopBarAction.TonalButtonAction(
                         text = "Import",
-                        onClick = onImportCharacter
+                        onClick = { showImportDialog = true }
                     ),
                     TopBarAction.TonalButtonAction(
                         text = "Export",
-                        onClick = onExportCharacter
+                        onClick = { 
+                            if (characters.isNotEmpty()) {
+                                showExportDialog = true
+                            }
+                        }
                     ),
                     TopBarAction.IconAction(
                         icon = Icons.Default.Add,
@@ -118,39 +492,31 @@ private fun CharacterListItem(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
-        onClick = onSelect
+        onClick = onSelect,
+        modifier = modifier.fillMaxWidth()
     ) {
         Row(
             modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = character.name,
                     style = MaterialTheme.typography.titleMedium
                 )
-                Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Level ${character.level} ${character.characterClass}",
-                    style = MaterialTheme.typography.titleMedium,
+                    text = "${character.characterClass} Level ${character.level}",
+                    style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "${character.species.ifBlank { "No Species" }} • ${character.vocation.ifBlank { "No Vocation" }}",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                 )
             }
             IconButton(onClick = onDelete) {
                 Icon(
-                    Icons.Default.Delete,
+                    imageVector = Icons.Default.Delete,
                     contentDescription = "Delete Character",
-                    modifier = Modifier.size(32.dp),
                     tint = MaterialTheme.colorScheme.error
                 )
             }

@@ -160,4 +160,13 @@ data class PlayerCharacter(
             } ?: this
         }
     }
+
+    fun copyWithNewId(): PlayerCharacter {
+        return this.copy(
+            id = UUID.randomUUID().toString(),
+            weapons = weapons.map { it.copy(id = UUID.randomUUID().toString()) },
+            armor = armor.map { it.copy(id = UUID.randomUUID().toString()) },
+            gear = gear.map { it.copy(id = UUID.randomUUID().toString()) }
+        )
+    }
 }

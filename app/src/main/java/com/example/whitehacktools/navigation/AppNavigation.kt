@@ -58,9 +58,10 @@ fun AppNavigation(
                 },
                 onDeleteCharacter = { character ->
                     scope.launch {
-                        characterStore.saveCharacters(characters.value - character)
+                        characterStore.saveCharacters(characters.value.filter { it.id != character.id })
                     }
-                }
+                },
+                characterStore = characterStore
             )
         }
 
