@@ -2,17 +2,25 @@ package com.example.whitehacktools.model
 
 import com.example.whitehacktools.utilities.AdvancementTables
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import java.util.UUID
 
-@Serializable
-enum class BraveQuirk {
-    DOUBLE_STRAIN_ROLLS,
-    IMPROVED_HEALING,
-    PROTECT_ALLY,
-    RESIST_CURSES,
-    DRAW_ATTENTION,
-    FULFILL_REQUIREMENTS,
-    DIVINE_INVOCATION,
-    IMPROVISED_WEAPONS;
+@Serializable(with = BraveQuirkSerializer::class)
+enum class BraveQuirk(val id: Int) {
+    DOUBLE_STRAIN_ROLLS(0),
+    IMPROVED_HEALING(1),
+    PROTECT_ALLY(2),
+    RESIST_CURSES(3),
+    DRAW_ATTENTION(4),
+    FULFILL_REQUIREMENTS(5),
+    DIVINE_INVOCATION(6),
+    IMPROVISED_WEAPONS(7);
 
     val displayName: String
         get() = when (this) {
@@ -40,46 +48,73 @@ enum class BraveQuirk {
 
     companion object {
         val values = values()
+        fun fromId(id: Int): BraveQuirk? = values.find { it.id == id }
+    }
+}
+
+object BraveQuirkSerializer : KSerializer<BraveQuirk> {
+    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("BraveQuirk", PrimitiveKind.INT)
+    
+    override fun serialize(encoder: Encoder, value: BraveQuirk) {
+        encoder.encodeInt(value.id)
+    }
+    
+    override fun deserialize(decoder: Decoder): BraveQuirk {
+        val id = decoder.decodeInt()
+        return BraveQuirk.fromId(id) ?: BraveQuirk.DOUBLE_STRAIN_ROLLS
     }
 }
 
 @Serializable
 data class BraveQuirkSlot(
+    @SerialName("quirk")
     val quirk: BraveQuirk? = null,
-    val protectedAllyName: String = "" // Only used if quirk is PROTECT_ALLY
+    @SerialName("protectedAllyName")
+    val protectedAllyName: String = "", // Only used if quirk is PROTECT_ALLY
+    @SerialName("id")
+    val id: String = UUID.randomUUID().toString()
+)
+
+@Serializable
+data class BraveQuirkOptions(
+    @SerialName("slots")
+    val slots: List<BraveQuirkSlot> = List(10) { BraveQuirkSlot() }
 )
 
 @Serializable
 data class BraveAbilities(
+    @SerialName("braveQuirkOptions")
+    val quirkOptions: BraveQuirkOptions = BraveQuirkOptions(),
+    @SerialName("comebackDice")
     val comebackDice: Int = 0,
-    val quirkSlots: List<BraveQuirkSlot> = List(10) { BraveQuirkSlot() }, // Max level is 10
-    val hasSayNoPower: Boolean = false
+    @SerialName("hasUsedSayNo")
+    val hasUsedSayNo: Boolean = false
 ) {
     val activeQuirks: List<BraveQuirk>
-        get() = quirkSlots.mapNotNull { it.quirk }
+        get() = quirkOptions.slots.mapNotNull { it.quirk }
 
     fun getQuirkSlot(at: Int): BraveQuirkSlot =
-        if (at < quirkSlots.size) quirkSlots[at] else BraveQuirkSlot()
+        if (at < quirkOptions.slots.size) quirkOptions.slots[at] else BraveQuirkSlot()
 
     fun setQuirkSlot(slot: BraveQuirkSlot, at: Int): BraveAbilities {
-        if (at >= quirkSlots.size) return this
-        val newSlots = quirkSlots.toMutableList()
+        if (at >= quirkOptions.slots.size) return this
+        val newSlots = quirkOptions.slots.toMutableList()
         newSlots[at] = slot
         // Ensure list size remains the same
         while (newSlots.size < 10) {
             newSlots.add(BraveQuirkSlot())
         }
-        return copy(quirkSlots = newSlots)
+        return copy(quirkOptions = BraveQuirkOptions(slots = newSlots))
     }
 
     fun isQuirkActive(quirk: BraveQuirk): Boolean =
-        quirkSlots.any { it.quirk == quirk }
+        quirkOptions.slots.any { it.quirk == quirk }
 
     fun isSlotFilled(at: Int): Boolean =
-        at < quirkSlots.size && quirkSlots[at].quirk != null
+        at < quirkOptions.slots.size && quirkOptions.slots[at].quirk != null
 
     val count: Int
-        get() = quirkSlots.count { it.quirk != null }
+        get() = quirkOptions.slots.count { it.quirk != null }
 
     fun setQuirk(at: Int, quirk: BraveQuirk?, protectedAllyName: String = ""): BraveAbilities {
         return setQuirkSlot(BraveQuirkSlot(quirk = quirk, protectedAllyName = protectedAllyName), at)
@@ -87,10 +122,10 @@ data class BraveAbilities(
 
     fun updateForLevel(level: Int): BraveAbilities {
         val availableSlots = AdvancementTables.stats("Brave", level).slots
-        val newSlots = quirkSlots.take(availableSlots).toMutableList()
+        val newSlots = quirkOptions.slots.take(availableSlots).toMutableList()
         while (newSlots.size < availableSlots) {
             newSlots.add(BraveQuirkSlot())
         }
-        return copy(quirkSlots = newSlots)
+        return copy(quirkOptions = BraveQuirkOptions(slots = newSlots))
     }
 }

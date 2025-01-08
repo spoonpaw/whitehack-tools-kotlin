@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.whitehacktools.model.BraveAbilities
 import com.example.whitehacktools.model.BraveQuirk
+import com.example.whitehacktools.model.BraveQuirkOptions
 import com.example.whitehacktools.model.BraveQuirkSlot
 import com.example.whitehacktools.utilities.AdvancementTables
 
@@ -23,8 +24,12 @@ import com.example.whitehacktools.utilities.AdvancementTables
 fun BraveFormCard(
     characterClass: String,
     level: Int,
-    braveAbilities: BraveAbilities,
-    onBraveAbilitiesChanged: (BraveAbilities) -> Unit,
+    braveQuirkOptions: BraveQuirkOptions,
+    comebackDice: Int,
+    hasUsedSayNo: Boolean,
+    onBraveQuirkOptionsChanged: (BraveQuirkOptions) -> Unit,
+    onComebackDiceChanged: (Int) -> Unit,
+    onHasUsedSayNoChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (characterClass == "Brave") {
@@ -34,16 +39,16 @@ fun BraveFormCard(
 
         // Initialize or resize quirks list if needed
         LaunchedEffect(availableSlots) {
-            if (braveAbilities.quirkSlots.size < 4) {
+            if (braveQuirkOptions.slots.size < 4) {
                 // Create a new list with 4 slots, copying over existing values
-                val newQuirks = List(4) { index ->
-                    if (index < braveAbilities.quirkSlots.size) {
-                        braveAbilities.quirkSlots[index]
+                val newSlots = List(4) { index ->
+                    if (index < braveQuirkOptions.slots.size) {
+                        braveQuirkOptions.slots[index]
                     } else {
                         BraveQuirkSlot(null, "")
                     }
                 }
-                onBraveAbilitiesChanged(braveAbilities.copy(quirkSlots = newQuirks))
+                onBraveQuirkOptionsChanged(BraveQuirkOptions(slots = newSlots))
             }
         }
 
@@ -54,205 +59,129 @@ fun BraveFormCard(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(24.dp)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                // Comeback Dice Section
-                Card(
+                // Comeback Dice
+                Row(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Text(
-                            text = "Comeback Dice",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Medium
-                        )
-
-                        var textFieldValue by remember(braveAbilities.comebackDice) { 
-                            mutableStateOf(if (braveAbilities.comebackDice == 0) "" else braveAbilities.comebackDice.toString()) 
-                        }
-                        
-                        OutlinedTextField(
-                            value = textFieldValue,
-                            onValueChange = { newValue ->
-                                if (newValue.isEmpty() || newValue.toIntOrNull() != null) {
-                                    textFieldValue = newValue
-                                    if (newValue.isNotEmpty()) {
-                                        val newDice = newValue.toIntOrNull() ?: return@OutlinedTextField
-                                        onBraveAbilitiesChanged(braveAbilities.copy(comebackDice = newDice))
-                                    }
-                                }
-                            },
-                            label = { Text("Dice") },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
+                    Text(
+                        text = "Comeback Dice:",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    OutlinedTextField(
+                        value = comebackDice.toString(),
+                        onValueChange = { newValue ->
+                            val newDice = newValue.toIntOrNull() ?: 0
+                            onComebackDiceChanged(newDice)
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.width(100.dp),
+                        textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
+                    )
                 }
 
-                // Say No Power Section
-                Card(
+                // Say No Power
+                Row(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(8.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant
-                    )
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                    Text(
+                        text = "Used Say No Power:",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Switch(
+                        checked = hasUsedSayNo,
+                        onCheckedChange = onHasUsedSayNoChanged
+                    )
+                }
+
+                // Quirks
+                Text(
+                    text = "Quirks",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                braveQuirkOptions.slots.take(availableSlots).forEachIndexed { index, slot ->
+                    var expanded by remember { mutableStateOf(false) }
+                    var protectedAllyName by remember { mutableStateOf(slot.protectedAllyName) }
+
+                    Column {
+                        ExposedDropdownMenuBox(
+                            expanded = expanded,
+                            onExpandedChange = { expanded = it }
                         ) {
-                            Text(
-                                text = "Say No Power",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Medium
+                            OutlinedTextField(
+                                value = slot.quirk?.displayName ?: "Select a Quirk",
+                                onValueChange = {},
+                                readOnly = true,
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                                modifier = Modifier
+                                    .menuAnchor()
+                                    .fillMaxWidth()
                             )
-                            
-                            Switch(
-                                checked = braveAbilities.hasSayNoPower,
-                                onCheckedChange = { isEnabled ->
-                                    onBraveAbilitiesChanged(braveAbilities.copy(hasSayNoPower = isEnabled))
+
+                            ExposedDropdownMenu(
+                                expanded = expanded,
+                                onDismissRequest = { expanded = false }
+                            ) {
+                                BraveQuirk.values().forEach { quirk ->
+                                    if (!isQuirkActive(braveQuirkOptions, quirk) || quirk == slot.quirk) {
+                                        DropdownMenuItem(
+                                            text = { Text(quirk.displayName) },
+                                            onClick = {
+                                                val newSlots = braveQuirkOptions.slots.toMutableList()
+                                                newSlots[index] = BraveQuirkSlot(quirk = quirk, protectedAllyName = protectedAllyName)
+                                                onBraveQuirkOptionsChanged(BraveQuirkOptions(slots = newSlots))
+                                                expanded = false
+                                            }
+                                        )
+                                    }
                                 }
-                            )
-                            
-                            Text(
-                                text = if (braveAbilities.hasSayNoPower) "Available" else "Used",
-                                style = MaterialTheme.typography.bodyMedium
+                                // Add option to clear selection
+                                DropdownMenuItem(
+                                    text = { Text("Clear Selection") },
+                                    onClick = {
+                                        val newSlots = braveQuirkOptions.slots.toMutableList()
+                                        newSlots[index] = BraveQuirkSlot(quirk = null, protectedAllyName = "")
+                                        onBraveQuirkOptionsChanged(BraveQuirkOptions(slots = newSlots))
+                                        expanded = false
+                                    }
+                                )
+                            }
+                        }
+
+                        // Show Protected Ally Name field if PROTECT_ALLY is selected
+                        if (slot.quirk == BraveQuirk.PROTECT_ALLY) {
+                            OutlinedTextField(
+                                value = protectedAllyName,
+                                onValueChange = { newName ->
+                                    protectedAllyName = newName
+                                    val newSlots = braveQuirkOptions.slots.toMutableList()
+                                    newSlots[index] = BraveQuirkSlot(quirk = BraveQuirk.PROTECT_ALLY, protectedAllyName = newName)
+                                    onBraveQuirkOptionsChanged(BraveQuirkOptions(slots = newSlots))
+                                },
+                                label = { Text("Protected Ally Name") },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 8.dp)
                             )
                         }
-                    }
-                }
 
-                // Quirks Section
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    shape = RoundedCornerShape(8.dp),
-                    border = BorderStroke(1.5.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    )
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        Text(
-                            text = "Quirks",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
-                        )
-
-                        repeat(availableSlots) { index ->
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(8.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                                )
-                            ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(12.dp),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    Text(
-                                        text = "Quirk ${index + 1}",
-                                        style = MaterialTheme.typography.titleSmall,
-                                        fontWeight = FontWeight.Medium
-                                    )
-
-                                    val currentQuirk = braveAbilities.quirkSlots.getOrNull(index)?.quirk
-                                    var expanded by remember { mutableStateOf(false) }
-                                    
-                                    ExposedDropdownMenuBox(
-                                        expanded = expanded,
-                                        onExpandedChange = { expanded = it },
-                                        modifier = Modifier.fillMaxWidth()
-                                    ) {
-                                        OutlinedTextField(
-                                            value = currentQuirk?.displayName ?: "",
-                                            onValueChange = { },
-                                            readOnly = true,
-                                            label = { Text("Select a Quirk") },
-                                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .menuAnchor()
-                                        )
-
-                                        ExposedDropdownMenu(
-                                            expanded = expanded,
-                                            onDismissRequest = { expanded = false }
-                                        ) {
-                                            BraveQuirk.values().filter { quirk ->
-                                                // Include if it's either the current quirk for this slot or not used in any slot
-                                                quirk == currentQuirk || !braveAbilities.quirkSlots.take(availableSlots).any { slot -> slot.quirk == quirk }
-                                            }.forEach { quirk ->
-                                                DropdownMenuItem(
-                                                    text = {
-                                                        Column {
-                                                            Text(quirk.displayName)
-                                                            Text(
-                                                                text = quirk.description,
-                                                                style = MaterialTheme.typography.bodySmall,
-                                                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                                                            )
-                                                        }
-                                                    },
-                                                    onClick = {
-                                                        onBraveAbilitiesChanged(braveAbilities.setQuirk(
-                                                            index, 
-                                                            quirk, 
-                                                            braveAbilities.quirkSlots.getOrNull(index)?.protectedAllyName ?: ""
-                                                        ))
-                                                        expanded = false
-                                                    }
-                                                )
-                                            }
-                                        }
-                                    }
-
-                                    if (currentQuirk != null) {
-                                        Text(
-                                            text = currentQuirk.description,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                                        )
-                                    }
-
-                                    if (currentQuirk == BraveQuirk.PROTECT_ALLY) {
-                                        OutlinedTextField(
-                                            value = braveAbilities.quirkSlots.getOrNull(index)?.protectedAllyName ?: "",
-                                            onValueChange = { newName ->
-                                                onBraveAbilitiesChanged(braveAbilities.setQuirk(index, currentQuirk, newName))
-                                            },
-                                            label = { Text("Protected Ally Name") },
-                                            modifier = Modifier.fillMaxWidth()
-                                        )
-                                    }
-                                }
-                            }
+                        if (slot.quirk != null) {
+                            Text(
+                                text = slot.quirk.description,
+                                style = MaterialTheme.typography.bodySmall,
+                                modifier = Modifier.padding(top = 4.dp, bottom = 8.dp)
+                            )
                         }
                     }
                 }
@@ -260,3 +189,6 @@ fun BraveFormCard(
         }
     }
 }
+
+private fun isQuirkActive(braveQuirkOptions: BraveQuirkOptions, quirk: BraveQuirk): Boolean =
+    braveQuirkOptions.slots.any { it.quirk == quirk }

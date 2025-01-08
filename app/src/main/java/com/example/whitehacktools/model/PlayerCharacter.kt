@@ -17,6 +17,7 @@ import com.example.whitehacktools.model.FortunateOptions
 import com.example.whitehacktools.model.WiseMiracle
 import com.example.whitehacktools.model.WiseMiracles
 import com.example.whitehacktools.model.WiseMiracleSlot
+import com.example.whitehacktools.model.BraveQuirkOptions
 
 @Serializable
 enum class GroupType {
@@ -124,7 +125,13 @@ data class PlayerCharacter(
     // Wise Features
     val wiseMiracleSlots: List<WiseMiracleSlot> = emptyList(),
     // Brave Features
-    val braveAbilities: BraveAbilities = BraveAbilities(),
+    @SerialName("braveQuirkOptions")
+    val braveQuirkOptions: BraveQuirkOptions = BraveQuirkOptions(),
+    @SerialName("comebackDice")
+    val comebackDice: Int = 0,
+    @SerialName("hasUsedSayNo")
+    val hasUsedSayNo: Boolean = false,
+    // Clever Features
     val cleverAbilities: CleverAbilities = CleverAbilities(),
     // Fortunate Features
     val fortunateOptions: FortunateOptions = FortunateOptions()

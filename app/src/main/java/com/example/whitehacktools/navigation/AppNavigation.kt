@@ -8,18 +8,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.whitehacktools.data.CharacterStore
-import com.example.whitehacktools.model.AttributeArray
-import com.example.whitehacktools.model.AttributeGroupPair
-import com.example.whitehacktools.model.BraveAbilities
-import com.example.whitehacktools.model.CleverAbilities
-import com.example.whitehacktools.model.FortunateOptions
-import com.example.whitehacktools.model.Gear
-import com.example.whitehacktools.model.PlayerCharacter
-import com.example.whitehacktools.model.WiseMiracles
+import com.example.whitehacktools.model.*
 import com.example.whitehacktools.ui.models.CharacterTab
-import com.example.whitehacktools.ui.screens.CharacterDetailScreen
-import com.example.whitehacktools.ui.screens.CharacterFormScreen
-import com.example.whitehacktools.ui.screens.CharacterListScreen
+import com.example.whitehacktools.ui.screens.*
 import kotlinx.coroutines.launch
 import java.util.UUID
 
@@ -139,7 +130,9 @@ fun AppNavigation(
                     initialStrongCombatOptions = character.strongCombatOptions,
                     initialConflictLoot = character.conflictLoot,
                     initialWiseMiracleSlots = character.wiseMiracleSlots ?: emptyList(),
-                    initialBraveAbilities = character.braveAbilities ?: BraveAbilities(),
+                    initialBraveQuirkOptions = character.braveQuirkOptions ?: BraveQuirkOptions(),
+                    initialComebackDice = character.comebackDice,
+                    initialHasUsedSayNo = character.hasUsedSayNo,
                     initialCleverAbilities = character.cleverAbilities ?: CleverAbilities(),
                     initialFortunateOptions = character.fortunateOptions ?: FortunateOptions(),
                     initialWeapons = character.weapons ?: emptyList(),
@@ -213,7 +206,9 @@ fun AppNavigation(
                     initialStrongCombatOptions = character?.strongCombatOptions,
                     initialConflictLoot = character?.conflictLoot,
                     initialWiseMiracleSlots = character?.wiseMiracleSlots ?: emptyList(),
-                    initialBraveAbilities = character?.braveAbilities ?: BraveAbilities(),
+                    initialBraveQuirkOptions = character?.braveQuirkOptions ?: BraveQuirkOptions(),
+                    initialComebackDice = character?.comebackDice ?: 0,
+                    initialHasUsedSayNo = character?.hasUsedSayNo ?: false,
                     initialCleverAbilities = character?.cleverAbilities ?: CleverAbilities(),
                     initialFortunateOptions = character?.fortunateOptions ?: FortunateOptions(),
                     initialWeapons = character?.weapons ?: emptyList(),

@@ -28,37 +28,39 @@ private val characterClasses = listOf(
 @Composable
 fun CharacterFormScreen(
     id: String = "",
-    initialName: String,
-    initialPlayerName: String,
-    initialCharacterClass: String,
-    initialLevel: Int,
-    initialVocation: String,
-    initialSpecies: String,
-    initialAffiliations: List<String>,
-    initialLanguages: List<String>,
-    initialUseDefaultAttributes: Boolean,
-    initialStrength: Int,
-    initialAgility: Int,
-    initialToughness: Int,
-    initialIntelligence: Int,
-    initialWillpower: Int,
-    initialCharisma: Int,
-    initialCurrentHP: Int,
-    initialMaxHP: Int,
-    initialMovement: Int,
-    initialSaveColor: String,
-    initialCoinsOnHand: Int,
-    initialStashedCoins: Int,
-    initialExperience: Int,
-    initialCorruption: Int,
-    initialNotes: String,
+    initialName: String = "",
+    initialPlayerName: String = "",
+    initialCharacterClass: String = "",
+    initialLevel: Int = 1,
+    initialVocation: String = "",
+    initialSpecies: String = "",
+    initialAffiliations: List<String> = emptyList(),
+    initialLanguages: List<String> = emptyList(),
+    initialUseDefaultAttributes: Boolean = false,
+    initialStrength: Int = 10,
+    initialAgility: Int = 10,
+    initialToughness: Int = 10,
+    initialIntelligence: Int = 10,
+    initialWillpower: Int = 10,
+    initialCharisma: Int = 10,
+    initialCurrentHP: Int = 0,
+    initialMaxHP: Int = 0,
+    initialMovement: Int = 30,
+    initialSaveColor: String = "",
+    initialCoinsOnHand: Int = 0,
+    initialStashedCoins: Int = 0,
+    initialExperience: Int = 0,
+    initialCorruption: Int = 0,
+    initialNotes: String = "",
     initialCustomAttributeArray: AttributeArray? = null,
     initialAttributeGroupPairs: List<AttributeGroupPair> = emptyList(),
     initialAttunementSlots: List<AttunementSlot> = emptyList(),
     initialStrongCombatOptions: StrongCombatOptions? = null,
     initialConflictLoot: ConflictLoot? = null,
     initialWiseMiracleSlots: List<WiseMiracleSlot> = emptyList(),
-    initialBraveAbilities: BraveAbilities = BraveAbilities(),
+    initialBraveQuirkOptions: BraveQuirkOptions = BraveQuirkOptions(),
+    initialComebackDice: Int = 0,
+    initialHasUsedSayNo: Boolean = false,
     initialCleverAbilities: CleverAbilities = CleverAbilities(),
     initialFortunateOptions: FortunateOptions = FortunateOptions(),
     initialWeapons: List<Weapon> = emptyList(),
@@ -118,7 +120,9 @@ fun CharacterFormScreen(
     var wiseMiracleSlots by remember { mutableStateOf(initialWiseMiracleSlots) }
 
     // Brave Features
-    var braveAbilities by remember { mutableStateOf(initialBraveAbilities) }
+    var braveQuirkOptions by remember { mutableStateOf(initialBraveQuirkOptions) }
+    var comebackDice by remember { mutableStateOf(initialComebackDice) }
+    var hasUsedSayNo by remember { mutableStateOf(initialHasUsedSayNo) }
 
     // Clever Features
     var cleverAbilities by remember { mutableStateOf(initialCleverAbilities) }
@@ -160,7 +164,9 @@ fun CharacterFormScreen(
             strongCombatOptions = strongCombatOptions,
             conflictLoot = conflictLoot,
             wiseMiracleSlots = wiseMiracleSlots,
-            braveAbilities = braveAbilities,
+            braveQuirkOptions = braveQuirkOptions,
+            comebackDice = comebackDice,
+            hasUsedSayNo = hasUsedSayNo,
             cleverAbilities = cleverAbilities,
             fortunateOptions = fortunateOptions,
             weapons = weapons,
@@ -176,8 +182,7 @@ fun CharacterFormScreen(
         coinsOnHand, stashedCoins, experience, corruption, notes,
         useDefaultAttributes, strength, agility, toughness, intelligence,
         willpower, charisma, customAttributeArray, attributeGroupPairs, attunementSlots,
-        strongCombatOptions, conflictLoot, wiseMiracleSlots, braveAbilities, cleverAbilities,
-        fortunateOptions, weapons, armor, gear
+        strongCombatOptions, conflictLoot, wiseMiracleSlots, braveQuirkOptions, comebackDice, hasUsedSayNo, cleverAbilities, fortunateOptions, weapons, armor, gear
     ) {
         tempCharacter = PlayerCharacter(
             id = id,
@@ -211,7 +216,9 @@ fun CharacterFormScreen(
             strongCombatOptions = strongCombatOptions,
             conflictLoot = conflictLoot,
             wiseMiracleSlots = wiseMiracleSlots,
-            braveAbilities = braveAbilities,
+            braveQuirkOptions = braveQuirkOptions,
+            comebackDice = comebackDice,
+            hasUsedSayNo = hasUsedSayNo,
             cleverAbilities = cleverAbilities,
             fortunateOptions = fortunateOptions,
             weapons = weapons,
@@ -266,7 +273,9 @@ fun CharacterFormScreen(
                                     strongCombatOptions = strongCombatOptions,
                                     conflictLoot = conflictLoot,
                                     wiseMiracleSlots = wiseMiracleSlots,
-                                    braveAbilities = braveAbilities,
+                                    braveQuirkOptions = braveQuirkOptions,
+                                    comebackDice = comebackDice,
+                                    hasUsedSayNo = hasUsedSayNo,
                                     cleverAbilities = cleverAbilities,
                                     fortunateOptions = fortunateOptions.updateForLevel(level.toIntOrNull() ?: 1),
                                     weapons = weapons,
@@ -400,8 +409,12 @@ fun CharacterFormScreen(
                             "Brave" -> BraveFormCard(
                                 characterClass = characterClass,
                                 level = level.toIntOrNull() ?: 1,
-                                braveAbilities = braveAbilities,
-                                onBraveAbilitiesChanged = { braveAbilities = it },
+                                braveQuirkOptions = braveQuirkOptions,
+                                comebackDice = comebackDice,
+                                hasUsedSayNo = hasUsedSayNo,
+                                onBraveQuirkOptionsChanged = { braveQuirkOptions = it },
+                                onComebackDiceChanged = { comebackDice = it },
+                                onHasUsedSayNoChanged = { hasUsedSayNo = it },
                                 modifier = Modifier.fillMaxWidth()
                             )
                             "Clever" -> CleverFormCard(

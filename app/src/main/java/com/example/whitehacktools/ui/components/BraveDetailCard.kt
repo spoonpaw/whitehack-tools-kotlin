@@ -131,17 +131,21 @@ fun BraveDetailCard(
                             .padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Text(
-                            text = "Comeback Dice",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
-                        )
-
-                        Text(
-                            text = "Current Dice: ${character.braveAbilities.comebackDice}",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Medium
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Comeback Dice:",
+                                style = MaterialTheme.typography.bodyLarge,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = character.comebackDice.toString(),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                        }
 
                         Column(
                             modifier = Modifier.fillMaxWidth(),
@@ -191,15 +195,13 @@ fun BraveDetailCard(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Say No Power",
-                                style = MaterialTheme.typography.titleMedium,
+                                text = "Say No Power:",
+                                style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.Bold
                             )
-                            
                             Text(
-                                text = if (character.braveAbilities.hasSayNoPower) "Available" else "Used",
-                                style = MaterialTheme.typography.titleSmall,
-                                fontWeight = FontWeight.Medium
+                                text = if (character.hasUsedSayNo) "Used" else "Available",
+                                style = MaterialTheme.typography.bodyLarge
                             )
                         }
 
@@ -246,57 +248,34 @@ fun BraveDetailCard(
                         Text(
                             text = "Quirks",
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
                         )
 
-                        repeat(availableSlots) { index ->
-                            Card(
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(8.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                                )
-                            ) {
+                        character.braveQuirkOptions.slots.take(availableSlots).forEachIndexed { index, slot ->
+                            if (slot.quirk != null) {
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(12.dp),
-                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                        .padding(vertical = 4.dp)
                                 ) {
                                     Text(
-                                        text = "Quirk ${index + 1}",
-                                        style = MaterialTheme.typography.titleSmall,
+                                        text = "${index + 1}. ${slot.quirk.displayName}",
+                                        style = MaterialTheme.typography.bodyLarge,
                                         fontWeight = FontWeight.Medium
                                     )
+                                    
+                                    Text(
+                                        text = slot.quirk.description,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+                                    )
 
-                                    val quirk = character.braveAbilities.quirkSlots.getOrNull(index)?.quirk
-                                    if (quirk != null) {
+                                    if (slot.quirk == BraveQuirk.PROTECT_ALLY && slot.protectedAllyName.isNotEmpty()) {
                                         Text(
-                                            text = quirk.displayName,
+                                            text = "Protected Ally: ${slot.protectedAllyName}",
                                             style = MaterialTheme.typography.bodyMedium,
-                                            fontWeight = FontWeight.Medium
-                                        )
-
-                                        Text(
-                                            text = quirk.description,
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                                        )
-
-                                        if (quirk == BraveQuirk.PROTECT_ALLY) {
-                                            val allyName = character.braveAbilities.quirkSlots[index].protectedAllyName
-                                            if (allyName.isNotEmpty()) {
-                                                Text(
-                                                    text = "Protected Ally: $allyName",
-                                                    style = MaterialTheme.typography.bodyMedium
-                                                )
-                                            }
-                                        }
-                                    } else {
-                                        Text(
-                                            text = "No Quirk Selected",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                            modifier = Modifier.padding(start = 16.dp, top = 4.dp)
                                         )
                                     }
                                 }
