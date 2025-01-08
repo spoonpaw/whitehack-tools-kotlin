@@ -13,6 +13,7 @@ import com.example.whitehacktools.model.AttributeGroupPair
 import com.example.whitehacktools.model.BraveAbilities
 import com.example.whitehacktools.model.CleverAbilities
 import com.example.whitehacktools.model.FortunateOptions
+import com.example.whitehacktools.model.Gear
 import com.example.whitehacktools.model.PlayerCharacter
 import com.example.whitehacktools.model.WiseMiracles
 import com.example.whitehacktools.ui.models.CharacterTab
@@ -139,6 +140,8 @@ fun AppNavigation(
                 initialCleverAbilities = character?.cleverAbilities ?: CleverAbilities(),
                 initialFortunateOptions = character?.fortunateOptions ?: FortunateOptions(),
                 initialWeapons = character?.weapons ?: emptyList(),
+                initialArmor = character?.armor ?: emptyList(),
+                initialGear = character?.gear ?: emptyList(),
                 initialTab = selectedTab,
                 onNavigateBack = { tab -> 
                     if (characterId == "new") {

@@ -62,6 +62,8 @@ data class PlayerCharacter(
     val weapons: List<Weapon> = emptyList(),
     @Contextual
     val armor: List<Armor> = emptyList(),
+    @Contextual
+    val gear: List<Gear> = emptyList(),
     // Additional Info
     val experience: Int = 0,
     val corruption: Int = 0,
