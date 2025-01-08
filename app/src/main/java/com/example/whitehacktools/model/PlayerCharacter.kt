@@ -101,6 +101,15 @@ data class PlayerCharacter(
         )
     }
 
+    fun calculateInitiativeBonus(): Int {
+        if (!useDefaultAttributes) return 0
+        return when {
+            agility >= 16 -> 2
+            agility >= 13 -> 1
+            else -> 0
+        }
+    }
+
     // Calculate defense value from equipped armor
     fun calculateDefenseValue(): Int {
         return armor.filter { it.isEquipped }.sumOf { it.df + it.bonus }

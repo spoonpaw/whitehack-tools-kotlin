@@ -52,10 +52,10 @@ fun CombatDetailCard(
             label = "Movement",
             value = character.movement.toString()
         )
-        
+
         DetailItem(
             label = "Initiative Bonus",
-            value = character.initiativeBonus.toString()
+            value = "+${character.calculateInitiativeBonus()}"
         )
         
         DetailItem(
