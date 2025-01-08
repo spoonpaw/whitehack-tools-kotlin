@@ -21,12 +21,12 @@ fun GroupsDetailCard(
     ) {
         DetailItem(
             label = "Vocation",
-            value = character.vocation.ifEmpty { "None" }
+            value = character.effectiveVocation.ifEmpty { "None" }
         )
         
         DetailItem(
             label = "Species",
-            value = character.species.ifEmpty { "None" }
+            value = character.effectiveSpecies.ifEmpty { "None" }
         )
 
         OutlinedCard(
@@ -55,7 +55,7 @@ fun GroupsDetailCard(
                     modifier = Modifier.padding(start = 4.dp)
                 )
 
-                if (character.affiliations.isEmpty()) {
+                if (character.effectiveAffiliations.isEmpty()) {
                     Text(
                         text = "No affiliations added",
                         style = MaterialTheme.typography.bodyMedium,
@@ -63,7 +63,7 @@ fun GroupsDetailCard(
                         modifier = Modifier.padding(start = 4.dp)
                     )
                 } else {
-                    character.affiliations.forEach { affiliation ->
+                    character.effectiveAffiliations.forEach { affiliation ->
                         DetailItem(
                             label = "",
                             value = affiliation,

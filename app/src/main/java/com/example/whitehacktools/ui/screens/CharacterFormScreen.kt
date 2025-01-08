@@ -340,11 +340,11 @@ fun CharacterFormScreen(
                         Spacer(modifier = Modifier.height(16.dp))
                         
                         GroupsFormCard(
-                            vocation = vocation,
+                            vocation = tempCharacter.effectiveVocation ?: "",
                             onVocationChange = { vocation = it },
-                            species = species,
+                            species = tempCharacter.effectiveSpecies ?: "",
                             onSpeciesChange = { species = it },
-                            affiliations = affiliations,
+                            affiliations = tempCharacter.effectiveAffiliations ?: emptyList(),
                             onAffiliationsChange = { affiliations = it },
                             attributeGroupPairs = attributeGroupPairs,
                             onAttributeGroupPairsChange = { attributeGroupPairs = it },

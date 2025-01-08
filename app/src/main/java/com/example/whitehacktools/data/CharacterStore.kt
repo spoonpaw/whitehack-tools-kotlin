@@ -15,23 +15,41 @@ class CharacterStore(private val context: Context) {
     companion object {
         private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "characters")
         private val CHARACTERS_KEY = stringPreferencesKey("characters")
+        private val json = Json {
+            ignoreUnknownKeys = true  // Ignore fields we don't have in our model
+            encodeDefaults = true     // Include default values in JSON
+            coerceInputValues = true  // Try to coerce values to the right type
+        }
     }
 
     val characters: Flow<List<PlayerCharacter>> = context.dataStore.data
         .map { preferences ->
             val charactersJson = preferences[CHARACTERS_KEY] ?: "[]"
             try {
-                Json.decodeFromString<List<PlayerCharacter>>(charactersJson)
+                json.decodeFromString<List<PlayerCharacter>>(charactersJson)
                     .map { it.fixOutOfRangeAttributes() }
                     .map { it.validateWiseMiracles() }
+                    .map { character ->
+                        // If we have Swift format data but Kotlin format is empty, copy the data over
+                        character.copy(
+                            vocation = character.effectiveVocation,
+                            species = character.effectiveSpecies,
+                            affiliations = character.effectiveAffiliations,
+                            // Clear Swift format fields after copying to avoid duplication
+                            vocationGroup = null,
+                            speciesGroup = null,
+                            affiliationGroups = null
+                        )
+                    }
             } catch (e: Exception) {
+                android.util.Log.e("CharacterStore", "Error decoding characters", e)
                 emptyList()
             }
         }
 
     suspend fun saveCharacters(characters: List<PlayerCharacter>) {
         context.dataStore.edit { preferences ->
-            preferences[CHARACTERS_KEY] = Json.encodeToString(
+            preferences[CHARACTERS_KEY] = json.encodeToString(
                 characters
                     .map { it.fixOutOfRangeAttributes() }
                     .map { it.validateWiseMiracles() }

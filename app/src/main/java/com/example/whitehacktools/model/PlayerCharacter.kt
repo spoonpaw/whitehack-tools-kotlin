@@ -3,6 +3,7 @@ package com.example.whitehacktools.model
 import java.util.UUID
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Contextual
+import kotlinx.serialization.SerialName
 import com.example.whitehacktools.model.Weapon
 import com.example.whitehacktools.model.Armor
 import com.example.whitehacktools.model.Gear
@@ -64,8 +65,11 @@ data class PlayerCharacter(
     // Groups
     val vocation: String = "",
     val species: String = "",
+    @SerialName("vocationGroup")  // Match Swift field name
     val vocationGroup: String? = null,  // Swift format
+    @SerialName("speciesGroup")   // Match Swift field name
     val speciesGroup: String? = null,   // Swift format
+    @SerialName("affiliationGroups")  // Match Swift field name
     val affiliationGroups: List<String>? = null, // Swift format
     val affiliations: List<String> = emptyList(), // Kotlin format
     val languages: List<String> = emptyList(),
@@ -145,6 +149,15 @@ data class PlayerCharacter(
 
     val wiseMiracles: WiseMiracles
         get() = WiseMiracles(slots = wiseMiracleSlots)
+
+    val effectiveVocation: String
+        get() = vocationGroup ?: vocation
+
+    val effectiveSpecies: String
+        get() = speciesGroup ?: species
+
+    val effectiveAffiliations: List<String>
+        get() = affiliationGroups ?: affiliations
 
     fun calculateInitiativeBonus(): Int {
         if (!useDefaultAttributes) return 0
