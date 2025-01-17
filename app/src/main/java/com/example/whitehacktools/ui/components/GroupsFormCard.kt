@@ -36,27 +36,18 @@ fun GroupsFormCard(
     var selectedGroupType by remember { mutableStateOf<GroupType?>(null) }
     var selectedGroupName by remember { mutableStateOf("") }
 
+    var currentVocation by remember { mutableStateOf(vocation) }
+    var currentSpecies by remember { mutableStateOf(species) }
+
     SectionCard(
         title = "Groups",
         modifier = modifier
     ) {
         OutlinedTextField(
-            value = vocation,
+            value = currentVocation,
             onValueChange = { newVocation ->
+                currentVocation = newVocation
                 onVocationChange(newVocation)
-                // Remove pairs using vocation if it's cleared, otherwise update them
-                val updatedPairs = if (newVocation.isBlank()) {
-                    attributeGroupPairs.filter { it.groupType != GroupType.Vocation }
-                } else {
-                    attributeGroupPairs.map { pair ->
-                        if (pair.groupType == GroupType.Vocation) {
-                            pair.copy(groupName = newVocation)
-                        } else {
-                            pair
-                        }
-                    }
-                }
-                onAttributeGroupPairsChange(updatedPairs)
             },
             label = { Text("Vocation") },
             modifier = Modifier.fillMaxWidth(),
@@ -66,23 +57,27 @@ fun GroupsFormCard(
             )
         )
 
-        OutlinedTextField(
-            value = species,
-            onValueChange = { newSpecies ->
-                onSpeciesChange(newSpecies)
-                // Remove pairs using species if it's cleared, otherwise update them
-                val updatedPairs = if (newSpecies.isBlank()) {
-                    attributeGroupPairs.filter { it.groupType != GroupType.Species }
-                } else {
-                    attributeGroupPairs.map { pair ->
-                        if (pair.groupType == GroupType.Species) {
-                            pair.copy(groupName = newSpecies)
-                        } else {
-                            pair
-                        }
+        DisposableEffect(currentVocation) {
+            val updatedPairs = if (currentVocation.isBlank()) {
+                attributeGroupPairs.filter { it.groupType != GroupType.Vocation }
+            } else {
+                attributeGroupPairs.map { pair ->
+                    if (pair.groupType == GroupType.Vocation) {
+                        pair.copy(groupName = currentVocation)
+                    } else {
+                        pair
                     }
                 }
-                onAttributeGroupPairsChange(updatedPairs)
+            }
+            onAttributeGroupPairsChange(updatedPairs)
+            onDispose { }
+        }
+
+        OutlinedTextField(
+            value = currentSpecies,
+            onValueChange = { newSpecies ->
+                currentSpecies = newSpecies
+                onSpeciesChange(newSpecies)
             },
             label = { Text("Species") },
             modifier = Modifier.fillMaxWidth(),
@@ -91,6 +86,22 @@ fun GroupsFormCard(
                 unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
             )
         )
+
+        DisposableEffect(currentSpecies) {
+            val updatedPairs = if (currentSpecies.isBlank()) {
+                attributeGroupPairs.filter { it.groupType != GroupType.Species }
+            } else {
+                attributeGroupPairs.map { pair ->
+                    if (pair.groupType == GroupType.Species) {
+                        pair.copy(groupName = currentSpecies)
+                    } else {
+                        pair
+                    }
+                }
+            }
+            onAttributeGroupPairsChange(updatedPairs)
+            onDispose { }
+        }
 
         OutlinedCard(
             modifier = Modifier
@@ -355,8 +366,8 @@ fun GroupsFormCard(
                         // Group dropdown
                         var groupExpanded by remember { mutableStateOf(false) }
                         val availableGroups = buildList {
-                            if (vocation.isNotEmpty()) add(GroupType.Vocation to vocation)
-                            if (species.isNotEmpty()) add(GroupType.Species to species)
+                            if (currentVocation.isNotEmpty()) add(GroupType.Vocation to currentVocation)
+                            if (currentSpecies.isNotEmpty()) add(GroupType.Species to currentSpecies)
                             addAll(affiliations.map { GroupType.Affiliation to it })
                         }
 
