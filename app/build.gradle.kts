@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.whitehacktools"
+    namespace = "com.netartisancollective.whitehacktools"
     compileSdk = 34
 
     defaultConfig {

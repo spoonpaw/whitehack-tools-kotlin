@@ -13,7 +13,7 @@
         android:theme="@style/Theme.WhitehackTools"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name="com.netartisancollective.whitehacktools.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.WhitehackTools">
