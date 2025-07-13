@@ -10,10 +10,10 @@ import com.example.whitehacktools.model.Gear
 
 private fun getWeightWithSlots(weight: String): String {
     return when (weight) {
-        "No size" -> "No size (0/slot)"
+        "No size" -> "No size (100/slot)"
         "Minor" -> "Minor (2/slot)"
-        "Regular" -> "Regular (4/slot)"
-        "Heavy" -> "Heavy (6/slot)"
+        "Regular" -> "Regular (1 slot)"
+        "Heavy" -> "Heavy (2 slots)"
         else -> weight
     }
 }

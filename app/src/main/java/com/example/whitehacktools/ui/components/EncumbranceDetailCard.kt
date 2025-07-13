@@ -37,6 +37,9 @@ fun EncumbranceDetailCard(
     val maxSlots = remember(character) { calculateMaxSlots(character) }
     val excessSlots = maxOf(0.0, usedSlots - maxSlots)
     val burdenLevel = remember(excessSlots) { calculateBurdenLevel(excessSlots) }
+    val hasUnequippedContainer = remember(character) {
+        character.gear.any { it.isContainer && !it.isEquipped && !it.isStashed }
+    }
     val movementPenalty = (5 * ((excessSlots + 1) / 2)).toInt()
     val base = character.movement
     val movementRates = remember(base) {
@@ -141,6 +144,14 @@ fun EncumbranceDetailCard(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    if (hasUnequippedContainer && !character.gear.any { it.isContainer && it.isEquipped }) {
+                        Text(
+                            text = "You have a container in your inventory. Equip it to increase max slots.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.tertiary,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
                 }
 
                 if (excessSlots > 0) {
@@ -329,8 +340,12 @@ private fun calculateUsedSlots(character: PlayerCharacter): Double {
     
     // Add non-stashed armor slots
     for (armor in character.armor.filter { !it.isStashed }) {
-        val slots = armor.weight.toDouble() * armor.quantity
-        Log.d("Encumbrance", "Armor: ${armor.name} x${armor.quantity} = $slots slots")
+        val slots = if (armor.isMagical) {
+            armor.weight.toDouble() * armor.quantity
+        } else {
+            armor.df.toDouble() * armor.quantity
+        }
+        Log.d("Encumbrance", "Armor: ${armor.name} x${armor.quantity} = $slots slots (isMagical: ${armor.isMagical})")
         total += slots
     }
     
