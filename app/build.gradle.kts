@@ -6,12 +6,12 @@ plugins {
 
 android {
     namespace = "com.netartisancollective.whitehacktools"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.netartisancollective.whitehacktools"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 3
         versionName = "1.0.2"
 
