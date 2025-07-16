@@ -15,6 +15,10 @@ fun CombatDetailCard(
     Log.d("CombatDetailCard", "Character Level: ${character.level}")
     
     val stats = AdvancementTables.stats(character.characterClass, character.level)
+    var attackValue = stats.attackValue
+    if (character.characterClass.equals("Strong", ignoreCase = true) && character.strength >= 13) {
+        attackValue += 1
+    }
     Log.d("CombatDetailCard", "Attack Value from Tables: ${stats.attackValue}")
     
     SectionCard(
@@ -33,7 +37,7 @@ fun CombatDetailCard(
         
         DetailItem(
             label = "Attack Value",
-            value = stats.attackValue.toString()
+            value = attackValue.toString()
         )
         
         DetailItem(
