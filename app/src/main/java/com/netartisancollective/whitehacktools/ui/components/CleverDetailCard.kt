@@ -322,8 +322,8 @@ fun CleverDetailCard(
                                             style = MaterialTheme.typography.bodySmall
                                         )
 
-                                        // Combat Die Status
-                                        if (knack == CleverKnack.PROTECT_ALLY) {
+                                        // Combat Die Status (Combat Exploiter can switch d6 for d10 once per battle)
+                                        if (knack == CleverKnack.COMBAT_EXPLOITER) {
                                             Row(
                                                 modifier = Modifier
                                                     .fillMaxWidth()
@@ -332,7 +332,7 @@ fun CleverDetailCard(
                                                 verticalAlignment = Alignment.CenterVertically
                                             ) {
                                                 Text(
-                                                    text = "Combat Die: ${if (!slot.hasUsedCombatDie) "Available" else "Used"}",
+                                                    text = "d10 Damage Switch: ${if (!slot.hasUsedCombatDie) "Available" else "Used"}",
                                                     style = MaterialTheme.typography.bodyMedium
                                                 )
                                             }

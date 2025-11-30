@@ -97,7 +97,7 @@ fun CleverFormCard(
                                 expanded = expanded,
                                 onDismissRequest = { expanded = false }
                             ) {
-                                CleverKnack.values().forEach { knack ->
+                                CleverKnack.entries.forEach { knack ->
                                     if (!isKnackActive(cleverKnackOptions, knack) || knack == slot.knack) {
                                         DropdownMenuItem(
                                             text = { Text(knack.displayName) },
@@ -130,29 +130,31 @@ fun CleverFormCard(
                         }
 
                         if (slot.knack != null) {
-                            // Combat Die Usage Switch
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 8.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = "Used Combat Die:",
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                                Switch(
-                                    checked = slot.hasUsedCombatDie,
-                                    onCheckedChange = { checked ->
-                                        val newSlots = cleverKnackOptions.slots.toMutableList()
-                                        newSlots[index] = slot.copy(hasUsedCombatDie = checked)
-                                        onCleverKnackOptionsChanged(CleverKnackOptions(
-                                            slots = newSlots,
-                                            hasUsedUnorthodoxBonus = cleverKnackOptions.hasUsedUnorthodoxBonus
-                                        ))
-                                    }
-                                )
+                            // d10 Damage Switch (only for Combat Exploiter)
+                            if (slot.knack == CleverKnack.COMBAT_EXPLOITER) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = "Used d10 Damage Switch:",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                    Switch(
+                                        checked = slot.hasUsedCombatDie,
+                                        onCheckedChange = { checked ->
+                                            val newSlots = cleverKnackOptions.slots.toMutableList()
+                                            newSlots[index] = slot.copy(hasUsedCombatDie = checked)
+                                            onCleverKnackOptionsChanged(CleverKnackOptions(
+                                                slots = newSlots,
+                                                hasUsedUnorthodoxBonus = cleverKnackOptions.hasUsedUnorthodoxBonus
+                                            ))
+                                        }
+                                    )
+                                }
                             }
 
                             Text(
