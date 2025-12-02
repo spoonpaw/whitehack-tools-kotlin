@@ -25,6 +25,9 @@ import com.netartisancollective.whitehacktools.data.CharacterStore
 import kotlinx.coroutines.launch
 import android.util.Log
 import android.widget.Toast
+import com.netartisancollective.whitehacktools.util.CrossPlatformConverter
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,16 +58,35 @@ fun CharacterListScreen(
 
     fun parseCharactersFromJson(jsonString: String): List<PlayerCharacter> {
         return try {
+            Log.d("Import", "Parsing JSON data...")
+            
+            // First, parse as raw JSON to detect format
+            val rawJson = Json.parseToJsonElement(jsonString)
+            
+            // Check if this is Swift format and convert if needed
+            val finalJsonString = if (CrossPlatformConverter.isSwiftFormat(rawJson)) {
+                Log.d("Import", "🔄 Detected Swift format - converting to Kotlin format...")
+                val converted = CrossPlatformConverter.convertFromSwift(rawJson)
+                when (converted) {
+                    is JsonArray -> Json.encodeToString(JsonArray.serializer(), converted)
+                    is JsonObject -> Json.encodeToString(JsonObject.serializer(), converted)
+                    else -> jsonString
+                }
+            } else {
+                Log.d("Import", "✅ Detected native Kotlin format - no conversion needed")
+                jsonString
+            }
+            
             Log.d("Import", "Attempting to parse as list...")
             try {
                 // Parse and generate new IDs for each character
-                json.decodeFromString<List<PlayerCharacter>>(jsonString).map { it.copyWithNewId() }
+                json.decodeFromString<List<PlayerCharacter>>(finalJsonString).map { it.copyWithNewId() }
             } catch (e: Exception) {
                 Log.e("Import", "Failed to parse as list: ${e.message}", e)
                 Log.d("Import", "Attempting to parse as single character...")
                 try {
                     // Try parsing as single character and generate new ID
-                    listOf(json.decodeFromString<PlayerCharacter>(jsonString).copyWithNewId())
+                    listOf(json.decodeFromString<PlayerCharacter>(finalJsonString).copyWithNewId())
                 } catch (e: Exception) {
                     Log.e("Import", "Failed to parse as single character: ${e.message}", e)
                     throw Exception("Invalid character data format: ${e.message}")
